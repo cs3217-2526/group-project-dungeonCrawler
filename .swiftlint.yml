@@ -2,7 +2,6 @@ excluded:
   - Pods
 
 opt_in_rules:
-  - anyobject_protocol
   - array_init
   - attributes
   - closure_body_length
@@ -20,7 +19,6 @@ opt_in_rules:
   - empty_xctest_method
   - expiring_todo
   - explicit_init
-  - explicit_self
   - fallthrough
   - fatal_error_message
   - file_name
@@ -65,11 +63,14 @@ opt_in_rules:
   - unneeded_parentheses_in_closure_argument
   - unowned_variable_capture
   - untyped_error_in_catch
-  - unused_declaration
-  - unused_import
   - vertical_parameter_alignment_on_call
   - xct_specific_matcher
   - yoda_condition
+
+analyzer_rules:
+  - explicit_self
+  - unused_import
+  - unused_declaration
 
 disabled_rules:
   - attributes
