@@ -48,6 +48,10 @@ public final class World {
     public func removeComponent<T: Component>(type: T.Type, from entity: Entity) {
         components.remove(type: type, from: entity)
     }
+    
+    public func modifyComponent<T: Component>(type: T.Type, for entity: Entity, body: (inout T) -> Void) {
+        components.modify(type: type, for: entity, body: body)
+    }
 
     // MARK: - Querying helpers used by Systems
 
