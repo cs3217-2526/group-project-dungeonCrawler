@@ -7,7 +7,7 @@
 
 import Foundation
 
-// Owns and orchestrates every system in the game. Maintains a sorted array so insertion order never matters.
+/// Owns and orchestrates every system in the game. Maintains a sorted array so insertion order never matters.
 public final class SystemManager {
 
     private var _systems: [System] = []

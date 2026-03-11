@@ -10,7 +10,7 @@ import Foundation
 public final class ComponentStorage {
 
     // MARK: - Internal layout
-    // [type key → [entity → component instance]]
+    /// [type key → [entity → component instance]]
     private var _storage: [ObjectIdentifier: [Entity: AnyObject]] = [:]
 
     // MARK: - Public API
