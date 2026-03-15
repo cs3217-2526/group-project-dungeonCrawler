@@ -1,0 +1,8 @@
+{
+  "label": "Entity Component System",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Our game engine utilizes an ECS architecture to decouple data (Components) from logic (Systems), ensuring high performance and modularity in our iOS dungeon crawler."
+  }
+}
