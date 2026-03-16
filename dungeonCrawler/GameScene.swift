@@ -14,6 +14,9 @@ class GameScene: SKScene {
     private let world         = World()
     private let systemManager = SystemManager()
 
+    // MARK: - Camera
+    private let cam = SKCameraNode()
+
     // MARK: - Input provider
     private let touchInput = TouchJoystickInputProvider()
     
@@ -38,11 +41,19 @@ class GameScene: SKScene {
 
         view?.isMultipleTouchEnabled = true
         
+        setupCamera()
         setupJoystickHUD()
         setupSystems()
         spawnInitialEntities()
     }
     
+    // MARK: - Camera setup
+
+    private func setupCamera() {
+        self.camera = cam
+        addChild(cam)
+    }
+
     // MARK: - Joystick HUD setup
 
     private func setupJoystickHUD() {
@@ -53,7 +64,7 @@ class GameScene: SKScene {
             base.lineWidth   = 2
             base.zPosition   = 50
             base.isHidden    = true
-            addChild(base)
+            cam.addChild(base)
         }
 
         // Handle knob — slightly more opaque
@@ -63,7 +74,7 @@ class GameScene: SKScene {
             handle.lineWidth   = 2
             handle.zPosition   = 51
             handle.isHidden    = true
-            addChild(handle)
+            cam.addChild(handle)
         }
     }
 
@@ -74,6 +85,7 @@ class GameScene: SKScene {
         systemManager.register(InputSystem(inputProvider: touchInput))
         systemManager.register(MovementSystem())
         systemManager.register(CollisionSystem())
+        systemManager.register(CameraSystem(cameraNode: cam))
         systemManager.register(RenderSystem(scene: self))
     }
 
