@@ -73,6 +73,7 @@ class GameScene: SKScene {
     private func setupSystems() {
         systemManager.register(InputSystem(inputProvider: touchInput))
         systemManager.register(MovementSystem())
+        systemManager.register(CollisionSystem())
         systemManager.register(RenderSystem(scene: self))
     }
 
