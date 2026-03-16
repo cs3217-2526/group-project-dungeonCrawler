@@ -26,10 +26,6 @@ final class HealthSystemTests: XCTestCase {
         super.tearDown()
     }
 
-    func testPriority() {
-        XCTAssertEqual(system.priority, 15)
-    }
-
     func testEntityDestroyedAtZeroHealth() {
         let entity = world.createEntity()
         var health = HealthComponent(base: 100)

@@ -10,7 +10,13 @@ import Foundation
 public struct HealthComponent: StatProvidable {
     public var value: StatValue
 
-    public init(base: Float, max: Float? = nil) {
-        self.value = StatValue(base: base, max: max ?? base)
+    /// Use when Starting Health is Max Health
+    public init(base: Float) {
+        self.value = StatValue(base: base, max: base)
+    }
+
+    /// Use when Max Health is different from Starting Health
+    public init(base: Float, max: Float) {
+        self.value = StatValue(base: base, max: max)
     }
 }

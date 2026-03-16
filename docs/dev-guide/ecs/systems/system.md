@@ -15,7 +15,6 @@ A system contains the **game logic**. Each frame, `SystemManager` calls every re
 
 ```swift
 public protocol System: AnyObject {
-    /// Lower values run first. Use steps of 10 to leave room for insertions.
     var priority: Int { get }
 
     /// Called once per game-loop tick.
