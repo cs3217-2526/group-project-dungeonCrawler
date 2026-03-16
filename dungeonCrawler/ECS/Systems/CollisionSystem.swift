@@ -10,12 +10,23 @@ public final class CollisionSystem: System {
 
     public func update(deltaTime: Double, world: World) {
         // OBB collision detection and resolution using SAT (Separating Axis Theorem).
-        
+
     }
-    
-    public func minimumTranslationVector(
+
+    /// Returns true if the two OBBs overlap.
+    public func checkCollision(
         transformA: TransformComponent, boxA: CollisionBoxComponent,
-        transformB: TransformComponent, boxB: CollisionBoxComponent) {
-        
+        transformB: TransformComponent, boxB: CollisionBoxComponent
+    ) -> Bool {
+        minimumTranslationVector(transformA: transformA, boxA: boxA,
+                                  transformB: transformB, boxB: boxB) != nil
+    }
+
+    /// Returns the MTV that separates A from B, or nil if they do not overlap.
+    private func minimumTranslationVector(
+        transformA: TransformComponent, boxA: CollisionBoxComponent,
+        transformB: TransformComponent, boxB: CollisionBoxComponent
+    ) -> SIMD2<Float>? {
+        nil // TODO: implement SAT
     }
 }

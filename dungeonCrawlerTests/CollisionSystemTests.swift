@@ -39,7 +39,7 @@ final class CollisionSystemTests: XCTestCase {
         let boxComp = CollisionBoxComponent(size: box)
 
         // Exactly touching (distance == sum of half-widths) is NOT a collision.
-        XCTAssertNil(collisionSystem.minimumTranslationVector(
+        XCTAssertFalse(collisionSystem.checkCollision(
             transformA: transformA, boxA: boxComp,
             transformB: transformB, boxB: boxComp
         ))
@@ -51,7 +51,7 @@ final class CollisionSystemTests: XCTestCase {
         let transformB = TransformComponent(position: SIMD2<Float>(100, 0), scale: 1)
         let boxComp = CollisionBoxComponent(size: box)
 
-        XCTAssertNil(collisionSystem.minimumTranslationVector(
+        XCTAssertFalse(collisionSystem.checkCollision(
             transformA: transformA, boxA: boxComp,
             transformB: transformB, boxB: boxComp
         ))

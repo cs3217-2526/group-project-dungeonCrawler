@@ -19,4 +19,7 @@ public final class CollisionBoxComponent: Component {
     public init(size: SIMD2<Float> = .zero) {
         self.size = size
     }
+
+    // Workaround for iOS 26 Swift runtime bug (MarkerItem::create allocator mismatch).
+    deinit {}
 }

@@ -33,4 +33,7 @@ public final class TransformComponent: Component {
     public var cgPoint: CGPoint {
         CGPoint(x: CGFloat(position.x), y: CGFloat(position.y))
     }
+
+    // Workaround for iOS 26 Swift runtime bug (MarkerItem::create allocator mismatch).
+    deinit {}
 }
