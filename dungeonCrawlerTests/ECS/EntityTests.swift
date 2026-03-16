@@ -9,6 +9,7 @@ import Foundation
 import XCTest
 @testable import dungeonCrawler
  
+@MainActor
 final class EntityTests: XCTestCase {
     
     func testEntityCreation() {

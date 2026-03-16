@@ -10,6 +10,7 @@ import XCTest
 import simd
 @testable import dungeonCrawler
  
+@MainActor
 final class InputSystemTests: XCTestCase {
     
     var world: World!

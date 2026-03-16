@@ -75,6 +75,7 @@ final class OrderTrackingSystem: System {
  
 // MARK: - SystemManager Tests
  
+@MainActor
 final class SystemManagerTests: XCTestCase {
     
     var systemManager: SystemManager!
