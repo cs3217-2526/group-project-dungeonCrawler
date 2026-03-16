@@ -16,6 +16,7 @@ A lightweight, string-backed key that identifies a stat.
 ```swift
 public struct StatType: RawRepresentable, Hashable {
     public let rawValue: String
+    public init(rawValue: String) { self.rawValue = rawValue }
 }
 ```
 
@@ -90,10 +91,10 @@ let hp = statsComponent.value(for: .health)   // StatValue? Optional type
 
 ### `HealthSystem` (priority 15)
 
-Runs every frame. Destroys any entity whose `health.current` has reached zero or below.
+Runs every frame. Destroys any entity whose `health.current` has reached zero or below. E.g.
 
 ```
-InputSystem (10) → HealthSystem (15) → MovementSystem (20) → RenderSystem (30)
+InputSystem (10) → HealthSystem (15) → MovementSystem (20) → RenderSystem (100)
 ```
 
 It does not apply damage itself — that is another system's job.

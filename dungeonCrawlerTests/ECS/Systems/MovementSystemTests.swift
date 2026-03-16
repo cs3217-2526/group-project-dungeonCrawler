@@ -7,7 +7,7 @@ import XCTest
 import simd
 @testable import dungeonCrawler
 
-final class MovementSystemStatsTests: XCTestCase {
+final class MovementSystemTests: XCTestCase {
 
     private var world: World!
     private let system = MovementSystem()
