@@ -9,7 +9,7 @@ import Foundation
 
 public final class HealthSystem: System {
 
-    public let priority: Int = 15
+    public let priority: Int = 20
 
     public init() {}
 
