@@ -14,8 +14,8 @@ public final class MovementSystem: System {
 
     // MARK: - Configuration
 
-    // TODO: move to StatsComponent when that's added.
-    public var defaultMoveSpeed: Float = 90
+    /// Used only when an entity has no StatsComponent; keeps the system safe for non-stat entities.
+    public var fallbackMoveSpeed: Float = 90
 
     // TODO: Remove when CollisionSystem handles wall entities.
     public var worldBounds: (minX: Float, maxX: Float, minY: Float, maxY: Float) = (
@@ -35,8 +35,15 @@ public final class MovementSystem: System {
         )
 
         for (entity, input, _) in movable {
+            let speed: Float
+            if let sc = world.getComponent(type: StatsComponent.self, for: entity),
+               let sv = sc.value(for: .moveSpeed) {
+                speed = sv.current
+            } else {
+                speed = fallbackMoveSpeed
+            }
             world.modifyComponent(type: VelocityComponent.self, for: entity) { velocity in
-                velocity.linear = input.moveDirection * defaultMoveSpeed
+                velocity.linear = input.moveDirection * speed
             }
             
             guard let velocity = world.getComponent(type: VelocityComponent.self, for: entity)
