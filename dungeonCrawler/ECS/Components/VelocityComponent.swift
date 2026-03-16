@@ -8,7 +8,7 @@
 import Foundation
 import simd
 
-public final class VelocityComponent: Component {
+public struct VelocityComponent: Component {
     /// Desired movement vector in world-space points-per-second.
     public var linear: SIMD2<Float>
 

@@ -10,7 +10,7 @@ import simd // simd is used for integration with SpriteKit
 import CoreGraphics
 
 /// "Where is this entity and which way does it face?"
-public final class TransformComponent: Component {
+public struct TransformComponent: Component {
     public var position: SIMD2<Float>
 
     /// Rotation in radians. 0 = facing right, positive = counter-clockwise.

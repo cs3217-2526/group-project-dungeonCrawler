@@ -28,6 +28,13 @@ public final class World {
         components.removeAll(from: entity)
         _entities.remove(entity)
     }
+    
+    public func destroyAllEntities() {
+        for entity in _entities {
+            components.removeAll(from: entity)
+        }
+        _entities.removeAll()
+    }
 
     public func isAlive(entity: Entity) -> Bool {
         _entities.contains(entity)

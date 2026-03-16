@@ -7,7 +7,7 @@
 
 import Foundation
 
-public final class SpriteComponent: Component {
+public struct SpriteComponent: Component {
     /// Asset catalog name for the entity's texture.
     public var textureName: String
 
