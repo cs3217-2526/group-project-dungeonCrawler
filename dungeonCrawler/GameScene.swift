@@ -82,7 +82,10 @@ class GameScene: SKScene {
     private func spawnInitialEntities() {
         let shortSide   = Float(min(size.width, size.height))
         let knightScale = shortSide * 0.04 / 48.0   // assumes 48pt base texture size
+        let enemyScale = shortSide * 0.04 / 48.0   // follow knight scale for now
         EntityFactory.makePlayer(in: world, at: .zero, scale: knightScale)
+        EntityFactory.makeEnemy(in: world, at: SIMD2(100, 100), type:
+                .charger, scale: enemyScale * EnemyType.charger.scale)
     }
 
     // MARK: - Touch forwarding
