@@ -44,4 +44,32 @@ public enum EntityFactory {
 
         return entity
     }
+
+    // MARK: - Enemy
+    //
+    // Components attached:
+    //   • TransformComponent  — position, rotation, scale
+    //   • SpriteComponent     — visual representation
+    //   • EnemyTagComponent   — marks this as an enemy and holds its type
+    //
+    // Future additions:
+    //   • HealthComponent      — current / max health
+    //   • CombatStatsComponent — attack damage, attack speed
+    //   • AIComponent          — movement behaviour state machine
+
+    @discardableResult
+    public static func makeEnemy(
+        in world: World,
+        at position: SIMD2<Float>,
+        type: EnemyType,
+        scale: Float = 1
+    ) -> Entity {
+        let entity = world.createEntity()
+
+        world.addComponent(component: TransformComponent(position: position, rotation: 0, scale: scale), to: entity)
+        world.addComponent(component: SpriteComponent(textureName: type.textureName), to: entity)
+        world.addComponent(component: EnemyTagComponent(enemyType: type), to: entity)
+
+        return entity
+    }
 }
