@@ -76,4 +76,20 @@ public final class World {
             return (entity, a, b)
         }
     }
+
+    /// Returns every living entity that has all three of `T`, `U`, and `V` (3-way join).
+    public func entities<T: Component, U: Component, V: Component>(
+        with typeA: T.Type,
+        and typeB: U.Type,
+        and typeC: V.Type
+    ) -> [(entity: Entity, a: T, b: U, c: V)] {
+        components.entities(with: typeA).compactMap { entity in
+            guard
+                let a = components.get(type: typeA, for: entity),
+                let b = components.get(type: typeB, for: entity),
+                let c = components.get(type: typeC, for: entity)
+            else { return nil }
+            return (entity, a, b, c)
+        }
+    }
 }

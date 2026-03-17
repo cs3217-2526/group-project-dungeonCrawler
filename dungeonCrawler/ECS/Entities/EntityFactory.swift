@@ -18,9 +18,10 @@ public enum EntityFactory {
     //   • InputComponent      — intent from InputSystem
     //   • SpriteComponent     — visual representation
     //   • PlayerTag           — marks this as the human-controlled entity
+    //   • HealthComponent     — current/max HP; entity destroyed at 0
+    //   • MoveSpeedComponent  — scalar speed used by MovementSystem
     //
     // Future additions:
-    //   • StatsComponent      — health, attack, speed modifier
     //   • WeaponSlotComponent — which weapon is equipped
     //   • AnimationComponent  — walk / idle / attack animation state machine
     
@@ -38,7 +39,9 @@ public enum EntityFactory {
         world.addComponent(component: InputComponent(), to: entity)
         world.addComponent(component: SpriteComponent(textureName: textureName), to: entity)
         world.addComponent(component: PlayerTagComponent(), to: entity)
-        
+        world.addComponent(component: HealthComponent(base: 100), to: entity)
+        world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
+
         return entity
     }
 

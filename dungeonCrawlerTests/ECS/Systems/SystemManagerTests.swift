@@ -259,9 +259,9 @@ final class SystemManagerTests: XCTestCase {
         world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
         world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(10, 0)), to: entity)
         world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-        
+        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+
         let movementSystem = MovementSystem()
-        movementSystem.defaultMoveSpeed = 100
         systemManager.register(movementSystem)
         
         systemManager.update(deltaTime: 0.1, world: world)
@@ -276,9 +276,10 @@ final class SystemManagerTests: XCTestCase {
         world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: InputComponent(), to: entity)
-        
+        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+
         mockInput.rawMoveVector = SIMD2<Float>(1, 0)
-        
+
         let movementSystem = MovementSystem()
         let inputSystem = InputSystem(inputProvider: mockInput)
         
