@@ -9,30 +9,30 @@ import Foundation
 
 /// Type-erased protocol so ComponentStorage can hold stores of any T in one dictionary.
 protocol AnyComponentStore {
-    mutating func removeValue(for entity: Entity)
+    mutating func removeValue(for entityID: EntityID)
 }
 
-/// Concrete per-type store. Holds one [Entity: T] dictionary.
+/// Concrete per-type store. Holds one [EntityID: T] dictionary.
 struct ComponentStore<T: Component>: AnyComponentStore {
 
-    private var _data: [Entity: T] = [:]
+    private var _data: [EntityID: T] = [:]
 
-    mutating func add(_ component: T, for entity: Entity) {
-        _data[entity] = component
+    mutating func add(_ component: T, for entityID: EntityID) {
+        _data[entityID] = component
     }
 
-    func get(for entity: Entity) -> T? {
-        _data[entity]
+    func get(for entityID: EntityID) -> T? {
+        _data[entityID]
     }
 
-    mutating func modify(for entity: Entity, _ body: (inout T) -> Void) {
-        guard _data[entity] != nil else { return }
-        body(&_data[entity]!)
+    mutating func modify(for entityID: EntityID, _ body: (inout T) -> Void) {
+        guard _data[entityID] != nil else { return }
+        body(&_data[entityID]!)
     }
 
-    mutating func removeValue(for entity: Entity) {
-        _data[entity] = nil
+    mutating func removeValue(for entityID: EntityID) {
+        _data[entityID] = nil
     }
 
-    var entities: [Entity] { Array(_data.keys) }
+    var entities: [Entity] { _data.keys.map { Entity(id: $0) } }
 }

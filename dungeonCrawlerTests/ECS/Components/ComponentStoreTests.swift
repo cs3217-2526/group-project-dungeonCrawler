@@ -34,16 +34,16 @@ final class ComponentStoreTests: XCTestCase {
     
     func testAddComponent() {
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
-        store.add(transform, for: entity1)
+        store.add(transform, for: entity1.id)
         
-        let retrieved = store.get(for: entity1)
+        let retrieved = store.get(for: entity1.id)
         XCTAssertNotNil(retrieved)
         XCTAssertEqual(retrieved?.position.x, 10)
         XCTAssertEqual(retrieved?.position.y, 20)
     }
     
     func testGetNonexistentComponent() {
-        let retrieved = store.get(for: entity1)
+        let retrieved = store.get(for: entity1.id)
         XCTAssertNil(retrieved)
     }
     
@@ -51,21 +51,21 @@ final class ComponentStoreTests: XCTestCase {
         let transform1 = TransformComponent(position: SIMD2<Float>(10, 20))
         let transform2 = TransformComponent(position: SIMD2<Float>(30, 40))
         
-        store.add(transform1, for: entity1)
-        store.add(transform2, for: entity2)
+        store.add(transform1, for: entity1.id)
+        store.add(transform2, for: entity2.id)
         
-        XCTAssertEqual(store.get(for: entity1)?.position.x, 10)
-        XCTAssertEqual(store.get(for: entity2)?.position.x, 30)
+        XCTAssertEqual(store.get(for: entity1.id)?.position.x, 10)
+        XCTAssertEqual(store.get(for: entity2.id)?.position.x, 30)
     }
     
     func testOverwriteComponent() {
         let transform1 = TransformComponent(position: SIMD2<Float>(10, 20))
         let transform2 = TransformComponent(position: SIMD2<Float>(30, 40))
         
-        store.add(transform1, for: entity1)
-        store.add(transform2, for: entity1)
+        store.add(transform1, for: entity1.id)
+        store.add(transform2, for: entity1.id)
         
-        let retrieved = store.get(for: entity1)
+        let retrieved = store.get(for: entity1.id)
         XCTAssertEqual(retrieved?.position.x, 30)
         XCTAssertEqual(retrieved?.position.y, 40)
     }
@@ -74,38 +74,38 @@ final class ComponentStoreTests: XCTestCase {
     
     func testModifyComponent() {
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
-        store.add(transform, for: entity1)
+        store.add(transform, for: entity1.id)
         
-        store.modify(for: entity1) { component in
+        store.modify(for: entity1.id) { component in
             component.position.x = 100
         }
         
-        let retrieved = store.get(for: entity1)
+        let retrieved = store.get(for: entity1.id)
         XCTAssertEqual(retrieved?.position.x, 100)
         XCTAssertEqual(retrieved?.position.y, 20)
     }
     
     func testModifyNonexistentComponent() {
         // Should not crash when modifying a component that doesn't exist
-        store.modify(for: entity1) { component in
+        store.modify(for: entity1.id) { component in
             component.position.x = 100
         }
         
         // Component should still not exist
-        XCTAssertNil(store.get(for: entity1))
+        XCTAssertNil(store.get(for: entity1.id))
     }
     
     func testModifyMultipleFields() {
         let transform = TransformComponent(position: SIMD2<Float>(10, 20), rotation: 0, scale: 1)
-        store.add(transform, for: entity1)
+        store.add(transform, for: entity1.id)
         
-        store.modify(for: entity1) { component in
+        store.modify(for: entity1.id) { component in
             component.position = SIMD2<Float>(100, 200)
             component.rotation = 3.14
             component.scale = 2.0
         }
         
-        let retrieved = store.get(for: entity1)
+        let retrieved = store.get(for: entity1.id)
         let r = try? XCTUnwrap(retrieved)
         XCTAssertNotNil(r)
         if let r {
@@ -120,33 +120,33 @@ final class ComponentStoreTests: XCTestCase {
     
     func testRemoveComponent() {
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
-        store.add(transform, for: entity1)
+        store.add(transform, for: entity1.id)
         
-        XCTAssertNotNil(store.get(for: entity1))
+        XCTAssertNotNil(store.get(for: entity1.id))
         
-        store.removeValue(for: entity1)
+        store.removeValue(for: entity1.id)
         
-        XCTAssertNil(store.get(for: entity1))
+        XCTAssertNil(store.get(for: entity1.id))
     }
     
     func testRemoveNonexistentComponent() {
         // Should not crash when removing a component that doesn't exist
-        store.removeValue(for: entity1)
-        XCTAssertNil(store.get(for: entity1))
+        store.removeValue(for: entity1.id)
+        XCTAssertNil(store.get(for: entity1.id))
     }
     
     func testRemoveOneOfMany() {
         let transform1 = TransformComponent(position: SIMD2<Float>(10, 20))
         let transform2 = TransformComponent(position: SIMD2<Float>(30, 40))
         
-        store.add(transform1, for: entity1)
-        store.add(transform2, for: entity2)
+        store.add(transform1, for: entity1.id)
+        store.add(transform2, for: entity2.id)
         
-        store.removeValue(for: entity1)
+        store.removeValue(for: entity1.id)
         
-        XCTAssertNil(store.get(for: entity1))
-        XCTAssertNotNil(store.get(for: entity2))
-        XCTAssertEqual(store.get(for: entity2)?.position.x, 30)
+        XCTAssertNil(store.get(for: entity1.id))
+        XCTAssertNotNil(store.get(for: entity2.id))
+        XCTAssertEqual(store.get(for: entity2.id)?.position.x, 30)
     }
     
     // MARK: - Entities
@@ -159,8 +159,8 @@ final class ComponentStoreTests: XCTestCase {
         let transform1 = TransformComponent(position: SIMD2<Float>(10, 20))
         let transform2 = TransformComponent(position: SIMD2<Float>(30, 40))
         
-        store.add(transform1, for: entity1)
-        store.add(transform2, for: entity2)
+        store.add(transform1, for: entity1.id)
+        store.add(transform2, for: entity2.id)
         
         let entities = store.entities
         XCTAssertEqual(entities.count, 2)
@@ -172,10 +172,10 @@ final class ComponentStoreTests: XCTestCase {
         let transform1 = TransformComponent(position: SIMD2<Float>(10, 20))
         let transform2 = TransformComponent(position: SIMD2<Float>(30, 40))
         
-        store.add(transform1, for: entity1)
-        store.add(transform2, for: entity2)
+        store.add(transform1, for: entity1.id)
+        store.add(transform2, for: entity2.id)
         
-        store.removeValue(for: entity1)
+        store.removeValue(for: entity1.id)
         
         let entities = store.entities
         XCTAssertEqual(entities.count, 1)

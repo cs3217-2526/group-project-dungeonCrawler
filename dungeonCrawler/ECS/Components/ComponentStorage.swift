@@ -30,29 +30,29 @@ public final class ComponentStorage {
 
     public func add<T: Component>(component: T, to entity: Entity) {
         var s = store(for: T.self)
-        s.add(component, for: entity)
+        s.add(component, for: entity.id)
         setStore(s, for: T.self)
     }
 
-    public func get<T: Component>(type: T.Type, for entity: Entity) -> T? {
-        store(for: type).get(for: entity)
+    func get<T: Component>(type: T.Type, for entity: Entity) -> T? {
+        store(for: type).get(for: entity.id)
     }
     
     public func modify<T: Component>(type: T.Type, for entity: Entity, body: (inout T) -> Void) {
         var s = store(for: type)
-        s.modify(for: entity, body)
+        s.modify(for: entity.id, body)
         setStore(s, for: type)
     }
 
     public func remove<T: Component>(type: T.Type, from entity: Entity) {
         var s = store(for: type)
-        s.removeValue(for: entity)
+        s.removeValue(for: entity.id)
         setStore(s, for: type)
     }
 
     public func removeAll(from entity: Entity) {
         for key in _stores.keys {
-            _stores[key]!.removeValue(for: entity)
+            _stores[key]!.removeValue(for: entity.id)
         }
     }
 
