@@ -1,41 +1,31 @@
-//
-//  CameraSystem.swift
-//  dungeonCrawler
-//
-//
-//  Created by gerteck on 17/3/26.
-//
 
 import Foundation
-import SpriteKit
 import simd
 
-/// Shifts scene's SKCameraNode toward entity tagged with
-/// CameraFocusComponent. Runs before rendering (100).
+/// Lerps the ViewportComponent position toward the entity tagged with
+/// CameraFocusComponent. Runs before rendering (priority 90).
 public final class CameraSystem: System {
 
     public let priority: Int = 90
 
-    private weak var cameraNode: SKCameraNode?
-
-    /// Controls speed smoothness. Higher = snappier / more instant (~20). 
+    /// Controls smoothness. Higher = snappier (~20 is nearly instant).
     public var smoothing: Float = 8.0
 
-    public init(cameraNode: SKCameraNode) {
-        self.cameraNode = cameraNode
-    }
+    public init() {}
 
     public func update(deltaTime: Double, world: World) {
-        guard let cameraNode else { return }
-
+        // Find the entity to follow.
         let targets = world.entities(with: TransformComponent.self, and: CameraFocusComponent.self)
         guard let (_, transform, focus) = targets.first else { return }
+        let targetPosition = transform.position + focus.lookOffset
 
-        let target  = transform.position + focus.lookOffset
-        let current = SIMD2<Float>(Float(cameraNode.position.x), Float(cameraNode.position.y))
-        let t       = min(smoothing * Float(deltaTime), 1.0)
-        let next    = current + (target - current) * t
+        // Find the camera entity and lerp its ViewportComponent toward the target.
+        let cameras = world.entities(with: ViewportComponent.self)
+        guard let cameraEntity = cameras.first else { return }
 
-        cameraNode.position = CGPoint(x: CGFloat(next.x), y: CGFloat(next.y))
+        world.modifyComponent(type: ViewportComponent.self, for: cameraEntity) { viewport in
+            let t = min(smoothing * Float(deltaTime), 1.0)
+            viewport.position = viewport.position + (targetPosition - viewport.position) * t
+        }
     }
 }
