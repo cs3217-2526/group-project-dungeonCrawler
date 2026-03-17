@@ -30,14 +30,14 @@ final class MoveSpeedComponentTests: XCTestCase {
 
     func testMoveSpeedIsComponent() {
         let entity = world.createEntity()
-        world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
         let retrieved = world.getComponent(type: MoveSpeedComponent.self, for: entity)
         XCTAssertNotNil(retrieved)
     }
 
     func testMoveSpeedCanBeModified() {
         let entity = world.createEntity()
-        world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
         world.modifyComponent(type: MoveSpeedComponent.self, for: entity) { speed in
             speed.value.current = 150
         }

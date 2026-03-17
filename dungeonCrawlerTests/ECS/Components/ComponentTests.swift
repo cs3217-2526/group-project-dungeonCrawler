@@ -178,6 +178,18 @@ final class ComponentTests: XCTestCase {
         // Just verify it can be created (it's a marker component with no data)
         XCTAssertNotNil(tag)
     }
+
+    func testPlayerTagComponentSingletonConstraint() {
+        let entity1 = world.createEntity()
+        let entity2 = world.createEntity()
+        // should be ok to add the first player, if there is error should crash
+        try! world.addComponent(component: PlayerTagComponent(), to: entity1)
+        
+        XCTAssertThrowsError(try world.addComponent(component: PlayerTagComponent(), to: entity2)) {
+            let error = $0 as? ComponentValidationError
+            XCTAssertEqual(error, .singletonComponentAlreadyExists)
+        }
+    }
     
     // MARK: - Component Integration Tests
     
@@ -185,11 +197,11 @@ final class ComponentTests: XCTestCase {
         let entity = world.createEntity()
         
         // Add all component types
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity)
-        world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(5, 5)), to: entity)
-        world.addComponent(component: InputComponent(), to: entity)
-        world.addComponent(component: SpriteComponent(textureName: "player"), to: entity)
-        world.addComponent(component: PlayerTagComponent(), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity)
+        try! world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(5, 5)), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: SpriteComponent(textureName: "player"), to: entity)
+        try! world.addComponent(component: PlayerTagComponent(), to: entity)
         
         // Verify all components exist
         XCTAssertNotNil(world.getComponent(type: TransformComponent.self, for: entity))
@@ -213,7 +225,7 @@ final class ComponentTests: XCTestCase {
     func testComponentMutation() {
         let entity = world.createEntity()
         
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
         
         world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
             transform.position = SIMD2<Float>(100, 200)

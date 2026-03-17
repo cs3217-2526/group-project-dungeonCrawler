@@ -47,7 +47,8 @@ public final class World {
 
     // MARK: - Component convenience pass-throughs
 
-    public func addComponent<T: Component>(component: T, to entity: Entity) {
+    public func addComponent<T: Component>(component: T, to entity: Entity) throws {
+        Validator.validate(component: component, in: self)
         components.add(component: component, to: entity)
     }
 

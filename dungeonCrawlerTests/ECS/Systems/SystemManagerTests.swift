@@ -256,10 +256,10 @@ final class SystemManagerTests: XCTestCase {
     
     func testIntegrationWithMovementSystem() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(10, 0)), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(10, 0)), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
 
         let movementSystem = MovementSystem()
         systemManager.register(movementSystem)
@@ -273,10 +273,10 @@ final class SystemManagerTests: XCTestCase {
     
     func testMultipleSystemsWorkingTogether() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
 
         mockInput.rawMoveVector = SIMD2<Float>(1, 0)
 

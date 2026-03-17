@@ -35,7 +35,7 @@ final class InputSystemTests: XCTestCase {
     
     func testMoveDirectionPropagation() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.rawMoveVector = SIMD2<Float>(1, 0)
         
@@ -49,7 +49,7 @@ final class InputSystemTests: XCTestCase {
     
     func testAimDirectionPropagation() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.rawAimVector = SIMD2<Float>(0, 1)
         
@@ -63,7 +63,7 @@ final class InputSystemTests: XCTestCase {
     
     func testShootPressedPropagation() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.isShootPressed = true
         
@@ -76,7 +76,7 @@ final class InputSystemTests: XCTestCase {
     
     func testAllInputsPropagatedTogether() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.rawMoveVector = SIMD2<Float>(1, 1)
         mockProvider.rawAimVector = SIMD2<Float>(-1, 0)
@@ -97,9 +97,9 @@ final class InputSystemTests: XCTestCase {
         let entity2 = world.createEntity()
         let entity3 = world.createEntity()
         
-        world.addComponent(component: InputComponent(), to: entity1)
-        world.addComponent(component: InputComponent(), to: entity2)
-        world.addComponent(component: InputComponent(), to: entity3)
+        try! world.addComponent(component: InputComponent(), to: entity1)
+        try! world.addComponent(component: InputComponent(), to: entity2)
+        try! world.addComponent(component: InputComponent(), to: entity3)
         
         mockProvider.rawMoveVector = SIMD2<Float>(0.5, -0.5)
         
@@ -118,8 +118,8 @@ final class InputSystemTests: XCTestCase {
         let entityWithInput = world.createEntity()
         let entityWithoutInput = world.createEntity()
         
-        world.addComponent(component: InputComponent(), to: entityWithInput)
-        world.addComponent(component: TransformComponent(), to: entityWithoutInput)
+        try! world.addComponent(component: InputComponent(), to: entityWithInput)
+        try! world.addComponent(component: TransformComponent(), to: entityWithoutInput)
         
         mockProvider.rawMoveVector = SIMD2<Float>(1, 0)
         
@@ -139,7 +139,7 @@ final class InputSystemTests: XCTestCase {
     
     func testInputChangesAcrossFrames() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         // Frame 1: Moving right
         mockProvider.rawMoveVector = SIMD2<Float>(1, 0)
@@ -165,7 +165,7 @@ final class InputSystemTests: XCTestCase {
     
     func testShootButtonToggle() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         // Frame 1: Not shooting
         mockProvider.isShootPressed = false
@@ -193,7 +193,7 @@ final class InputSystemTests: XCTestCase {
     
     func testZeroInputVectors() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.rawMoveVector = SIMD2<Float>(0, 0)
         mockProvider.rawAimVector = SIMD2<Float>(0, 0)
@@ -207,7 +207,7 @@ final class InputSystemTests: XCTestCase {
     
     func testLargeInputValues() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.rawMoveVector = SIMD2<Float>(1000, 1000)
         mockProvider.rawAimVector = SIMD2<Float>(-1000, -1000)
@@ -221,7 +221,7 @@ final class InputSystemTests: XCTestCase {
     
     func testNegativeInputValues() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.rawMoveVector = SIMD2<Float>(-1, -1)
         mockProvider.rawAimVector = SIMD2<Float>(-0.5, -0.5)
@@ -244,7 +244,7 @@ final class InputSystemTests: XCTestCase {
     
     func testDeltaTimeDoesNotAffectInput() {
         let entity = world.createEntity()
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         mockProvider.rawMoveVector = SIMD2<Float>(1, 0)
         

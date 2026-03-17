@@ -30,7 +30,7 @@ final class HealthSystemTests: XCTestCase {
         let entity = world.createEntity()
         var health = HealthComponent(base: 100)
         health.value.current = 0
-        world.addComponent(component: health, to: entity)
+        try! world.addComponent(component: health, to: entity)
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -41,7 +41,7 @@ final class HealthSystemTests: XCTestCase {
         let entity = world.createEntity()
         var health = HealthComponent(base: 100)
         health.value.current = -1
-        world.addComponent(component: health, to: entity)
+        try! world.addComponent(component: health, to: entity)
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -52,7 +52,7 @@ final class HealthSystemTests: XCTestCase {
         let entity = world.createEntity()
         var health = HealthComponent(base: 100)
         health.value.current = 50
-        world.addComponent(component: health, to: entity)
+        try! world.addComponent(component: health, to: entity)
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -63,7 +63,7 @@ final class HealthSystemTests: XCTestCase {
         let entity = world.createEntity()
         var health = HealthComponent(base: 100)
         health.value.current = 1
-        world.addComponent(component: health, to: entity)
+        try! world.addComponent(component: health, to: entity)
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -74,12 +74,12 @@ final class HealthSystemTests: XCTestCase {
         let dead = world.createEntity()
         var deadHealth = HealthComponent(base: 100)
         deadHealth.value.current = 0
-        world.addComponent(component: deadHealth, to: dead)
+        try! world.addComponent(component: deadHealth, to: dead)
 
         let alive = world.createEntity()
         var aliveHealth = HealthComponent(base: 100)
         aliveHealth.value.current = 50
-        world.addComponent(component: aliveHealth, to: alive)
+        try! world.addComponent(component: aliveHealth, to: alive)
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -89,7 +89,7 @@ final class HealthSystemTests: XCTestCase {
 
     func testEntityWithoutHealthComponentUnaffected() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(), to: entity)
+        try! world.addComponent(component: TransformComponent(), to: entity)
 
         // Should not crash
         system.update(deltaTime: 0.016, world: world)
@@ -105,8 +105,8 @@ final class HealthSystemTests: XCTestCase {
         let entity = world.createEntity()
         var health = HealthComponent(base: 100)
         health.value.current = 0
-        world.addComponent(component: health, to: entity)
-        world.addComponent(component: TransformComponent(), to: entity)
+        try! world.addComponent(component: health, to: entity)
+        try! world.addComponent(component: TransformComponent(), to: entity)
 
         system.update(deltaTime: 0.016, world: world)
 

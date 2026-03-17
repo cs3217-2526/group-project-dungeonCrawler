@@ -46,7 +46,7 @@ final class HealthComponentTests: XCTestCase {
 
     func testHealthIsComponent() {
         let entity = world.createEntity()
-        world.addComponent(component: HealthComponent(base: 100), to: entity)
+        try! world.addComponent(component: HealthComponent(base: 100), to: entity)
         let retrieved = world.getComponent(type: HealthComponent.self, for: entity)
         XCTAssertNotNil(retrieved)
         XCTAssertEqual(retrieved!.value.current, 100, accuracy: Float(0.001))

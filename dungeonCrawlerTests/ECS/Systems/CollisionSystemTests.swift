@@ -25,8 +25,8 @@ final class CollisionSystemTests: XCTestCase {
     // TODO: add stats when ready
     private func makeCollidableEntity(at position: SIMD2<Float>, size: SIMD2<Float>, rotation: Float = 0) -> Entity {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: position, rotation: rotation, scale: 1), to: entity)
-        world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
+        try! world.addComponent(component: TransformComponent(position: position, rotation: rotation, scale: 1), to: entity)
+        try! world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
         return entity
     }
 

@@ -33,14 +33,17 @@ public enum EntityFactory {
         scale: Float = 1
     ) -> Entity {
         let entity = world.createEntity()
-        
-        world.addComponent(component: TransformComponent(position: position, rotation: 0, scale: scale), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(), to: entity)
-        world.addComponent(component: SpriteComponent(textureName: textureName), to: entity)
-        world.addComponent(component: PlayerTagComponent(), to: entity)
-        world.addComponent(component: HealthComponent(base: 100), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
+        do {
+            try world.addComponent(component: TransformComponent(position: position, rotation: 0, scale: scale), to: entity)
+            try world.addComponent(component: VelocityComponent(), to: entity)
+            try world.addComponent(component: InputComponent(), to: entity)
+            try world.addComponent(component: SpriteComponent(textureName: textureName), to: entity)
+            try world.addComponent(component: PlayerTagComponent(), to: entity)
+            try world.addComponent(component: HealthComponent(base: 100), to: entity)
+            try world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
+        } catch {
+            fatalError("Error adding component to player entity: \(error)")
+        }
 
         return entity
     }
@@ -65,10 +68,13 @@ public enum EntityFactory {
         scale: Float = 1
     ) -> Entity {
         let entity = world.createEntity()
-
-        world.addComponent(component: TransformComponent(position: position, rotation: 0, scale: scale), to: entity)
-        world.addComponent(component: SpriteComponent(textureName: type.textureName), to: entity)
-        world.addComponent(component: EnemyTagComponent(enemyType: type), to: entity)
+        do {
+            try world.addComponent(component: TransformComponent(position: position, rotation: 0, scale: scale), to: entity)
+            try world.addComponent(component: SpriteComponent(textureName: type.textureName), to: entity)
+            try world.addComponent(component: EnemyTagComponent(enemyType: type), to: entity)
+        } catch {
+            fatalError("Error adding component to enemy entity: \(error)")
+        }
 
         return entity
     }

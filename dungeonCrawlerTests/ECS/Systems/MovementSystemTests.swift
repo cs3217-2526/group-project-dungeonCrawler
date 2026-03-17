@@ -31,10 +31,10 @@ final class MovementSystemTests: XCTestCase {
     
     func testBasicMovement() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
 
         system.update(deltaTime: 0.1, world: world)
 
@@ -56,10 +56,10 @@ final class MovementSystemTests: XCTestCase {
 
         for direction in directions {
             let entity = world.createEntity()
-            world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-            world.addComponent(component: VelocityComponent(), to: entity)
-            world.addComponent(component: InputComponent(moveDirection: direction), to: entity)
-            world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
+            try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+            try! world.addComponent(component: VelocityComponent(), to: entity)
+            try! world.addComponent(component: InputComponent(moveDirection: direction), to: entity)
+            try! world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
 
             system.update(deltaTime: 0.1, world: world)
 
@@ -75,10 +75,10 @@ final class MovementSystemTests: XCTestCase {
     
     func testNoMovementWhenDirectionIsZero() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
 
         system.update(deltaTime: 0.1, world: world)
 
@@ -92,10 +92,10 @@ final class MovementSystemTests: XCTestCase {
     func testVelocityIsSetFromInput() {
         let speed: Float = 100
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
+        try! world.addComponent(component: TransformComponent(), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
 
         system.update(deltaTime: 0.1, world: world)
 
@@ -107,10 +107,10 @@ final class MovementSystemTests: XCTestCase {
     
     func testDifferentMoveSpeed() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 200), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 200), to: entity)
 
         system.update(deltaTime: 0.1, world: world)
 
@@ -126,10 +126,10 @@ final class MovementSystemTests: XCTestCase {
 
         for dt in deltaTimes {
             let entity = world.createEntity()
-            world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-            world.addComponent(component: VelocityComponent(), to: entity)
-            world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-            world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
+            try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+            try! world.addComponent(component: VelocityComponent(), to: entity)
+            try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+            try! world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
 
             system.update(deltaTime: dt, world: world)
 
@@ -142,10 +142,10 @@ final class MovementSystemTests: XCTestCase {
     func testAccumulatedMovementOverMultipleFrames() {
         let speed: Float = 100
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: speed), to: entity)
 
         // Simulate 10 frames
         for _ in 0..<10 {
@@ -161,10 +161,10 @@ final class MovementSystemTests: XCTestCase {
     
     func testWorldBoundsClampingMinX() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(-400, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(-1, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(-400, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(-1, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
 
         system.worldBounds = (minX: -500, maxX: 500, minY: -500, maxY: 500)
         system.update(deltaTime: 1.0, world: world) // Move far left
@@ -175,10 +175,10 @@ final class MovementSystemTests: XCTestCase {
     
     func testWorldBoundsClampingMaxX() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(400, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(400, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
 
         system.worldBounds = (minX: -500, maxX: 500, minY: -500, maxY: 500)
         system.update(deltaTime: 1.0, world: world) // Move far right
@@ -190,10 +190,10 @@ final class MovementSystemTests: XCTestCase {
     func testWorldBoundsClampingY() {
         // Test min Y
         let entity1 = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, -400)), to: entity1)
-        world.addComponent(component: VelocityComponent(), to: entity1)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, -1)), to: entity1)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity1)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, -400)), to: entity1)
+        try! world.addComponent(component: VelocityComponent(), to: entity1)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, -1)), to: entity1)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity1)
 
         system.worldBounds = (minX: -500, maxX: 500, minY: -500, maxY: 500)
         system.update(deltaTime: 1.0, world: world)
@@ -203,10 +203,10 @@ final class MovementSystemTests: XCTestCase {
 
         // Test max Y
         let entity2 = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 400)), to: entity2)
-        world.addComponent(component: VelocityComponent(), to: entity2)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, 1)), to: entity2)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity2)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 400)), to: entity2)
+        try! world.addComponent(component: VelocityComponent(), to: entity2)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, 1)), to: entity2)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity2)
 
         system.update(deltaTime: 1.0, world: world)
 
@@ -216,10 +216,10 @@ final class MovementSystemTests: XCTestCase {
     
     func testMovementWithinBounds() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 1)), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 1)), to: entity)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity)
 
         system.worldBounds = (minX: -500, maxX: 500, minY: -500, maxY: 500)
         system.update(deltaTime: 0.1, world: world)
@@ -235,8 +235,8 @@ final class MovementSystemTests: XCTestCase {
     
     func testEntityWithoutTransform() {
         let entity = world.createEntity()
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
         
         // Should not crash
         system.update(deltaTime: 0.1, world: world)
@@ -244,8 +244,8 @@ final class MovementSystemTests: XCTestCase {
     
     func testEntityWithoutVelocity() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
         
         // Should not crash, position should not change
         system.update(deltaTime: 0.1, world: world)
@@ -256,8 +256,8 @@ final class MovementSystemTests: XCTestCase {
     
     func testEntityWithoutInput() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
         
         // Should not crash, position should not change
         system.update(deltaTime: 0.1, world: world)
@@ -270,16 +270,16 @@ final class MovementSystemTests: XCTestCase {
     
     func testMultipleEntitiesMoving() {
         let entity1 = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity1)
-        world.addComponent(component: VelocityComponent(), to: entity1)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity1)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity1)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity1)
+        try! world.addComponent(component: VelocityComponent(), to: entity1)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity1)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity1)
 
         let entity2 = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity2)
-        world.addComponent(component: VelocityComponent(), to: entity2)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, 1)), to: entity2)
-        world.addComponent(component: MoveSpeedComponent(base: 100), to: entity2)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity2)
+        try! world.addComponent(component: VelocityComponent(), to: entity2)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(0, 1)), to: entity2)
+        try! world.addComponent(component: MoveSpeedComponent(base: 100), to: entity2)
 
         system.update(deltaTime: 0.1, world: world)
 
@@ -299,9 +299,9 @@ final class MovementSystemTests: XCTestCase {
 
     func testEntityWithoutMoveSpeedSkipped() {
         let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(5, 5)), to: entity)
-        world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(5, 5)), to: entity)
+        try! world.addComponent(component: VelocityComponent(), to: entity)
+        try! world.addComponent(component: InputComponent(moveDirection: SIMD2<Float>(1, 0)), to: entity)
         // No MoveSpeedComponent — entity should be skipped
 
         system.update(deltaTime: 0.1, world: world)

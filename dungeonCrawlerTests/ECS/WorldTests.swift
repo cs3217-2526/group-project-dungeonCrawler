@@ -57,8 +57,8 @@ final class WorldTests: XCTestCase {
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
         let velocity = VelocityComponent(linear: SIMD2<Float>(5, 5))
         
-        world.addComponent(component: transform, to: entity)
-        world.addComponent(component: velocity, to: entity)
+        try! world.addComponent(component: transform, to: entity)
+        try! world.addComponent(component: velocity, to: entity)
         
         world.destroyEntity(entity: entity)
         
@@ -71,9 +71,9 @@ final class WorldTests: XCTestCase {
         let entity2 = world.createEntity()
         let entity3 = world.createEntity()
         
-        world.addComponent(component: TransformComponent(), to: entity1)
-        world.addComponent(component: TransformComponent(), to: entity2)
-        world.addComponent(component: TransformComponent(), to: entity3)
+        try! world.addComponent(component: TransformComponent(), to: entity1)
+        try! world.addComponent(component: TransformComponent(), to: entity2)
+        try! world.addComponent(component: TransformComponent(), to: entity3)
         
         world.destroyAllEntities()
         
@@ -107,7 +107,7 @@ final class WorldTests: XCTestCase {
         let entity = world.createEntity()
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
         
-        world.addComponent(component: transform, to: entity)
+        try! world.addComponent(component: transform, to: entity)
         
         let retrieved = world.getComponent(type: TransformComponent.self, for: entity)
         XCTAssertNotNil(retrieved)
@@ -118,7 +118,7 @@ final class WorldTests: XCTestCase {
         let entity = world.createEntity()
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
         
-        world.addComponent(component: transform, to: entity)
+        try! world.addComponent(component: transform, to: entity)
         
         let retrieved = world.getComponent(type: TransformComponent.self, for: entity)
         XCTAssertEqual(retrieved?.position.x, 10)
@@ -135,7 +135,7 @@ final class WorldTests: XCTestCase {
         let entity = world.createEntity()
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
         
-        world.addComponent(component: transform, to: entity)
+        try! world.addComponent(component: transform, to: entity)
         
         world.modifyComponent(type: TransformComponent.self, for: entity) { component in
             component.position.x = 100
@@ -152,7 +152,7 @@ final class WorldTests: XCTestCase {
         let entity = world.createEntity()
         let transform = TransformComponent(position: SIMD2<Float>(10, 20))
         
-        world.addComponent(component: transform, to: entity)
+        try! world.addComponent(component: transform, to: entity)
         XCTAssertNotNil(world.getComponent(type: TransformComponent.self, for: entity))
         
         world.removeComponent(type: TransformComponent.self, from: entity)
@@ -166,9 +166,9 @@ final class WorldTests: XCTestCase {
         let entity2 = world.createEntity()
         let entity3 = world.createEntity()
         
-        world.addComponent(component: TransformComponent(), to: entity1)
-        world.addComponent(component: TransformComponent(), to: entity2)
-        world.addComponent(component: VelocityComponent(), to: entity3)
+        try! world.addComponent(component: TransformComponent(), to: entity1)
+        try! world.addComponent(component: TransformComponent(), to: entity2)
+        try! world.addComponent(component: VelocityComponent(), to: entity3)
         
         let entities = world.entities(with: TransformComponent.self)
         XCTAssertEqual(entities.count, 2)
@@ -190,15 +190,15 @@ final class WorldTests: XCTestCase {
         let entity3 = world.createEntity()
         
         // entity1: Transform + Velocity
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity1)
-        world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(1, 2)), to: entity1)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity1)
+        try! world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(1, 2)), to: entity1)
         
         // entity2: Transform only
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(30, 40)), to: entity2)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(30, 40)), to: entity2)
         
         // entity3: Transform + Velocity
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(50, 60)), to: entity3)
-        world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(3, 4)), to: entity3)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(50, 60)), to: entity3)
+        try! world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(3, 4)), to: entity3)
         
         let results = world.entities(with: TransformComponent.self, and: VelocityComponent.self)
         
@@ -230,8 +230,8 @@ final class WorldTests: XCTestCase {
         let entity1 = world.createEntity()
         let entity2 = world.createEntity()
         
-        world.addComponent(component: TransformComponent(), to: entity1)
-        world.addComponent(component: VelocityComponent(), to: entity2)
+        try! world.addComponent(component: TransformComponent(), to: entity1)
+        try! world.addComponent(component: VelocityComponent(), to: entity2)
         
         let results = world.entities(with: TransformComponent.self, and: VelocityComponent.self)
         XCTAssertEqual(results.count, 0)
@@ -245,9 +245,9 @@ final class WorldTests: XCTestCase {
         XCTAssertTrue(world.isAlive(entity: entity))
         
         // Add components
-        world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity)
-        world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(5, 5)), to: entity)
-        world.addComponent(component: InputComponent(), to: entity)
+        try! world.addComponent(component: TransformComponent(position: SIMD2<Float>(10, 20)), to: entity)
+        try! world.addComponent(component: VelocityComponent(linear: SIMD2<Float>(5, 5)), to: entity)
+        try! world.addComponent(component: InputComponent(), to: entity)
         
         // Verify components exist
         XCTAssertNotNil(world.getComponent(type: TransformComponent.self, for: entity))
@@ -277,19 +277,19 @@ final class WorldTests: XCTestCase {
     func testMultipleEntitiesWithDifferentArchetypes() {
         // Archetype 1: Player (Transform + Velocity + Input)
         let player = world.createEntity()
-        world.addComponent(component: TransformComponent(), to: player)
-        world.addComponent(component: VelocityComponent(), to: player)
-        world.addComponent(component: InputComponent(), to: player)
-        world.addComponent(component: PlayerTagComponent(), to: player)
+        try! world.addComponent(component: TransformComponent(), to: player)
+        try! world.addComponent(component: VelocityComponent(), to: player)
+        try! world.addComponent(component: InputComponent(), to: player)
+        try! world.addComponent(component: PlayerTagComponent(), to: player)
         
         // Archetype 2: Enemy (Transform + Velocity)
         let enemy = world.createEntity()
-        world.addComponent(component: TransformComponent(), to: enemy)
-        world.addComponent(component: VelocityComponent(), to: enemy)
+        try! world.addComponent(component: TransformComponent(), to: enemy)
+        try! world.addComponent(component: VelocityComponent(), to: enemy)
         
         // Archetype 3: Static prop (Transform only)
         let prop = world.createEntity()
-        world.addComponent(component: TransformComponent(), to: prop)
+        try! world.addComponent(component: TransformComponent(), to: prop)
         
         // Query for all movable entities (Transform + Velocity)
         let movable = world.entities(with: TransformComponent.self, and: VelocityComponent.self)
