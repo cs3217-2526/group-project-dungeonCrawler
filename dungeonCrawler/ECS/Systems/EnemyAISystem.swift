@@ -23,23 +23,34 @@ public final class EnemyAISystem: System {
 
         for (enemy, state, transform) in enemies {
             guard world.getComponent(type: KnockbackComponent.self, for: enemy) == nil else { continue }
+            guard world.getComponent(type: VelocityComponent.self, for: enemy) != nil else { continue }
+            guard world.getComponent(type: EnemyStateComponent.self, for: enemy) != nil else { continue }
 
             let distToPlayer = simd_length(playerPos - transform.position)
 
+            // transition mode based on distance thresholds only
+            // between detectionRadius and loseRadius, mode is unchanged
             if distToPlayer <= state.detectionRadius {
-                world.modifyComponent(type: EnemyStateComponent.self, for: enemy) {
-                    state in state.mode = .chase
-                }
-
-                world.modifyComponent(type: VelocityComponent.self, for: enemy) {
-                    vel in vel.linear = normalize(playerPos - transform.position) * state.chaseSpeed
-                }
+                world.modifyComponent(type: EnemyStateComponent.self, for: enemy) { $0.mode = .chase }
             } else if distToPlayer > state.loseRadius {
-                world.modifyComponent(type: EnemyStateComponent.self, for: enemy) { s in
-                    s.mode = .wander
+                world.modifyComponent(type: EnemyStateComponent.self, for: enemy) { $0.mode = .wander }
+            }
 
-                    // if there are no targets or considered arrived at wander target,
-                    // wander to a new point
+            // compute velocity every frame based on current mode.
+            guard let currentState = world.getComponent(type: EnemyStateComponent.self, for: enemy)
+            else { continue }
+
+            if currentState.mode == .chase {
+                let delta = playerPos - transform.position
+                guard simd_length_squared(delta) > 1e-6 else { continue }
+
+                world.modifyComponent(type: VelocityComponent.self, for: enemy) { vel in
+                    vel.linear = normalize(delta) * currentState.chaseSpeed
+                }
+            } else {
+                // if there are no targets or considered arrived at wander target,
+                // wander to a new point
+                world.modifyComponent(type: EnemyStateComponent.self, for: enemy) { s in
                     let arrivalThreshold: Float = 8
                     if s.wanderTarget == nil ||
                        simd_length(transform.position - s.wanderTarget!) < arrivalThreshold {
@@ -54,8 +65,11 @@ public final class EnemyAISystem: System {
                                                       for: enemy)?.wanderTarget
                 else { continue }
 
+                let wanderDelta = target - transform.position
+                guard simd_length_squared(wanderDelta) > 1e-6 else { continue }
+                
                 world.modifyComponent(type: VelocityComponent.self, for: enemy) { vel in
-                    vel.linear = normalize(target - transform.position) * state.wanderSpeed
+                    vel.linear = normalize(wanderDelta) * currentState.wanderSpeed
                 }
             }
         }

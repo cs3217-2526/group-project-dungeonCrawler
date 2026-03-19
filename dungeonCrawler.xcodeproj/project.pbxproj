@@ -32,7 +32,6 @@
 		337108922F5EB5B800D27C2E /* dungeonCrawler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dungeonCrawler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		337108AB2F5EB5BA00D27C2E /* dungeonCrawlerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dungeonCrawlerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		337108B52F5EB5BA00D27C2E /* dungeonCrawlerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dungeonCrawlerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		581139A02F692FF70029734A /* dungeonCrawler.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dungeonCrawler.xcodeproj; sourceTree = "<group>"; };
 		8D8259BC2F5FFFBC00742D1A /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		8D8259BD2F5FFFBC00742D1A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -215,10 +214,6 @@
 			productRefGroup = 337108932F5EB5B800D27C2E /* Products */;
 			projectDirPath = "";
 			projectReferences = (
-				{
-					ProductGroup = 581139A62F692FF70029734A /* Products */;
-					ProjectRef = 581139A02F692FF70029734A /* dungeonCrawler.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (

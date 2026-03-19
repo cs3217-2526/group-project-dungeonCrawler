@@ -347,6 +347,19 @@ final class MovementSystemTests: XCTestCase {
         XCTAssertEqual(transform!.position.y, 0, accuracy: 0.01)
     }
 
+    func testEnemyMovementIsClampedToWorldBounds() {
+        let entity = world.createEntity()
+        world.addComponent(component: TransformComponent(position: SIMD2<Float>(490, 0)), to: entity)
+        world.addComponent(component: VelocityComponent(linear: SIMD2(100, 0)), to: entity)
+        world.addComponent(component: EnemyStateComponent(), to: entity)
+
+        system.worldBounds = (minX: -500, maxX: 500, minY: -500, maxY: 500)
+        system.update(deltaTime: 1.0, world: world)
+
+        let transform = world.getComponent(type: TransformComponent.self, for: entity)
+        XCTAssertLessThanOrEqual(transform!.position.x, 500)
+    }
+
     func testEntityWithoutMoveSpeedSkipped() {
         let entity = world.createEntity()
         world.addComponent(component: TransformComponent(position: SIMD2<Float>(5, 5)), to: entity)

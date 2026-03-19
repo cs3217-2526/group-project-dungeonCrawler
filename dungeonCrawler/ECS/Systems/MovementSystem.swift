@@ -53,8 +53,12 @@ public final class MovementSystem: System {
         }
 
         // Integrate velocity for enemies (velocity is set by EnemyAISystem)
-        let enemyMovable = world.entities(with: EnemyStateComponent.self, and: VelocityComponent.self)
-        for (entity, _, velocity) in enemyMovable {
+        let enemyMovable = world.entities(
+            with: EnemyStateComponent.self,
+            and: VelocityComponent.self,
+            and: TransformComponent.self)
+
+        for (entity, _, velocity, _) in enemyMovable {
             guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
             
             world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
