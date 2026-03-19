@@ -76,8 +76,8 @@ public final class MapSystem: System {
             ))
         }
         
-        // Random enemy spawn points
-        for _ in 0..<5 {
+        // Random enemy spawn points, for now spawning 3
+        for _ in 0..<3 {
             spawnPoints.append(SpawnPoint(
                 position: bounds.randomPosition(margin: 80),
                 type: .enemy

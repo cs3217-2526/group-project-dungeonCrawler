@@ -53,6 +53,7 @@ public final class RoomGenerator {
         // 2. Generate floor tiles (optional, for visual representation)
         createFloorTiles(bounds: bounds, world: world)
         
+        // TODO: add obstacles and doors
         // 3. Generate interior obstacles while preserving center navigability
 //        createObstacles(bounds: bounds, world: world)
         
@@ -154,6 +155,7 @@ public final class RoomGenerator {
         }
     }
     
+    // TODO: Implement Obstacle in the map
     private func createObstacle(at position: SIMD2<Float>, world: World) {
         let obstacle = world.createEntity()
         
@@ -170,6 +172,7 @@ public final class RoomGenerator {
     }
     
     // MARK: - Doorway Openings
+    // TODO: Implement Door in the map
     
     private func createDoorwayOpening(
         doorway: Doorway,
@@ -197,7 +200,7 @@ public final class RoomGenerator {
     }
 }
  
-// MARK: - Grid-Based Generation Extension
+// MARK: - Grid-Based Generation Extension (Not in use for now)
  
 extension RoomGenerator {
     
