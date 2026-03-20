@@ -90,6 +90,7 @@ class GameScene: SKScene {
         systemManager.register(KnockbackSystem())
         systemManager.register(CameraSystem())
         systemManager.register(RenderSystem(backend: renderingBackend))
+        systemManager.register(ProjectileSystem())
     }
 
     // MARK: - Entity spawning

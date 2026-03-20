@@ -69,6 +69,13 @@ public final class World {
         components.entities(with: type)
     }
 
+    public func entitiesWithComponent<T: Component>(with type: T.Type) -> [(Entity, a: T)] {
+        components.entities(with: type).compactMap { entity in
+            guard let a = components.get(type: type, for: entity) else { return nil }
+            return (entity, a)
+        }
+    }
+
     /// Returns every living entity that has BOTH `T` and `U` (binary join).
     public func entities<T: Component, U: Component>(with typeA: T.Type, and typeB: U.Type) -> [(entity: Entity, a: T, b: U)] {
         entities(with: typeA).compactMap { entity in
