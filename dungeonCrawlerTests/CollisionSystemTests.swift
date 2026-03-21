@@ -13,11 +13,13 @@ final class CollisionSystemTests: XCTestCase {
 
     var world: World!
     var collisionSystem: CollisionSystem!
+    let collisionEvents   = CollisionEventBuffer()
+    let destructionQueue  = DestructionQueue()
 
     override func setUp() {
         super.setUp()
         world = World()
-        collisionSystem = CollisionSystem()
+        collisionSystem = CollisionSystem(events: collisionEvents,  destructionQueue: destructionQueue)
     }
     
     // MARK: - Entity helpers

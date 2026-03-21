@@ -46,5 +46,6 @@ public final class ProjectileSystem: System {
             guard world.isAlive(entity: entity) else { continue }
             destructionQueue.enqueue(entity)
         }
+        destructionQueue.flush(world: world)
     }
 }
