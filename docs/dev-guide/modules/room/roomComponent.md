@@ -1,7 +1,6 @@
 ---
 title: "Room Component"
 description: "Data types that describe a room and its layout."
-sidebar_position: 5
 ---
 
 # Room Component

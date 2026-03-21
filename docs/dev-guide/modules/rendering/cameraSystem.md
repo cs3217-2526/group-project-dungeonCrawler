@@ -1,6 +1,5 @@
 ---
 description: "How the CameraSystem works."
-sidebar_position: 4
 ---
 
 # Camera System & Viewport
