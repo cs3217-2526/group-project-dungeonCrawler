@@ -62,8 +62,13 @@ public final class WeaponSystem: System {
                         weapon.lastFiredAt = gameTime
                     }
                     // Only for projectile weapon now
-                    // TODO: replace speed
-                    EntityFactory.makeProjectile(from: ownerTransform.position, aimAt: fireDirection, speed: 300, owner: ownerEntity, in: world)
+                    EntityFactory.makeProjectile(
+                        from: ownerTransform.position,
+                        aimAt: fireDirection,
+                        speed: 300,
+                        effectiveRange: 400,
+                        owner: ownerEntity,
+                        in: world)
                 }
             }
         }

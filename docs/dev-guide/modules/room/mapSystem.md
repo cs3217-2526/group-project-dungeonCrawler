@@ -1,7 +1,6 @@
 ---
 title: "Map System"
 description: "How rooms are generated and activated."
-sidebar_position: 4
 ---
 
 # Map System

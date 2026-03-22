@@ -1,7 +1,6 @@
 ---
 title: "Render System"
 description: "How the RenderSystem works."
-sidebar_position: 3
 ---
 
 # Rendering System
