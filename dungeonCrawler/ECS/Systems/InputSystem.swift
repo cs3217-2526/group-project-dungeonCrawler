@@ -47,8 +47,8 @@ public final class InputSystem: System {
                 input.isShooting    = shooting
             }
 
-            // Update facing: shoot direction takes priority over move direction.
-            let facingX: Float = shooting ? aimDirection.x : moveDirection.x
+            // Update facing: aim direction takes priority over move direction when aim input is present.
+            let facingX: Float = aimDirection.x != 0 ? aimDirection.x : moveDirection.x
             guard facingX != 0 else { continue }
             world.modifyComponent(type: FacingComponent.self, for: entity) { facing in
                 facing.facing = facingX > 0 ? .right : .left
