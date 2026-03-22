@@ -23,6 +23,7 @@ class GameScene: SKScene {
     // MARK: - Adapters
     private var renderingBackend: SpriteKitRenderingAdapter!
     private var cameraAdapter: SpriteKitCameraAdapter!
+    private var hudBackend: SpriteKitHUDAdapter!
 
     // MARK: - Input provider
     private let touchInput = TouchJoystickInputProvider()
@@ -87,7 +88,8 @@ class GameScene: SKScene {
     private func setupSystems() {
         renderingBackend = SpriteKitRenderingAdapter(worldLayer: worldLayer)
         cameraAdapter    = SpriteKitCameraAdapter(worldLayer: worldLayer)
-        
+        hudBackend       = SpriteKitHUDAdapter(uiLayer: uiLayer, screenSize: size)
+
         systemManager.register(mapSystem)
         systemManager.register(InputSystem(inputProvider: touchInput))
         systemManager.register(EnemyAISystem())
@@ -97,6 +99,7 @@ class GameScene: SKScene {
         systemManager.register(WeaponSystem())
         systemManager.register(KnockbackSystem())
         systemManager.register(CameraSystem())
+        systemManager.register(HUDSystem(backend: hudBackend))
         systemManager.register(RenderSystem(backend: renderingBackend))
         systemManager.register(ProjectileSystem(events: collisionEvents,  destructionQueue: destructionQueue))
     }
