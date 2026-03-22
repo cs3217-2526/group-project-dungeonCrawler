@@ -43,8 +43,8 @@ These components attache to the new entity (the projectile):
 | `TransformComponent` | Spawns at the given position; rotation derived from direction |
 | `VelocityComponent` | `direction * speed` |
 | `SpriteComponent` | `"normalHandgunBullet"`, z-position 5 |
-| `ProjectileComponent` | `damage: 10`, `owner: ownerEntity` |
-| `EffectiveRangeComponent` | `base: 400` units |
+| `ProjectileComponent` | `damage in factory method: 10`, `owner: ownerEntity` |
+| `EffectiveRangeComponent` | `base in factory method: 400` units |
 | `CollisionBoxComponent` | 6 × 6 point hitbox |
 
 ## Lifetime
@@ -56,7 +56,7 @@ A projectile is destroyed when either:
 
 Both cases enqueue the entity in `DestructionQueue`, which flushes at the end of `ProjectileSystem.update`.
 
-In future iterations, we want to add a third case for hitting a damageable entity (e.g. an enemy), but currently projectiles pass through enemies without collision.
+*In future iterations, we want to add a third case for hitting a damageable entity (e.g. an enemy), but currently projectiles pass through enemies without collision.*
 
 ## ProjectileSystem
 
