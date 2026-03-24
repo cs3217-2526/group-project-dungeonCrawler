@@ -9,8 +9,8 @@ import Foundation
 /// NodeID, NodeData, and EdgeData are all generic parameters, defined when the graph is instantiated.
 ///
 /// `NodeID` is the stable identity key (e.g. `UUID`).
-/// `NodeData` is for payload stored at each vertex (e.g. `RoomDescriptor`).
-/// `EdgeData` is for payload on each directed arc (e.g. connection metadata).
+/// `NodeData` is for payload stored at each vertex.
+/// `EdgeData` is for payload on each directed edge.
 public struct Graph<NodeID: Hashable, NodeData, EdgeData> {
 
     /// Edge: A directed edge from one node to another, carrying typed metadata.
