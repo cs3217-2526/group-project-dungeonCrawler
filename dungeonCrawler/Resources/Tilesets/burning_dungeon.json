@@ -1,6 +1,6 @@
 {
   "meta": {
-    "sheet": "burning_dungeon",
+    "sheet": "Tilesets/burning_dungeon",
     "tileSize": 16,
     "sheetCols": 32,
     "sheetRows": 32

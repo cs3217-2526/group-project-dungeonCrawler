@@ -1,6 +1,6 @@
 {
   "meta": {
-    "sheet": "living_dungeon",
+    "sheet": "Tilesets/living_dungeon",
     "tileSize": 16,
     "sheetCols": 32,
     "sheetRows": 32
