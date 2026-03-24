@@ -13,4 +13,13 @@ public enum Direction {
         case .west:  return SIMD2<Float>(-1, 0)
         }
     }
+
+    public var opposite: Direction {
+        switch self {
+        case .north: return .south
+        case .south: return .north
+        case .east:  return .west
+        case .west:  return .east
+        }
+    }
 }
