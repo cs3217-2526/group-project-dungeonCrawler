@@ -23,7 +23,8 @@ final class CollisionSystemTests: XCTestCase {
     }
     
     // MARK: - Entity helpers
-     
+
+    @discardableResult
     /// Bare collidable — no VelocityComponent, so treated as static (wall/obstacle).
     private func makeStaticEntity(at position: SIMD2<Float>, size: SIMD2<Float>) -> Entity {
         let entity = world.createEntity()
@@ -32,17 +33,44 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: WallTag(), to: entity)
         return entity
     }
- 
-    /// Has VelocityComponent — treated as a dynamic enemy.
-    private func makeEnemyEntity(at position: SIMD2<Float>, size: SIMD2<Float>) -> Entity {
+
+    @discardableResult
+    /// Light enemy (ranger, mass 5) — knocked back more.
+    private func makeLightWeightEnemyEntity(at position: SIMD2<Float>, size: SIMD2<Float>) -> Entity {
         let entity = world.createEntity()
         world.addComponent(component: TransformComponent(position: position, scale: 1), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
         world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: EnemyTagComponent(textureName: EnemyType.charger.textureName, scale: EnemyType.charger.scale), to: entity)
+        world.addComponent(component: EnemyTagComponent(textureName: EnemyType.ranger.textureName, scale: EnemyType.ranger.scale), to: entity)
+        world.addComponent(component: MassComponent(mass: EnemyType.ranger.mass), to: entity)
         return entity
     }
- 
+
+    @discardableResult
+    /// Heavy enemy (tower, mass 20) — knocked back less.
+    private func makeHeavyWeightEnemyEntity(at position: SIMD2<Float>, size: SIMD2<Float>) -> Entity {
+        let entity = world.createEntity()
+        world.addComponent(component: TransformComponent(position: position, scale: 1), to: entity)
+        world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
+        world.addComponent(component: VelocityComponent(), to: entity)
+        world.addComponent(component: EnemyTagComponent(textureName: EnemyType.tower.textureName, scale: EnemyType.tower.scale), to: entity)
+        world.addComponent(component: MassComponent(mass: EnemyType.tower.mass), to: entity)
+        return entity
+    }
+
+    @discardableResult
+    /// Equal Mass enemy (equal, mass 10) — knocked back the same.
+    private func makeSameWeightEnemyEntity(at position: SIMD2<Float>, size: SIMD2<Float>) -> Entity {
+        let entity = world.createEntity()
+        world.addComponent(component: TransformComponent(position: position, scale: 1), to: entity)
+        world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
+        world.addComponent(component: VelocityComponent(), to: entity)
+        world.addComponent(component: EnemyTagComponent(textureName: EnemyType.tower.textureName, scale: EnemyType.mummy.scale), to: entity)
+        world.addComponent(component: MassComponent(mass: EnemyType.mummy.mass), to: entity)
+        return entity
+    }
+
+    @discardableResult
     /// Has VelocityComponent + PlayerTagComponent.
     private func makePlayerEntity(at position: SIMD2<Float>, size: SIMD2<Float>) -> Entity {
         let entity = world.createEntity()
@@ -50,6 +78,7 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: PlayerTagComponent(), to: entity)
+        world.addComponent(component: MassComponent(), to: entity)
         return entity
     }
 
@@ -153,7 +182,7 @@ final class CollisionSystemTests: XCTestCase {
     func test_enemyHitsWall_onlyEnemyMoves() {
         let box   = SIMD2<Float>(20, 20)
         let wall  = makeStaticEntity(at: SIMD2(15, 0), size: box)
-        let enemy = makeEnemyEntity( at: SIMD2(0,  0), size: box)
+        let enemy = makeLightWeightEnemyEntity( at: SIMD2(0,  0), size: box)
  
         let wallPosBefore = world.getComponent(type: TransformComponent.self, for: wall)!.position
         collisionSystem.update(deltaTime: 0.016, world: world)
@@ -184,7 +213,7 @@ final class CollisionSystemTests: XCTestCase {
     func test_playerVsEnemy_bothReceiveKnockback() {
         let box    = SIMD2<Float>(20, 20)
         let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeEnemyEntity( at: SIMD2(15, 0), size: box)
+        let enemy  = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: box)
  
         collisionSystem.update(deltaTime: 0.016, world: world)
  
@@ -195,7 +224,7 @@ final class CollisionSystemTests: XCTestCase {
     func test_playerVsEnemy_knockbackDirectionsAreOpposite() {
         let box    = SIMD2<Float>(20, 20)
         let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeEnemyEntity( at: SIMD2(15, 0), size: box)
+        let enemy  = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: box)
  
         collisionSystem.update(deltaTime: 0.016, world: world)
  
@@ -206,26 +235,100 @@ final class CollisionSystemTests: XCTestCase {
                       "Player and enemy knockback velocities should point in opposite directions")
     }
  
-    func test_playerVsEnemy_enemyDisplacedMoreThanPlayer() {
+    // player (mass 10) vs light enemy (ranger, mass 5): enemy is lighter so gets displaced more
+    func test_playerVsLightEnemy_enemyDisplacedMore() {
         let box    = SIMD2<Float>(20, 20)
         let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeEnemyEntity( at: SIMD2(15, 0), size: box)
- 
+        let enemy  = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+
         let playerPosBefore = world.getComponent(type: TransformComponent.self, for: player)!.position
         let enemyPosBefore  = world.getComponent(type: TransformComponent.self, for: enemy)!.position
         collisionSystem.update(deltaTime: 0.016, world: world)
- 
+
         let playerDisp = abs(world.getComponent(type: TransformComponent.self, for: player)!.position.x - playerPosBefore.x)
         let enemyDisp  = abs(world.getComponent(type: TransformComponent.self, for: enemy)!.position.x  - enemyPosBefore.x)
- 
+
         XCTAssertGreaterThan(enemyDisp, playerDisp,
-                             "Enemy bounce factor (0.75) should displace more than player bounce factor (0.1)")
+                             "Lighter enemy (ranger) should be displaced more than heavier player")
     }
- 
+
+    // player (mass 10) vs heavy enemy (tower, mass 20): player is lighter so gets displaced more
+    func test_playerVsHeavyEnemy_playerDisplacedMore() {
+        let box    = SIMD2<Float>(20, 20)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
+        let enemy  = makeHeavyWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+
+        let playerPosBefore = world.getComponent(type: TransformComponent.self, for: player)!.position
+        let enemyPosBefore  = world.getComponent(type: TransformComponent.self, for: enemy)!.position
+        collisionSystem.update(deltaTime: 0.016, world: world)
+
+        let playerDisp = abs(world.getComponent(type: TransformComponent.self, for: player)!.position.x - playerPosBefore.x)
+        let enemyDisp  = abs(world.getComponent(type: TransformComponent.self, for: enemy)!.position.x  - enemyPosBefore.x)
+
+        XCTAssertGreaterThan(playerDisp, enemyDisp,
+                             "Player should be displaced more than heavier enemy (tower)")
+    }
+
+    // player (mass 10) vs same weight enemy (mummy, mass 10): displace equally
+    func test_playerVsSameWeightEnemy_playerDisplacedMore() {
+        let box    = SIMD2<Float>(20, 20)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
+        let enemy  = makeSameWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+
+        let playerPosBefore = world.getComponent(type: TransformComponent.self, for: player)!.position
+        let enemyPosBefore  = world.getComponent(type: TransformComponent.self, for: enemy)!.position
+        collisionSystem.update(deltaTime: 0.016, world: world)
+
+        let playerDisp = abs(world.getComponent(type: TransformComponent.self, for: player)!.position.x - playerPosBefore.x)
+        let enemyDisp  = abs(world.getComponent(type: TransformComponent.self, for: enemy)!.position.x  - enemyPosBefore.x)
+
+        XCTAssertEqual(playerDisp, enemyDisp,
+                             "Player should be displaced equally from same weight enemy (mummy)")
+    }
+
+    // light enemy (ranger, mass 5) receives high knockback speed from player collision
+    func test_lightEnemyReceivesHighKnockbackSpeed() {
+        let box = SIMD2<Float>(20, 20)
+        makePlayerEntity(at: SIMD2(0, 0), size: box)
+        let lightEnemy = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        collisionSystem.update(deltaTime: 0.016, world: world)
+
+        let lightKB = world.getComponent(type: KnockbackComponent.self, for: lightEnemy)!
+        // ranger mass 5: knockbackSpeed = baseForce / 5 = 300
+        XCTAssertEqual(simd_length(lightKB.velocity), 1500 / Float(EnemyType.ranger.mass), accuracy: 0.001,
+                       "Light enemy (ranger) should receive knockback speed of baseForce / mass")
+    }
+
+    // heavy enemy (tower, mass 20) receives low knockback speed from player collision
+    func test_heavyEnemyReceivesLowKnockbackSpeed() {
+        let box = SIMD2<Float>(20, 20)
+        makePlayerEntity(at: SIMD2(0, 0), size: box)
+        let heavyEnemy = makeHeavyWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        collisionSystem.update(deltaTime: 0.016, world: world)
+
+        let heavyKB = world.getComponent(type: KnockbackComponent.self, for: heavyEnemy)!
+        // tower mass 20: knockbackSpeed = baseForce / 20 = 75
+        XCTAssertEqual(simd_length(heavyKB.velocity), 1500 / Float(EnemyType.tower.mass), accuracy: 0.001,
+                       "Heavy enemy (tower) should receive knockback speed of baseForce / mass")
+    }
+
+    // same weight enemy (mummy, mass 10) receives equal knockbackspeed as
+    func test_sameWeightEnemyReceivesSameKnockbackSpeed() {
+        let box = SIMD2<Float>(20, 20)
+        makePlayerEntity(at: SIMD2(0, 0), size: box)
+        let sameWeightEnemy = makeSameWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        collisionSystem.update(deltaTime: 0.016, world: world)
+
+        let sameWeightKB = world.getComponent(type: KnockbackComponent.self, for: sameWeightEnemy)!
+        // mummy mass 20: knockbackSpeed = baseForce / 10 = 150
+        XCTAssertEqual(simd_length(sameWeightKB.velocity), 1500 / Float(EnemyType.mummy.mass), accuracy: 0.001,
+                       "Same Weight enemy (mummy) should receive knockback speed of baseForce / mass")
+    }
+
     func test_playerVsEnemy_existingKnockbackNotOverwritten() {
         let box    = SIMD2<Float>(20, 20)
         let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        _          = makeEnemyEntity( at: SIMD2(15, 0), size: box)
+        _          = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: box)
  
         let existingVelocity = SIMD2<Float>(999, 0)
         world.addComponent(component: KnockbackComponent(velocity: existingVelocity, remainingTime: 1.0), to: player)
@@ -241,8 +344,8 @@ final class CollisionSystemTests: XCTestCase {
  
     func test_enemyVsEnemy_equalDisplacement() {
         let box    = SIMD2<Float>(20, 20)
-        let enemyA = makeEnemyEntity(at: SIMD2(0,  0), size: box)
-        let enemyB = makeEnemyEntity(at: SIMD2(15, 0), size: box)
+        let enemyA = makeLightWeightEnemyEntity(at: SIMD2(0,  0), size: box)
+        let enemyB = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
  
         let posABefore = world.getComponent(type: TransformComponent.self, for: enemyA)!.position
         let posBBefore = world.getComponent(type: TransformComponent.self, for: enemyB)!.position
@@ -256,8 +359,8 @@ final class CollisionSystemTests: XCTestCase {
  
     func test_enemyVsEnemy_noKnockbackApplied() {
         let box    = SIMD2<Float>(20, 20)
-        let enemyA = makeEnemyEntity(at: SIMD2(0,  0), size: box)
-        let enemyB = makeEnemyEntity(at: SIMD2(15, 0), size: box)
+        let enemyA = makeLightWeightEnemyEntity(at: SIMD2(0,  0), size: box)
+        let enemyB = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
  
         collisionSystem.update(deltaTime: 0.016, world: world)
  

@@ -9,18 +9,19 @@ import Foundation
 import simd
 
 // Components attached:
-//   • TransformComponent  — position, rotation, scale
-//   • VelocityComponent   — movement vector (starts at zero)
-//   • InputComponent      — intent from InputSystem
-//   • SpriteComponent     — visual representation
-//   • PlayerTag           — marks this as the human-controlled entity
+//   • TransformComponent     — position, rotation, scale
+//   • VelocityComponent      — movement vector (starts at zero)
+//   • InputComponent         — intent from InputSystem
+//   • SpriteComponent        — visual representation
+//   • PlayerTag              — marks this as the human-controlled entity
 //   • HealthComponent        — current/max HP; entity destroyed at 0
 //   • MoveSpeedComponent     — scalar speed used by MovementSystem
 //   • CollisionBoxComponent  — axis-aligned bounding box for collision
+//   • MassComponent          — current mass used by KnockbackSystem
 //
 // Future additions:
-//   • WeaponSlotComponent — which weapon is equipped
-//   • AnimationComponent  — walk / idle / attack animation state machine
+//   • WeaponSlotComponent    — which weapon is equipped
+//   • AnimationComponent     — walk / idle / attack animation state machine
 
 public struct PlayerEntityFactory: EntityFactory {
     let position: SIMD2<Float>
@@ -52,6 +53,7 @@ public struct PlayerEntityFactory: EntityFactory {
         world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: SIMD2(48 * scale, 48 * scale)), to: entity)
         world.addComponent(component: FacingComponent(), to: entity)
+        world.addComponent(component: MassComponent(), to: entity)
 
         return entity
     }

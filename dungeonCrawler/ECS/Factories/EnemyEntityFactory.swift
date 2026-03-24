@@ -32,19 +32,29 @@ public enum EnemyType {
         case .tower:   return 1.5
         }
     }
+
+    var mass: Int {
+        switch self {
+        case .charger: return 15
+        case .mummy:   return 10
+        case .ranger:  return 5
+        case .tower:   return 20
+        }
+    }
 }
 
 // Components attached:
-//   • TransformComponent   — position, rotation, scale
-//   • SpriteComponent      — visual representation
-//   • EnemyTagComponent    — marks this as an enemy and holds its type
-//   • VelocityComponent    — movement vector (set each frame by EnemyAISystem)
-//   • EnemyStateComponent  — AI mode (wander/chase) and related config
+//   • TransformComponent     — position, rotation, scale
+//   • SpriteComponent        — visual representation
+//   • EnemyTagComponent      — marks this as an enemy and holds its type
+//   • VelocityComponent      — movement vector (set each frame by EnemyAISystem)
+//   • EnemyStateComponent    — AI mode (wander/chase) and related config
 //   • CollisionBoxComponent  — axis-aligned bounding box for collision
+//   • MassComponent          — current mass used by KnockbackSystem
 //
 // Future additions:
-//   • HealthComponent      — current / max health
-//   • CombatStatsComponent — attack damage, attack speed
+//   • HealthComponent        — current / max health
+//   • CombatStatsComponent   — attack damage, attack speed
 
 public struct EnemyEntityFactory: EntityFactory {
     let position: SIMD2<Float>
@@ -72,6 +82,7 @@ public struct EnemyEntityFactory: EntityFactory {
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: EnemyStateComponent(), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: SIMD2(48 * finalScale, 48 * finalScale)), to: entity)
+        world.addComponent(component: MassComponent(mass: type.mass), to: entity)
 
         return entity
     }
