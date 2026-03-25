@@ -81,7 +81,12 @@ public struct EnemyEntityFactory: EntityFactory {
             content: .texture(name: type.textureName),
             layer: .entity
         ), to: entity)
-        world.addComponent(component: EnemyTagComponent(enemyType: type), to: entity)
+
+        world.addComponent(component: EnemyTagComponent(
+            textureName: type.textureName,
+            scale: finalScale
+        ), to: entity)
+        
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: EnemyStateComponent(), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: SIMD2(WorldConstants.playerSize * finalScale, WorldConstants.playerSize * finalScale)), to: entity)

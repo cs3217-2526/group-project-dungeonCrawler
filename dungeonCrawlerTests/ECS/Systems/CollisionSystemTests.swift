@@ -41,7 +41,7 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: TransformComponent(position: position, scale: 1), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
         world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: EnemyTagComponent(enemyType: .ranger), to: entity)
+        world.addComponent(component: EnemyTagComponent(textureName: EnemyType.ranger.textureName, scale: EnemyType.ranger.scale), to: entity)
         world.addComponent(component: MassComponent(mass: EnemyType.ranger.mass), to: entity)
         return entity
     }
@@ -53,7 +53,7 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: TransformComponent(position: position, scale: 1), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
         world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: EnemyTagComponent(enemyType: .tower), to: entity)
+        world.addComponent(component: EnemyTagComponent(textureName: EnemyType.tower.textureName, scale: EnemyType.tower.scale), to: entity)
         world.addComponent(component: MassComponent(mass: EnemyType.tower.mass), to: entity)
         return entity
     }
@@ -65,7 +65,7 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: TransformComponent(position: position, scale: 1), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: size), to: entity)
         world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: EnemyTagComponent(enemyType: .mummy), to: entity)
+        world.addComponent(component: EnemyTagComponent(textureName: EnemyType.mummy.textureName, scale: EnemyType.mummy.scale), to: entity)
         world.addComponent(component: MassComponent(mass: EnemyType.mummy.mass), to: entity)
         return entity
     }
