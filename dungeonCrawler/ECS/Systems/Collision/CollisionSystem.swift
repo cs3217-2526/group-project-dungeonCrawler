@@ -180,25 +180,32 @@ public final class CollisionSystem: System {
             $0.position += mtv
         }
     }
-    
-    /// Player and enemy overlap — small nudge for the player, larger for the enemy,
-    /// and knockback applied to both if not already in knockback.
+
+    /// Player and Enemy knockback are scaled inversely to their mass
     private func resolvePlayerEnemyCollision(player: Entity, enemy: Entity, pushTowardPlayer: SIMD2<Float>, world: World) {
-        let playerBounce: Float = 0.1
-        let enemyBounce: Float = 0.75
-        let knockbackSpeed: Float = 150
+        let baseKnockbackSpeed: Float = 1500
         let knockbackDuration: Float = 0.1
         let bounceDir = normalize(pushTowardPlayer)
- 
+
+        let rawEnemyMass = Float(world.getComponent(type: MassComponent.self, for: enemy)?.mass ?? 10)
+        let rawPlayerMass = Float(world.getComponent(type: MassComponent.self, for: player)?.mass ?? 10)
+
+        let enemyMass = max(rawEnemyMass, 1.0)
+        let playerMass = max(rawPlayerMass, 1.0)
+        let totalMass = enemyMass + playerMass
+
+        let enemyKnockbackSpeed = baseKnockbackSpeed / enemyMass
+        let playerKnockbackSpeed = baseKnockbackSpeed / playerMass
+
         world.modifyComponent(type: TransformComponent.self, for: player) {
-            $0.position += pushTowardPlayer * playerBounce
+            $0.position += pushTowardPlayer * (enemyMass / totalMass)
         }
         world.modifyComponent(type: TransformComponent.self, for: enemy) {
-            $0.position -= pushTowardPlayer * enemyBounce
+            $0.position -= pushTowardPlayer * (playerMass / totalMass)
         }
-        applyKnockbackIfNeeded(to: player, velocity:  knockbackSpeed * bounceDir,
+        applyKnockbackIfNeeded(to: player, velocity:  playerKnockbackSpeed * bounceDir,
                                duration: knockbackDuration, world: world)
-        applyKnockbackIfNeeded(to: enemy,  velocity: -knockbackSpeed * bounceDir,
+        applyKnockbackIfNeeded(to: enemy,  velocity: -enemyKnockbackSpeed * bounceDir,
                                duration: knockbackDuration, world: world)
     }
  
