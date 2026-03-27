@@ -41,12 +41,7 @@ public final class EnemyAISystem: System {
             else { continue }
 
             if currentState.mode == .chase {
-                let delta = playerPos - transform.position
-                guard simd_length_squared(delta) > 1e-6 else { continue }
-
-                world.modifyComponent(type: VelocityComponent.self, for: enemy) { vel in
-                    vel.linear = normalize(delta) * currentState.chaseSpeed
-                }
+                StraightLineChaseStrategy().update(entity: enemy, transform: transform, playerPos: playerPos, world: world)
             } else {
                 WanderStrategy().update(entity: enemy, transform: transform, playerPos: playerPos, world: world)
             }
