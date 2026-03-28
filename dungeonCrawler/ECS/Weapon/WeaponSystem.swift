@@ -47,6 +47,12 @@ public final class WeaponSystem: System {
                 facing.facing = facingRight ? .right : .left
             }
             
+            // Only fire if this weapon is the owner's primary weapon
+            if let equipped = world.getComponent(type: EquippedWeaponComponent.self, for: ownerEntity),
+               equipped.primaryWeapon != weaponEntity {
+                continue
+            }
+
             if ownerInput.isShooting {
                 let isReadyToFire: Bool = (gameTime - weaponComponent.lastFiredAt) >= Float(weaponComponent.coolDownInterval)
                 let aimDirection = ownerInput.aimDirection

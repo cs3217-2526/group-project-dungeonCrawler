@@ -5,7 +5,6 @@ struct WeaponComponent: Component {
     var manaCost: Float
     var attackSpeed: Float
     var coolDownInterval: TimeInterval
-    // var coolDown: TimeInterval
     var lastFiredAt: Float = 0
 
     init(type: WeaponType,
@@ -25,4 +24,14 @@ public enum WeaponType: String {
     case handgun
     case sword
     case bow
+    case sniper
+
+    var textureName: String {
+        switch self {
+        case .handgun: return "handgun"
+        case .sniper: return "Sniper"
+        case .sword: return "sword"
+        case .bow: return "bow"
+        }
+    }
 }

@@ -20,9 +20,9 @@ public enum RenderLayer: CGFloat {
     case wall = 1
     case obstacle = 2
     case pickUp = 3
-    case weapon = 4
     case projectile = 5
     case entity = 6
+    case weapon = 7
     case ui = 10
 }
 

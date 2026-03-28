@@ -9,7 +9,7 @@ import Foundation
 
 // we make it referenced
 // since systems need to borrow the queues
-class CommandQueues {
+public class CommandQueues {
     private var queues: [ObjectIdentifier: AnyObject] = [:]
 
     func queue<C: Command>(for type: C.Type) -> CommandQueue<C>? {

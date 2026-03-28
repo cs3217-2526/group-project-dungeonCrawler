@@ -28,9 +28,12 @@ class GameScene: SKScene {
     // MARK: - Level service (owns the graph and room lifecycle)
     private var levelOrchestrator: LevelOrchestrator!
 
+    // MARK: - Command queues
+    private let commandQueues = CommandQueues()
+
     // MARK: - Input provider
     private let touchInput = TouchJoystickInputProvider()
-    private let reloadInput = SwitchWeaponButtonInputProvider()
+    private lazy var reloadInput = SwitchWeaponButtonInputProvider(commandQueues: commandQueues)
 
     // MARK: - Collision Events
     let collisionEvents  = CollisionEventBuffer()
@@ -118,7 +121,8 @@ class GameScene: SKScene {
         levelOrchestrator.tileMapRenderer = tileAdapter
 
         systemManager.register(LevelTransitionSystem(orchestrator: levelOrchestrator))
-        systemManager.register(InputSystem(inputProvider: touchInput))
+        commandQueues.register(SwitchWeaponCommand.self)
+        systemManager.register(InputSystem(joyStickInputProvider: touchInput, commandQueues: commandQueues))
         systemManager.register(EnemyAISystem())
         systemManager.register(HealthSystem())
         systemManager.register(MovementSystem())

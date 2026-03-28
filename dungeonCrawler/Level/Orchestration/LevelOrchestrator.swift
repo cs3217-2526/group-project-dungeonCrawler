@@ -169,13 +169,26 @@ public final class LevelOrchestrator {
             let scale  = WorldConstants.standardEntityScale
             let player = PlayerEntityFactory(at: position, scale: scale).make(in: world)
             let weaponOffset = SIMD2<Float>(10, -5)
-            WeaponEntityFactory(
+            let handgun = WeaponEntityFactory(
                 ownedBy: player,
-                textureName: "handgun",
+                weaponType: .handgun,
                 offset: weaponOffset,
                 scale: scale,
                 lastFiredAt: 0
             ).make(in: world)
+            let sniper = WeaponEntityFactory(
+                ownedBy: player,
+                weaponType: .sniper,
+                offset: weaponOffset,
+                scale: scale,
+                lastFiredAt: 0
+            ).make(in: world)
+            // Sniper starts as secondary — hide its sprite until switched to
+            world.removeComponent(type: SpriteComponent.self, from: sniper)
+            world.addComponent(
+                component: EquippedWeaponComponent(primaryWeapon: handgun, secondaryWeapon: sniper),
+                to: player
+            )
         }
     }
 
