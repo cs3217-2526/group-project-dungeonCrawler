@@ -43,6 +43,7 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: EnemyTagComponent(textureName: EnemyType.ranger.textureName, scale: EnemyType.ranger.scale), to: entity)
         world.addComponent(component: MassComponent(mass: EnemyType.ranger.mass), to: entity)
+        world.addComponent(component: HealthComponent(base: 100), to: entity)
         return entity
     }
 
@@ -55,6 +56,7 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: EnemyTagComponent(textureName: EnemyType.tower.textureName, scale: EnemyType.tower.scale), to: entity)
         world.addComponent(component: MassComponent(mass: EnemyType.tower.mass), to: entity)
+        world.addComponent(component: HealthComponent(base: 100), to: entity)
         return entity
     }
 
@@ -67,6 +69,7 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: EnemyTagComponent(textureName: EnemyType.mummy.textureName, scale: EnemyType.mummy.scale), to: entity)
         world.addComponent(component: MassComponent(mass: EnemyType.mummy.mass), to: entity)
+        world.addComponent(component: HealthComponent(base: 100), to: entity)
         return entity
     }
 
@@ -79,11 +82,11 @@ final class CollisionSystemTests: XCTestCase {
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: PlayerTagComponent(), to: entity)
         world.addComponent(component: MassComponent(), to: entity)
+        world.addComponent(component: HealthComponent(base: 100), to: entity)
         return entity
     }
 
     // Creates an entity with the components required for collision testing.
-    // TODO: add stats when ready
     private func makeCollidableEntity(at position: SIMD2<Float>, size: SIMD2<Float>, rotation: Float = 0) -> Entity {
         let entity = world.createEntity()
         world.addComponent(component: TransformComponent(position: position, rotation: rotation, scale: 1), to: entity)

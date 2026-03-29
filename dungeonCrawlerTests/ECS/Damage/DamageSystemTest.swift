@@ -14,17 +14,20 @@ final class DamageSystemTests: XCTestCase {
     var world: World!
     var events: CollisionEventBuffer!
     var system: DamageSystem!
+    var destructionQueue: DestructionQueue!
 
     override func setUp() {
         super.setUp()
         world  = World()
         events = CollisionEventBuffer()
-        system = DamageSystem(events: events)
+        destructionQueue = DestructionQueue()
+        system = DamageSystem(events: events, destructionQueue: destructionQueue)
     }
 
     override func tearDown() {
         system = nil
         events = nil
+        destructionQueue = nil
         world  = nil
         super.tearDown()
     }
@@ -43,6 +46,7 @@ final class DamageSystemTests: XCTestCase {
     private func makeEnemy() -> Entity {
         let entity = world.createEntity()
         world.addComponent(component: EnemyTagComponent(textureName: "Mummy", scale: 1.0), to: entity)
+        world.addComponent(component: HealthComponent(base: 100), to: entity)
         return entity
     }
 
