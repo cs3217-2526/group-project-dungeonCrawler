@@ -9,7 +9,7 @@ import Foundation
 import simd
 
 public final class CollisionSystem: System {
-    public let priority: Int = 30
+    public var dependencies: [System.Type] { [MovementSystem.self, HealthSystem.self] }
     
     public let events: CollisionEventBuffer
     public let destructionQueue: DestructionQueue

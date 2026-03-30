@@ -12,7 +12,7 @@ import simd
 
 public final class InputSystem: System {
 
-    public let priority: Int = 10
+    public var dependencies: [System.Type] { [] }
 
     private let commandQueues: CommandQueues
 
