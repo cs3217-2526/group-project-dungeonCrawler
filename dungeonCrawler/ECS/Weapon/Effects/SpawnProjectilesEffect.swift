@@ -10,6 +10,8 @@ import simd
 
 /**
  * effect of spawning projectiles
+ * after add the projectile entity to the world
+ * we hand over control to projectile system
  *
  * modifiable parameters:
  *  - speed: Float
@@ -28,7 +30,7 @@ struct SpawnProjectileEffect: WeaponEffect {
 
     func apply(context: FireContext) -> FireEffectResult {
         ProjectileEntityFactory(
-            from: context.spawnPosition,
+            from: context.firePosition,
             aimAt: context.fireDirection,
             speed: speed,
             effectiveRange: effectiveRange,

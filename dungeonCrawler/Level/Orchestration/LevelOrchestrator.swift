@@ -203,8 +203,23 @@ public final class LevelOrchestrator {
             ).make(in: world)
             // Sniper starts as secondary — hide its sprite until switched to
             world.removeComponent(type: SpriteComponent.self, from: sniper)
+            let sword = WeaponEntityFactory(
+                player: player,
+                textureName: "sword",
+                offset: SIMD2<Float>(18, -6),
+                scale: 0.4,
+                coolDownIntervel: TimeInterval(0.5),
+                attackSpeed: 1,
+                effects: [
+                    ConsumeManaEffect(amount: 20),
+                    MeleeDamageEffect(
+                        damage: 50, effectiveRange: 100,
+                        halfAngleDegrees: 90, maxTargets: 1)
+                ]
+            ).make(in: world)
+            world.removeComponent(type: SpriteComponent.self, from: sword)
             world.addComponent(
-                component: EquippedWeaponComponent(primaryWeapon: handgun, secondaryWeapon: sniper),
+                component: EquippedWeaponComponent(primaryWeapon: handgun, secondaryWeapon: sword),
                 to: player
             )
         }

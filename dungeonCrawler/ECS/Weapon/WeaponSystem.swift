@@ -65,7 +65,7 @@ public final class WeaponSystem: System {
                 owner: ownerEntity,
                 weapon: weaponEntity,
                 fireDirection: fireDirection,
-                spawnPosition: projectileSpawnPosition,
+                firePosition: projectileSpawnPosition,
                 gameTime: gameTime,
                 world: world
             )
