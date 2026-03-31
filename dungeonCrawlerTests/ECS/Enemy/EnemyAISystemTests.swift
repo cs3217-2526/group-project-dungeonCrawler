@@ -97,14 +97,16 @@ final class EnemyAISystemTests: XCTestCase {
         XCTAssertTrue(state!.mode == .wander)
     }
 
-    func testEnemyInWanderGetsAWanderTarget() {
+    func testEnemyInWanderProducesNonZeroVelocity() {
         makePlayer(at: SIMD2(300, 0))
         let enemy = makeEnemy(at: SIMD2(0, 0), detectionRadius: 150, loseRadius: 225)
 
         system.update(deltaTime: 0.1, world: world)
 
-        let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
-        XCTAssertNotNil(state!.wanderTarget)
+        let vel = world.getComponent(type: VelocityComponent.self, for: enemy)
+        XCTAssertNotNil(vel)
+        XCTAssertGreaterThan(simd_length(vel!.linear), 0,
+                             "Wander strategy should produce a non-zero velocity toward its target")
     }
 
     // MARK: - Knockback suppression, enemyAI shouldnt interfere

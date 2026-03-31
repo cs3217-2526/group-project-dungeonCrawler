@@ -10,7 +10,7 @@ import simd
 
 public final class MovementSystem: System {
 
-    public let priority: Int = 20
+    public var dependencies: [System.Type] { [InputSystem.self, EnemyAISystem.self, KnockbackSystem.self] }
 
     public init() {}
 

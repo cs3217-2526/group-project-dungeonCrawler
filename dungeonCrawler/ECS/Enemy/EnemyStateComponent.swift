@@ -17,22 +17,18 @@ public struct EnemyStateComponent: Component {
     public var mode: EnemyMode = .wander
     public var detectionRadius: Float
     public var loseRadius: Float
-    public var wanderTarget: SIMD2<Float>?
-    public var wanderRadius: Float
-    public var wanderSpeed: Float
-    public var chaseSpeed: Float
+    public var wanderStrategy: any EnemyAIStrategy
+    public var chaseStrategy: any EnemyAIStrategy
 
     public init(
         detectionRadius: Float = 150,
         loseRadius: Float = 225,
-        wanderRadius: Float = 100,
-        wanderSpeed: Float = 40,
-        chaseSpeed: Float = 70
+        wanderStrategy: any EnemyAIStrategy = WanderStrategy(),
+        chaseStrategy: any EnemyAIStrategy = StraightLineChaseStrategy()
     ) {
         self.detectionRadius = detectionRadius
         self.loseRadius = loseRadius
-        self.wanderRadius = wanderRadius
-        self.wanderSpeed = wanderSpeed
-        self.chaseSpeed = chaseSpeed
+        self.wanderStrategy = wanderStrategy
+        self.chaseStrategy = chaseStrategy
     }
 }

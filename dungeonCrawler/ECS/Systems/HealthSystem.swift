@@ -9,7 +9,7 @@ import Foundation
 
 public final class HealthSystem: System {
 
-    public let priority: Int = 20
+    public var dependencies: [System.Type] { [EnemyAISystem.self] }
 
     public init() {}
 

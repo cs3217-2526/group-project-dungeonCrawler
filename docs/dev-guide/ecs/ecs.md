@@ -41,4 +41,4 @@ ECS makes it easy to add new behaviours (e.g. a "poisoned" status) by simply att
 
 ## How It Fits Together
 
-Each game frame, `World` holds all entities and their components. `SystemManager` calls every registered system in priority order, passing `deltaTime` and the `World`. Systems read and write component data — no system talks to another directly.
+Each game frame, `World` holds all entities and their components. `SystemManager` calls every registered system in dependency order, passing `deltaTime` and the `World`. Systems read and write component data — no system talks to another directly.

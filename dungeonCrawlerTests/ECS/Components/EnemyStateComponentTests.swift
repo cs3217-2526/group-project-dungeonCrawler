@@ -20,11 +20,6 @@ final class EnemyStateComponentTests: XCTestCase {
         XCTAssertTrue(state.mode == .wander)
     }
 
-    func testDefaultWanderTargetIsNil() {
-        let state = EnemyStateComponent()
-        XCTAssertNil(state.wanderTarget)
-    }
-
     func testDefaultDetectionRadius() {
         let state = EnemyStateComponent()
         XCTAssertEqual(state.detectionRadius, 150, accuracy: 0.001)
@@ -35,19 +30,16 @@ final class EnemyStateComponentTests: XCTestCase {
         XCTAssertEqual(state.loseRadius, 225, accuracy: 0.001)
     }
 
-    func testDefaultWanderRadius() {
+    // MARK: - Default strategies
+
+    func testDefaultWanderStrategyIsWanderStrategy() {
         let state = EnemyStateComponent()
-        XCTAssertEqual(state.wanderRadius, 100, accuracy: 0.001)
+        XCTAssertTrue(state.wanderStrategy is WanderStrategy)
     }
 
-    func testDefaultWanderSpeed() {
+    func testDefaultChaseStrategyIsStraightLineChaseStrategy() {
         let state = EnemyStateComponent()
-        XCTAssertEqual(state.wanderSpeed, 40, accuracy: 0.001)
-    }
-
-    func testDefaultChaseSpeed() {
-        let state = EnemyStateComponent()
-        XCTAssertEqual(state.chaseSpeed, 70, accuracy: 0.001)
+        XCTAssertTrue(state.chaseStrategy is StraightLineChaseStrategy)
     }
 
     // MARK: - Logical invariants
@@ -55,11 +47,6 @@ final class EnemyStateComponentTests: XCTestCase {
     func testLoseRadiusIsGreaterThanDetectionRadius() {
         let state = EnemyStateComponent()
         XCTAssertGreaterThan(state.loseRadius, state.detectionRadius)
-    }
-
-    func testChaseSpeedIsGreaterThanWanderSpeed() {
-        let state = EnemyStateComponent()
-        XCTAssertGreaterThan(state.chaseSpeed, state.wanderSpeed)
     }
 
     // MARK: - Custom initialisation
@@ -74,19 +61,21 @@ final class EnemyStateComponentTests: XCTestCase {
         XCTAssertEqual(state.loseRadius, 300, accuracy: 0.001)
     }
 
-    func testCustomWanderRadius() {
-        let state = EnemyStateComponent(wanderRadius: 50)
-        XCTAssertEqual(state.wanderRadius, 50, accuracy: 0.001)
+    func testCustomWanderStrategy() {
+        let customWander = WanderStrategy(wanderRadius: 50, wanderSpeed: 25)
+        let state = EnemyStateComponent(wanderStrategy: customWander)
+        let wander = state.wanderStrategy as? WanderStrategy
+        XCTAssertNotNil(wander)
+        XCTAssertEqual(wander!.wanderRadius, 50, accuracy: 0.001)
+        XCTAssertEqual(wander!.wanderSpeed, 25, accuracy: 0.001)
     }
 
-    func testCustomWanderSpeed() {
-        let state = EnemyStateComponent(wanderSpeed: 25)
-        XCTAssertEqual(state.wanderSpeed, 25, accuracy: 0.001)
-    }
-
-    func testCustomChaseSpeed() {
-        let state = EnemyStateComponent(chaseSpeed: 120)
-        XCTAssertEqual(state.chaseSpeed, 120, accuracy: 0.001)
+    func testCustomChaseStrategy() {
+        let customChase = StraightLineChaseStrategy(chaseSpeed: 120)
+        let state = EnemyStateComponent(chaseStrategy: customChase)
+        let chase = state.chaseStrategy as? StraightLineChaseStrategy
+        XCTAssertNotNil(chase)
+        XCTAssertEqual(chase!.chaseSpeed, 120, accuracy: 0.001)
     }
 
     // MARK: - Mutation
@@ -104,19 +93,15 @@ final class EnemyStateComponentTests: XCTestCase {
         XCTAssertTrue(state.mode == .wander)
     }
 
-    func testWanderTargetCanBeSet() {
+    func testWanderStrategyCanBeSwapped() {
         var state = EnemyStateComponent()
-        let target = SIMD2<Float>(100, 200)
-        state.wanderTarget = target
-        XCTAssertNotNil(state.wanderTarget)
-        XCTAssertEqual(state.wanderTarget!.x, 100, accuracy: 0.001)
-        XCTAssertEqual(state.wanderTarget!.y, 200, accuracy: 0.001)
+        state.wanderStrategy = StraightLineChaseStrategy()
+        XCTAssertTrue(state.wanderStrategy is StraightLineChaseStrategy)
     }
 
-    func testWanderTargetCanBeCleared() {
+    func testChaseStrategyCanBeSwapped() {
         var state = EnemyStateComponent()
-        state.wanderTarget = SIMD2<Float>(100, 200)
-        state.wanderTarget = nil
-        XCTAssertNil(state.wanderTarget)
+        state.chaseStrategy = WanderStrategy()
+        XCTAssertTrue(state.chaseStrategy is WanderStrategy)
     }
 }

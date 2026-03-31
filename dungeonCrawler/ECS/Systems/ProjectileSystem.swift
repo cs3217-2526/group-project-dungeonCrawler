@@ -9,7 +9,7 @@ import Foundation
 import simd
 
 public final class ProjectileSystem: System {
-    public let priority: Int = 60 // After weapon spawn new projectiles
+    public var dependencies: [System.Type] { [WeaponSystem.self] }
     
     private let events: CollisionEventBuffer
     private let destructionQueue: DestructionQueue
