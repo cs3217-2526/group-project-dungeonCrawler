@@ -32,8 +32,10 @@ final class WeaponSystemTests: XCTestCase {
         aimDirection: SIMD2<Float> = SIMD2(1, 0),
         coolDownInterval: TimeInterval = 1.0,
         lastFiredAt: Float = 0,
-        weaponDamage: Float = 25,
-        weaponManaCost: Float = 0
+        projectileDamage: Float = 25,
+        weaponManaCost: Float = 0,
+        projectileSpeed: Float = 300,
+        projectileEffectiveRange: Float = 400
     ) -> (owner: Entity, weapon: Entity) {
         let owner = world.createEntity()
         world.addComponent(component: TransformComponent(position: ownerPosition), to: owner)
@@ -52,13 +54,20 @@ final class WeaponSystemTests: XCTestCase {
         let facingOfOwner = world.getComponent(type: FacingComponent.self, for: owner)!.facing
         world.addComponent(component: FacingComponent(facing: facingOfOwner), to: weapon)
         world.addComponent(component: WeaponTimingComponent(
-            type: .handgun,
-            damage: weaponDamage,
-            manaCost: weaponManaCost,
-            attackSpeed: 1,
+            lastFiredAt: lastFiredAt,
             coolDownInterval: coolDownInterval,
-            lastFiredAt: lastFiredAt
+            attackSpeed: 1
         ), to: weapon)
+        world.addComponent(component: WeaponEffectsComponent(effects: [
+            ConsumeManaEffect(amount: weaponManaCost),
+            SpawnProjectileEffect(
+                speed: projectileSpeed,
+                effectiveRange: projectileEffectiveRange,
+                damage: projectileDamage,
+                spriteName: "normalHandgunBullet",
+                collisionSize: SIMD2<Float>(6, 6)
+            )
+        ]), to: weapon)
 
         return (owner, weapon)
     }
@@ -287,15 +296,15 @@ final class WeaponSystemTests: XCTestCase {
             isShooting: true,
             coolDownInterval: 0.5,
             lastFiredAt: 0,
-            weaponDamage: 42
+            projectileDamage: 42
         )
         system.update(deltaTime: 1.0, world: world)
 
-        let proj = world.getComponent(type: ProjectileComponent.self, for: getSpawnedProjectiles()[0])!
-        XCTAssertEqual(proj.damage, 42, accuracy: 0.001)
+        let contactDamage = world.getComponent(type: ContactDamageComponent.self, for: getSpawnedProjectiles()[0])!
+        XCTAssertEqual(contactDamage.damage, 42, accuracy: 0.001)
     }
 
-    func testSpawnedProjectileHasManaCostFromWeapon() {
+    func testManaConsumedUsingWeaponEffectCost() {
         let (owner, _) = makeWeaponWithOwner(
             isShooting: true,
             coolDownInterval: 0.5,
@@ -305,8 +314,8 @@ final class WeaponSystemTests: XCTestCase {
         addMana(to: owner, current: 100, max: 100)
         system.update(deltaTime: 1.0, world: world)
 
-        let proj = world.getComponent(type: ProjectileComponent.self, for: getSpawnedProjectiles()[0])!
-        XCTAssertEqual(proj.manaCost, 18, accuracy: 0.001)
+        let mana = world.getComponent(type: ManaComponent.self, for: owner)!
+        XCTAssertEqual(mana.value.current, 82, accuracy: 0.001)
     }
 
     // MARK: - Projectile basic checks
@@ -314,6 +323,7 @@ final class WeaponSystemTests: XCTestCase {
     func testSpawnedProjectileHasTransformAtOwnerPosition() {
         makeWeaponWithOwner(
             ownerPosition: SIMD2(50, 30),
+            offset: .zero,
             isShooting: true,
             coolDownInterval: 0.5,
             lastFiredAt: 0
@@ -352,8 +362,8 @@ final class WeaponSystemTests: XCTestCase {
         let (owner, _) = makeWeaponWithOwner(isShooting: true, coolDownInterval: 0.5, lastFiredAt: 0)
         system.update(deltaTime: 1.0, world: world)
 
-        let proj = world.getComponent(type: ProjectileComponent.self, for: getSpawnedProjectiles()[0])!
-        XCTAssertEqual(proj.owner, owner)
+        let projectileOwner = world.getComponent(type: OwnerComponent.self, for: getSpawnedProjectiles()[0])!
+        XCTAssertEqual(projectileOwner.ownerEntity, owner)
     }
 
     func testSpawnedProjectileHasPositiveEffectiveRange() {
