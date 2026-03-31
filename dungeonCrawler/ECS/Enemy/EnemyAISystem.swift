@@ -9,7 +9,7 @@ import Foundation
 import simd
 
 public final class EnemyAISystem: System {
-    public let priority: Int = 15
+    public var dependencies: [System.Type] { [KnockbackSystem.self] }
 
     public init() {}
 

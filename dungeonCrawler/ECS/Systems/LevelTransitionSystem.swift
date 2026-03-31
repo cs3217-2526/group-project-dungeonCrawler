@@ -8,7 +8,7 @@ import simd
 /// event via the `LevelOrchestrator`.
 public final class LevelTransitionSystem: System {
 
-    public let priority: Int = 10
+    public var dependencies: [System.Type] { [] }
 
     private let orchestrator: LevelOrchestrator
 

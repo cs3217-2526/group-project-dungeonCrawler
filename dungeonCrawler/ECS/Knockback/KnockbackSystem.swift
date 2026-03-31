@@ -9,7 +9,7 @@ import Foundation
 import simd
 
 public final class KnockbackSystem: System {
-    public let priority: Int = 12
+    public var dependencies: [System.Type] { [LevelTransitionSystem.self] }
 
     public func update(deltaTime: Double, world: World) {
         let dt = Float(deltaTime)

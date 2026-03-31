@@ -3,10 +3,10 @@ import Foundation
 import simd
 
 /// Lerps the ViewportComponent position toward the entity tagged with
-/// CameraFocusComponent. Runs before rendering (priority 90).
+/// CameraFocusComponent. Runs before RenderSystem (see dependencies).
 public final class CameraSystem: System {
 
-    public let priority: Int = 90
+    public var dependencies: [System.Type] { [MovementSystem.self] }
 
     /// Controls smoothness. Higher = snappier (~20 is nearly instant).
     public var smoothing: Float = 8.0
