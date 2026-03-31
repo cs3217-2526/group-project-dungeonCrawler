@@ -184,15 +184,16 @@ final class SystemManagerTests: XCTestCase {
         XCTAssertEqual(third.executionOrder.first,  3, "Third (depends on Second) should run third")
     }
 
-    func testSystemsWithNoDependenciesAllRun() {
+    func testMultipleDistinctSystemsAllRun() {
         let systemA = MockSystemA()
-        let systemB = MockSystemA() // Same type — second registration overwrites first
+        let systemB = MockSystemB()
         systemManager.register(systemA)
-        _ = systemB // intentionally unused; same type as A so only one runs
+        systemManager.register(systemB)
 
         systemManager.update(deltaTime: 0.016, world: world)
 
         XCTAssertEqual(systemA.updateCallCount, 1)
+        XCTAssertEqual(systemB.updateCallCount, 1)
     }
 
     func testDependencyOrderMaintainedAfterLateRegistration() {
