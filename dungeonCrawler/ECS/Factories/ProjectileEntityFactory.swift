@@ -14,8 +14,8 @@ public struct ProjectileEntityFactory: EntityFactory {
     let speed: Float
     let effectiveRange: Float
     let damage: Float
-    let manaCost: Float
     let owner: Entity
+    let spriteName: String
 
     public init(
         from position: SIMD2<Float>,
@@ -23,16 +23,16 @@ public struct ProjectileEntityFactory: EntityFactory {
         speed: Float,
         effectiveRange: Float,
         damage: Float,
-        manaCost: Float,
-        owner: Entity
+        owner: Entity,
+        spriteName: String
     ) {
         self.position = position
         self.direction = direction
         self.speed = speed
         self.effectiveRange = effectiveRange
         self.damage = damage
-        self.manaCost = manaCost
         self.owner = owner
+        self.spriteName = spriteName
     }
 
     @discardableResult
@@ -48,7 +48,16 @@ public struct ProjectileEntityFactory: EntityFactory {
             content: .texture(name: "normalHandgunBullet"),
             layer: .projectile
         ), to: entity)
-        world.addComponent(component: ProjectileComponent(damage: damage, owner: owner, manaCost: manaCost), to: entity)
+        world.addComponent(
+            component: ProjectileComponent(
+                spec: ProjectileSpec(
+                    speed: speed,
+                    effectiveRange: effectiveRange,
+                    damage: damage,
+                    spriteName: spriteName,
+                    collisionSize: <#T##SIMD2<Float>?#>),
+                owner: owner),
+            to: entity)
         world.addComponent(component: EffectiveRangeComponent(base: effectiveRange), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: SIMD2<Float>(6, 6)), to: entity)
         // all projectiles are 10 damage for now, can extend this to make it tailored to the weapon

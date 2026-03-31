@@ -1,5 +1,4 @@
 struct ProjectileComponent: Component {
-    var damage: Float
+    var spec: ProjectileSpec
     var owner: Entity
-    var manaCost: Float
 }

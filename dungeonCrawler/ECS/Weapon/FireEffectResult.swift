@@ -7,6 +7,7 @@
 
 import Foundation
 
-struct FireEffectResult {
-    
+enum FireEffectResult {
+    case success
+    case blocked(String)
 }
