@@ -9,7 +9,7 @@ import Foundation
 
 public final class RenderSystem: System {
 
-    public let priority: Int = 100
+    public var dependencies: [System.Type] { [CameraSystem.self, HUDSystem.self, ProjectileSystem.self] }
 
     private weak var backend: RenderingBackend?
     private var seenEntities: Set<Entity> = []

@@ -4,7 +4,7 @@ import Foundation
 /// Dequeues JoystickRenderCommands to update the joystick backend.
 public final class HUDSystem: System {
 
-    public let priority: Int = 95
+    public var dependencies: [System.Type] { [HealthSystem.self] }
 
     private weak var backend: HUDBackend?
     private weak var joystickBackend: JoystickBackend?

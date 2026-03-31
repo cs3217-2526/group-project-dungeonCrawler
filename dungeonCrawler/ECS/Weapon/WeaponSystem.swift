@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 public final class WeaponSystem: System {
-    public let priority: Int = 50
+    public var dependencies: [System.Type] { [CollisionSystem.self] }
     
     private var gameTime: Float
 

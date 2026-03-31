@@ -262,11 +262,5 @@ final class InputSystemTests: XCTestCase {
 
         XCTAssertEqual(input1, input2)
     }
-
-    // MARK: - Priority
-
-    func testPriority() {
-        XCTAssertEqual(system.priority, 10)
-    }
 }
 
