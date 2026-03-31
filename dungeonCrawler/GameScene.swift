@@ -107,6 +107,7 @@ class GameScene: SKScene {
         systemManager.register(InputSystem(commandQueues: commandQueues))
         systemManager.register(EnemyAISystem())
         systemManager.register(HealthSystem(destructionQueue: destructionQueue, playerDeathEvent: playerDeathEvent))
+        systemManager.register(ManaSystem())
         systemManager.register(MovementSystem())
         systemManager.register(CollisionSystem(events: collisionEvents, destructionQueue: destructionQueue))
         systemManager.register(DamageSystem(events: collisionEvents, destructionQueue: destructionQueue))
