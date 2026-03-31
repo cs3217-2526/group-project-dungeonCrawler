@@ -19,8 +19,11 @@ public final class SystemManager {
     // MARK: - Registration
 
     public func register(_ system: any System) {
-        /// keyed by type identity so that no duplicate systems are allowed
-        _systems[ObjectIdentifier(type(of: system))] = system
+        // keyed by type identity so that no duplicate systems are allowed
+        let id = ObjectIdentifier(type(of: system))
+        assert(_systems[id] == nil, "Attempted to register duplicate system: \(id)!")
+
+        _systems[id] = system
         _isDirty = true
     }
 
