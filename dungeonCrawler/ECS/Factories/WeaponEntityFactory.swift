@@ -51,13 +51,6 @@ public struct WeaponEntityFactory: EntityFactory {
             to: entity
         )
         world.addComponent(component: FacingComponent(facing: ownerFacing), to: entity)
-        world.addComponent(
-            component: SpriteComponent(
-                content: .texture(name: textureName),
-                layer: .weapon,
-                anchorPoint: anchorPoint ?? SIMD2(0.5, 0.5)),
-            to: entity
-        )
         world.addComponent(component: OwnerComponent(ownerEntity: player, offset: offset), to: entity)
         world.addComponent(
             component: WeaponTimingComponent(

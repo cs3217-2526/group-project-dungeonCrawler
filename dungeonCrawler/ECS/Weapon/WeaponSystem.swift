@@ -45,7 +45,7 @@ public final class WeaponSystem: System {
                     world.removeComponent(type: WeaponSwingComponent.self, from: weaponEntity)
                 } else {
                     let progress = progressedElapsed / swing.duration
-                    let offset = sin(2 * progress * .pi) * swing.amplitude * swing.directionSign
+                    let offset = sin(2 * (0.25 - progress) * .pi) * swing.amplitude * swing.directionSign
                     renderedRotation = swing.baseRotation + offset
                     world.modifyComponentIfExist(type: WeaponSwingComponent.self, for: weaponEntity) { activeSwing in
                         activeSwing.elapsed = progressedElapsed

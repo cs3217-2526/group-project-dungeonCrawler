@@ -201,7 +201,6 @@ public final class LevelOrchestrator {
 //                        collisionSize: SIMD2<Float>(6, 6))
 //                ]
 //            ).make(in: world)
-//            world.removeComponent(type: SpriteComponent.self, from: sniper)
             let sword = WeaponEntityFactory(
                 player: player,
                 textureName: "sword",
@@ -215,13 +214,18 @@ public final class LevelOrchestrator {
                         range: 100,
                         halfAngleDegrees: 90,
                         maxTargets: 1,
-                        swingDuration: 0.14,
-                        swingAngleDegrees: 30
+                        swingDuration: 0.3,
+                        swingAngleDegrees: 40
                     )
                 ],
                 anchorPoint: SIMD2<Float>(0.1, 0.5)
             ).make(in: world)
-            world.removeComponent(type: SpriteComponent.self, from: sword)
+            world.addComponent(
+                component: SpriteComponent(
+                    content: .texture(name: "handgun"),
+                    layer: .weapon,
+                    anchorPoint: SIMD2(0.5, 0.5)),
+                to: handgun)
             world.addComponent(
                 component: EquippedWeaponComponent(primaryWeapon: handgun, secondaryWeapon: sword),
                 to: player
