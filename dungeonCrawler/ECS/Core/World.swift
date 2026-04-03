@@ -59,8 +59,16 @@ public final class World {
         components.remove(type: type, from: entity)
     }
     
-    public func modifyComponent<T: Component>(type: T.Type, for entity: Entity, body: (inout T) -> Void) {
+    public func modifyComponentIfExist<T: Component>(type: T.Type, for entity: Entity, body: (inout T) -> Void) {
         components.modify(type: type, for: entity, body: body)
+    }
+
+    public func modifyComponent<T: Component>(type: T.Type, for entity: Entity, component: T?, body: (inout T) -> Void) {
+        if components.get(type: type, for: entity) != nil {
+            components.modify(type: type, for: entity, body: body)
+        } else if let newComponent = component {
+            components.add(component: newComponent, to: entity)
+        }
     }
 
     // MARK: - Querying helpers used by Systems
@@ -111,6 +119,26 @@ public final class World {
                 let d = components.get(type: typeD, for: entity)
             else { return nil }
             return (entity, a, b, c, d)
+        }
+    }
+
+    /// Returns every living entity that has all three of `T`, `U`, `V` and `W` and `Y` (5-way join).
+    public func entities<T: Component, U: Component, V: Component, W: Component, Y: Component>(
+        with typeA: T.Type,
+        and typeB: U.Type,
+        and typeC: V.Type,
+        and typeD: W.Type,
+        and typeE: Y.Type
+    ) -> [(entity: Entity, a: T, b: U, c: V, d: W, e: Y)] {
+        components.entities(with: typeA).compactMap { entity in
+            guard
+                let a = components.get(type: typeA, for: entity),
+                let b = components.get(type: typeB, for: entity),
+                let c = components.get(type: typeC, for: entity),
+                let d = components.get(type: typeD, for: entity),
+                let e = components.get(type: typeE, for: entity)
+            else { return nil }
+            return (entity, a, b, c, d, e)
         }
     }
 }

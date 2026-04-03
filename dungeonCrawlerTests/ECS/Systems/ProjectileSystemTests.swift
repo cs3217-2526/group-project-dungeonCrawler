@@ -33,23 +33,21 @@ final class ProjectileSystemTests: XCTestCase {
     static let defaultVelocity: Float = 300
     static let defaultEffectiveRange: Float = 300
     static let defaultDamage: Float = 10
-    static let defaultManaCost: Float = 25
     
     /// default velocity is 300
     /// default projectile effective range is 300
     @discardableResult
     private func makeProjectile(from position: SIMD2<Float> = SIMD2(0, 0),
                                 aimAt direction: SIMD2<Float> = SIMD2(1, 0),
-                                damage: Float = 10,
-                                manaCost: Float = 25) -> Entity {
+                                damage: Float = 10) -> Entity {
         let speed: Float = ProjectileSystemTests.defaultVelocity
-        let owner = world.createEntity()
         let projectile = world.createEntity()
         world.addComponent(component: TransformComponent(position: position, scale: 1), to: projectile)
         world.addComponent(component: VelocityComponent(linear: direction * speed), to: projectile)
         world.addComponent(component: SpriteComponent(textureName: "normalHandgunBullet", zPosition: 5), to: projectile)
-        world.addComponent(component: ProjectileComponent(damage: damage, owner: owner, manaCost: manaCost), to: projectile)
+        world.addComponent(component: ProjectileComponent(), to: projectile)
         world.addComponent(component: EffectiveRangeComponent(base: Self.defaultEffectiveRange), to: projectile)
+        world.addComponent(component: ContactDamageComponent(damage: damage), to: projectile)
         return projectile
     }
     
@@ -88,27 +86,14 @@ final class ProjectileSystemTests: XCTestCase {
  
     func testProjectileComponentHasCorrectDamage() {
         let projectile = makeProjectile(damage: 42)
-        let comp = world.getComponent(type: ProjectileComponent.self, for: projectile)!
+        let comp = world.getComponent(type: ContactDamageComponent.self, for: projectile)!
         XCTAssertEqual(comp.damage, 42, accuracy: 0.001)
     }
  
-    func testProjectileComponentHasCorrectManaCost() {
-        let projectile = makeProjectile(manaCost: 18)
-        let comp = world.getComponent(type: ProjectileComponent.self, for: projectile)!
-        XCTAssertEqual(comp.manaCost, 18, accuracy: 0.001)
-    }
- 
-    func testProjectileComponentDamageUnchangedAfterRangeDecay() {
+    func testProjectileContactDamageUnchangedAfterRangeDecay() {
         let projectile = makeProjectile(damage: 30)
         system.update(deltaTime: 0.5, world: world)
-        let comp = world.getComponent(type: ProjectileComponent.self, for: projectile)!
+        let comp = world.getComponent(type: ContactDamageComponent.self, for: projectile)!
         XCTAssertEqual(comp.damage, 30, accuracy: 0.001)
-    }
- 
-    func testProjectileComponentManaCostUnchangedAfterRangeDecay() {
-        let projectile = makeProjectile(manaCost: 15)
-        system.update(deltaTime: 0.5, world: world)
-        let comp = world.getComponent(type: ProjectileComponent.self, for: projectile)!
-        XCTAssertEqual(comp.manaCost, 15, accuracy: 0.001)
     }
 }

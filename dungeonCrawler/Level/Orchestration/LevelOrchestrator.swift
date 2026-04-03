@@ -82,7 +82,7 @@ public final class LevelOrchestrator {
     public func transition(to nodeID: UUID, world: World) {
         guard let stateEntity = world.entities(with: LevelStateComponent.self).first else { return }
         
-        world.modifyComponent(type: LevelStateComponent.self, for: stateEntity) { state in
+        world.modifyComponentIfExist(type: LevelStateComponent.self, for: stateEntity) { state in
             state.activeNodeID = nodeID
             state.transitionCooldown = WorldConstants.transitionCooldown
         }
@@ -162,7 +162,7 @@ public final class LevelOrchestrator {
 
     private func positionPlayer(at position: SIMD2<Float>, world: World) {
         if let player = world.entities(with: PlayerTagComponent.self).first {
-            world.modifyComponent(type: TransformComponent.self, for: player) { t in
+            world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
                 t.position = position
             }
         } else {
@@ -170,23 +170,67 @@ public final class LevelOrchestrator {
             let player = PlayerEntityFactory(at: position, scale: scale).make(in: world)
             let weaponOffset = SIMD2<Float>(10, -5)
             let handgun = WeaponEntityFactory(
-                ownedBy: player,
-                weaponType: .handgun,
+                player: player,
+                textureName: "handgun",
                 offset: weaponOffset,
                 scale: scale,
-                lastFiredAt: 0
+                lastFiredAt: 0,
+                coolDownIntervel: TimeInterval(0.2),
+                attackSpeed: 1,
+                effects: [
+                    ConsumeManaEffect(amount: 5),
+                    SpawnProjectileEffect(
+                        speed: 300, effectiveRange: 400,
+                        damage: 15, spriteName: "normalHandgunBullet",
+                        collisionSize: SIMD2<Float>(6, 6))
+                ],
+                anchorPoint: nil,
+                initRotation: nil
             ).make(in: world)
-            let sniper = WeaponEntityFactory(
-                ownedBy: player,
-                weaponType: .sniper,
-                offset: weaponOffset,
-                scale: scale,
-                lastFiredAt: 0
+//            let sniper = WeaponEntityFactory(
+//                player: player,
+//                textureName: "Sniper",
+//                offset: weaponOffset,
+//                scale: scale,
+//                lastFiredAt: 0,
+//                coolDownIntervel: TimeInterval(0.8),
+//                attackSpeed: 1,
+//                effects: [
+//                    ConsumeManaEffect(amount: 20),
+//                    SpawnProjectileEffect(
+//                        speed: 300, effectiveRange: 400,
+//                        damage: 50, spriteName: "normalHandgunBullet",
+//                        collisionSize: SIMD2<Float>(6, 6))
+//                ]
+//            ).make(in: world)
+            let sword = WeaponEntityFactory(
+                player: player,
+                textureName: "sword",
+                offset: SIMD2<Float>(12, -6),
+                scale: 0.3,
+                coolDownIntervel: TimeInterval(0.5),
+                attackSpeed: 1,
+                effects: [
+                    MeleeDamageEffect(
+                        damage: 50,
+                        range: 100,
+                        halfAngleDegrees: 90,
+                        maxTargets: 1,
+                        swingDuration: 0.3,
+                        swingAngleDegrees: 40
+                    )
+                ],
+                anchorPoint: SIMD2<Float>(0.1, 0.5),
+                initRotation: .pi / 9
             ).make(in: world)
-            // Sniper starts as secondary — hide its sprite until switched to
-            world.removeComponent(type: SpriteComponent.self, from: sniper)
             world.addComponent(
-                component: EquippedWeaponComponent(primaryWeapon: handgun, secondaryWeapon: sniper),
+                component: SpriteComponent(
+                    content: .texture(name: "handgun"),
+                    layer: .weapon,
+                    anchorPoint: SIMD2(0.5, 0.5)),
+                to: handgun)
+            world.addComponent(
+                component: EquippedWeaponComponent(primaryWeapon: handgun, secondaryWeapon: sword),
                 to: player
             )
         }

@@ -26,12 +26,12 @@ public final class ProjectileSystem: System {
             and: VelocityComponent.self,
             and: TransformComponent.self,
             and: EffectiveRangeComponent.self) {
-            world.modifyComponent(type: TransformComponent.self, for: projectileEntity) { transform in
+            world.modifyComponentIfExist(type: TransformComponent.self, for: projectileEntity) { transform in
                 transform.position += velocityComponent.linear * dt
             }
             let distanceTraveled = simd_length(velocityComponent.linear) * dt
             var remainingRange: Float = .greatestFiniteMagnitude
-            world.modifyComponent(type: EffectiveRangeComponent.self, for: projectileEntity) { rangeComponent in
+            world.modifyComponentIfExist(type: EffectiveRangeComponent.self, for: projectileEntity) { rangeComponent in
                 rangeComponent.value.current -= distanceTraveled
                 remainingRange = rangeComponent.value.current
             }

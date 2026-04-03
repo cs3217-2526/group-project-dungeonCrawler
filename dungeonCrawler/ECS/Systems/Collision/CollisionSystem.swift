@@ -74,16 +74,16 @@ public final class CollisionSystem: System {
         // Projectile hits an enemy — record damage event, skip physics resolution.
         // CombatSystem consumes this to apply damage and destroy the projectile.
         if aIsProjectile && bIsEnemy {
-            let damage = world.getComponent(type: ProjectileComponent.self, for: entityA)?.damage ?? 0
+            let damage = world.getComponent(type: ContactDamageComponent.self, for: entityA)?.damage ?? 0
             // Guard: a projectile should not damage its own owner
-            let ownerID = world.getComponent(type: ProjectileComponent.self, for: entityA)?.owner.id
+            let ownerID = world.getComponent(type: OwnerComponent.self, for: entityA)?.ownerEntity.id
             guard ownerID != entityB.id else { return }
             events.recordProjectileHitEnemy(projectile: entityA, enemy: entityB, damage: damage)
             return
         }
         if bIsProjectile && aIsEnemy {
-            let damage = world.getComponent(type: ProjectileComponent.self, for: entityB)?.damage ?? 0
-            let ownerID = world.getComponent(type: ProjectileComponent.self, for: entityB)?.owner.id
+            let damage = world.getComponent(type: ContactDamageComponent.self, for: entityB)?.damage ?? 0
+            let ownerID = world.getComponent(type: OwnerComponent.self, for: entityB)?.ownerEntity.id
             guard ownerID != entityA.id else { return }
             events.recordProjectileHitEnemy(projectile: entityB, enemy: entityA, damage: damage)
             return
@@ -201,7 +201,7 @@ public final class CollisionSystem: System {
     /// Dynamic entity (player or enemy) hits a static entity (wall, obstacle).
     /// Only the dynamic entity is displaced; the static one never moves.
     private func resolveStaticCollision(dynamic: Entity, mtv: SIMD2<Float>, world: World) {
-        world.modifyComponent(type: TransformComponent.self, for: dynamic) {
+        world.modifyComponentIfExist(type: TransformComponent.self, for: dynamic) {
             $0.position += mtv
         }
     }
@@ -222,10 +222,10 @@ public final class CollisionSystem: System {
         let enemyKnockbackSpeed = baseKnockbackSpeed / enemyMass
         let playerKnockbackSpeed = baseKnockbackSpeed / playerMass
 
-        world.modifyComponent(type: TransformComponent.self, for: player) {
+        world.modifyComponentIfExist(type: TransformComponent.self, for: player) {
             $0.position += pushTowardPlayer * (enemyMass / totalMass)
         }
-        world.modifyComponent(type: TransformComponent.self, for: enemy) {
+        world.modifyComponentIfExist(type: TransformComponent.self, for: enemy) {
             $0.position -= pushTowardPlayer * (playerMass / totalMass)
         }
         applyKnockbackIfNeeded(to: player, velocity:  playerKnockbackSpeed * bounceDir,
@@ -238,8 +238,8 @@ public final class CollisionSystem: System {
  
     /// Two enemies overlap — equal positional split, no knockback.
     private func resolveEnemyEnemyCollision(entityA: Entity, entityB: Entity, mtv: SIMD2<Float>, world: World) {
-        world.modifyComponent(type: TransformComponent.self, for: entityA) { $0.position += mtv * 0.5 }
-        world.modifyComponent(type: TransformComponent.self, for: entityB) { $0.position -= mtv * 0.5 }
+        world.modifyComponentIfExist(type: TransformComponent.self, for: entityA) { $0.position += mtv * 0.5 }
+        world.modifyComponentIfExist(type: TransformComponent.self, for: entityB) { $0.position -= mtv * 0.5 }
     }
  
     /// Adds a KnockbackComponent only if the entity is not already being knocked back.

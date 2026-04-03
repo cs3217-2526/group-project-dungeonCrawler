@@ -28,14 +28,14 @@ public final class MovementSystem: System {
         for (entity, input, _, moveSpeed) in movable {
             guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
 
-            world.modifyComponent(type: VelocityComponent.self, for: entity) { velocity in
+            world.modifyComponentIfExist(type: VelocityComponent.self, for: entity) { velocity in
                 velocity.linear = input.moveDirection * moveSpeed.value.current
             }
             
             guard let velocity = world.getComponent(type: VelocityComponent.self, for: entity)
             else { continue }
 
-            world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
+            world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
                 transform.position += velocity.linear * dt
             }
         }
@@ -49,7 +49,7 @@ public final class MovementSystem: System {
         for (entity, _, velocity, _) in enemyMovable {
             guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
 
-            world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
+            world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
                 transform.position += velocity.linear * dt
             }
         }

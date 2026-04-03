@@ -137,7 +137,7 @@ final class WorldTests: XCTestCase {
         
         world.addComponent(component: transform, to: entity)
         
-        world.modifyComponent(type: TransformComponent.self, for: entity) { component in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { component in
             component.position.x = 100
             component.scale = 2.0
         }
@@ -255,7 +255,7 @@ final class WorldTests: XCTestCase {
         XCTAssertNotNil(world.getComponent(type: InputComponent.self, for: entity))
         
         // Modify components
-        world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
             transform.position = SIMD2<Float>(100, 200)
         }
         

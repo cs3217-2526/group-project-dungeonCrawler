@@ -24,7 +24,7 @@ public final class InvincibilitySystem: System {
             if invincibility.remainingTime <= 0 {
                 world.removeComponent(type: InvincibilityComponent.self, from: entity)
             } else {
-                world.modifyComponent(type: InvincibilityComponent.self, for: entity) {
+                world.modifyComponentIfExist(type: InvincibilityComponent.self, for: entity) {
                     $0.remainingTime = invincibility.remainingTime
                 }
             }

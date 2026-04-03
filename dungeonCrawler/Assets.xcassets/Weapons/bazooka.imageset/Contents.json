@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "bazooka.png",
       "idiom" : "universal",
       "scale" : "1x"
     },

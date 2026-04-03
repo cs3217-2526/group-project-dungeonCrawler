@@ -16,10 +16,10 @@ public final class KnockbackSystem: System {
         for entity in world.entities(with: KnockbackComponent.self) {
             guard let kb = world.getComponent(type: KnockbackComponent.self, for: entity) else { continue }
 
-            world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
+            world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
                 transform.position += kb.velocity * dt
             }
-            world.modifyComponent(type: KnockbackComponent.self, for: entity) { $0.remainingTime -= dt }
+            world.modifyComponentIfExist(type: KnockbackComponent.self, for: entity) { $0.remainingTime -= dt }
 
             if let kb = world.getComponent(type: KnockbackComponent.self, for: entity), kb.remainingTime <= 0 {
                 world.removeComponent(type: KnockbackComponent.self, from: entity)

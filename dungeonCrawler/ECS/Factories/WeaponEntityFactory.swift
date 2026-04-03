@@ -2,7 +2,6 @@
 //  WeaponEntityFactory.swift
 //  dungeonCrawler
 //
-//  Created by Wen Kang Yap on 24/3/26.
 //
 
 import Foundation
@@ -10,45 +9,71 @@ import simd
 
 public struct WeaponEntityFactory: EntityFactory {
     let player: Entity
-    let weaponType: WeaponType
+    let textureName: String
     let offset: SIMD2<Float>
     let scale: Float
     let lastFiredAt: Float
+    let coolDownIntervel: TimeInterval?
+    let attackSpeed: Float?
+    let effects: [any WeaponEffect]
+    let anchorPoint: SIMD2<Float>
+    let initRotation: Float
 
     public init(
-        ownedBy player: Entity,
-        weaponType: WeaponType = .handgun,
+        player: Entity,
+        textureName: String,
         offset: SIMD2<Float> = .zero,
         scale: Float = 1,
-        lastFiredAt: Float = 0
+        lastFiredAt: Float = 0,
+        coolDownIntervel: TimeInterval?,
+        attackSpeed: Float?,
+        effects: [any WeaponEffect],
+        anchorPoint: SIMD2<Float>?,
+        initRotation: Float?
     ) {
         self.player = player
-        self.weaponType = weaponType
+        self.textureName = textureName
         self.offset = offset
         self.scale = scale
         self.lastFiredAt = lastFiredAt
+        self.coolDownIntervel = coolDownIntervel
+        self.attackSpeed = attackSpeed
+        self.effects = effects
+        self.anchorPoint = anchorPoint ?? SIMD2<Float>(0.5, 0.5)
+        self.initRotation = initRotation ?? 0
     }
 
     @discardableResult
     public func make(in world: World) -> Entity {
         let entity = world.createEntity()
         let startPos = world.getComponent(type: TransformComponent.self, for: player)?.position ?? .zero
-        world.addComponent(component: TransformComponent(position: startPos + offset, rotation: 0, scale: scale), to: entity)
-        let facingOfOwner = world.getComponent(type: FacingComponent.self, for: player)?.facing ?? .right
-        world.addComponent(component: FacingComponent(facing: facingOfOwner), to: entity)
-        world.addComponent(component: SpriteComponent(
-            content: .texture(name: weaponType.textureName),
-            layer: .weapon
-        ), to: entity)
+        let ownerFacing = world.getComponent(type: FacingComponent.self, for: player)?.facing ?? .right
+
+        world.addComponent(
+            component: TransformComponent(
+                position: startPos + offset,
+                rotation: initRotation,
+                scale: scale),
+            to: entity
+        )
+        world.addComponent(component: FacingComponent(facing: ownerFacing), to: entity)
         world.addComponent(component: OwnerComponent(ownerEntity: player, offset: offset), to: entity)
-        world.addComponent(component: WeaponComponent(
-            type: weaponType,
-            damage: weaponType.damage,
-            manaCost: weaponType.manaCost,
-            attackSpeed: 1,
-            coolDownInterval: weaponType == .sniper ? TimeInterval(0.8) : TimeInterval(0.2),
-            lastFiredAt: lastFiredAt
-        ), to: entity)
+        world.addComponent(
+            component: WeaponTimingComponent(
+                lastFiredAt: lastFiredAt,
+                coolDownInterval: coolDownIntervel,
+                attackSpeed: attackSpeed),
+            to: entity)
+        world.addComponent(
+            component: WeaponRenderComponent(
+                textureName: textureName,
+                anchorPoint: anchorPoint,
+                initRotation: initRotation
+            ),
+            to: entity
+        )
+        world.addComponent(component: WeaponEffectsComponent(effects: effects), to: entity)
+
         return entity
     }
 }

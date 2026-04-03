@@ -14,25 +14,28 @@ public struct ProjectileEntityFactory: EntityFactory {
     let speed: Float
     let effectiveRange: Float
     let damage: Float
-    let manaCost: Float
     let owner: Entity
+    let spriteName: String
+    let collisionBoxSize: SIMD2<Float>
 
     public init(
         from position: SIMD2<Float>,
         aimAt direction: SIMD2<Float>,
         speed: Float,
         effectiveRange: Float,
-        damage: Float,
-        manaCost: Float,
-        owner: Entity
+        damage: Float = 10,
+        owner: Entity,
+        spriteName: String = "normalHandgunBullet",
+        collisionBoxSize: SIMD2<Float> = SIMD2<Float>(6, 6)
     ) {
         self.position = position
         self.direction = direction
         self.speed = speed
         self.effectiveRange = effectiveRange
         self.damage = damage
-        self.manaCost = manaCost
         self.owner = owner
+        self.spriteName = spriteName
+        self.collisionBoxSize = collisionBoxSize
     }
 
     @discardableResult
@@ -44,15 +47,12 @@ public struct ProjectileEntityFactory: EntityFactory {
             : -atan2(direction.y, -direction.x)
         world.addComponent(component: TransformComponent(position: position, rotation: bulletRotation, scale: 1), to: entity)
         world.addComponent(component: VelocityComponent(linear: direction * speed), to: entity)
-        world.addComponent(component: SpriteComponent(
-            content: .texture(name: "normalHandgunBullet"),
-            layer: .projectile
-        ), to: entity)
-        world.addComponent(component: ProjectileComponent(damage: damage, owner: owner, manaCost: manaCost), to: entity)
+        world.addComponent(component: SpriteComponent(content: .texture(name: spriteName), layer: .projectile), to: entity)
+        world.addComponent(component: ProjectileComponent(), to: entity)
+        world.addComponent(component: OwnerComponent(ownerEntity: owner), to: entity)
         world.addComponent(component: EffectiveRangeComponent(base: effectiveRange), to: entity)
-        world.addComponent(component: CollisionBoxComponent(size: SIMD2<Float>(6, 6)), to: entity)
-        // all projectiles are 10 damage for now, can extend this to make it tailored to the weapon
-        world.addComponent(component: ContactDamageComponent(damage: 10), to: entity)
+        world.addComponent(component: CollisionBoxComponent(size: collisionBoxSize), to: entity)
+        world.addComponent(component: ContactDamageComponent(damage: damage), to: entity)
         return entity
     }
 }

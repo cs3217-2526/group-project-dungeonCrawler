@@ -25,7 +25,7 @@ public final class LevelTransitionSystem: System {
         // 2. Manage Cooldown
         if state.transitionCooldown > 0 {
             let newCooldown = max(0, state.transitionCooldown - Float(deltaTime))
-            world.modifyComponent(type: LevelStateComponent.self, for: levelStateEntity) { s in
+            world.modifyComponentIfExist(type: LevelStateComponent.self, for: levelStateEntity) { s in
                 s.transitionCooldown = newCooldown
             }
             if newCooldown > 0 { return }

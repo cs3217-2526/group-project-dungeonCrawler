@@ -31,9 +31,9 @@ public final class EnemyAISystem: System {
             // transition mode based on distance thresholds only
             // between detectionRadius and loseRadius, mode is unchanged
             if distToPlayer <= state.detectionRadius {
-                world.modifyComponent(type: EnemyStateComponent.self, for: enemy) { $0.mode = .chase }
+                world.modifyComponentIfExist(type: EnemyStateComponent.self, for: enemy) { $0.mode = .chase }
             } else if distToPlayer > state.loseRadius {
-                world.modifyComponent(type: EnemyStateComponent.self, for: enemy) { $0.mode = .wander }
+                world.modifyComponentIfExist(type: EnemyStateComponent.self, for: enemy) { $0.mode = .wander }
             }
 
             // compute velocity every frame based on current mode.

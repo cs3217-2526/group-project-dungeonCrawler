@@ -47,7 +47,7 @@ struct LevelTransitionSystemTests {
 
         // Place player inside the neighbour's bounds
         let player = try #require(world.entities(with: PlayerTagComponent.self).first)
-        world.modifyComponent(type: TransformComponent.self, for: player) { t in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
             t.position = neighborDesc.bounds.center
         }
 
@@ -100,7 +100,7 @@ struct LevelTransitionSystemTests {
         let player = try #require(world.entities(with: PlayerTagComponent.self).first)
 
         // First transition: move into neighbour
-        world.modifyComponent(type: TransformComponent.self, for: player) { t in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
             t.position = neighborDesc.bounds.center
         }
         system.update(deltaTime: 1.0, world: world)
@@ -110,7 +110,7 @@ struct LevelTransitionSystemTests {
 
         // Immediately move back toward start room — cooldown must block retrigger
         let startDesc = try #require(graph.specification(for: startID))
-        world.modifyComponent(type: TransformComponent.self, for: player) { t in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
             t.position = startDesc.bounds.center
         }
         system.update(deltaTime: 0.01, world: world)  // still within 0.5 s cooldown
@@ -139,7 +139,7 @@ struct LevelTransitionSystemTests {
         let player = try #require(world.entities(with: PlayerTagComponent.self).first)
 
         // First transition
-        world.modifyComponent(type: TransformComponent.self, for: player) { t in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
             t.position = neighborDesc.bounds.center
         }
         system.update(deltaTime: 1.0, world: world)
@@ -149,7 +149,7 @@ struct LevelTransitionSystemTests {
 
         // Move back to start room and wait out the cooldown
         let startDesc = try #require(graph.specification(for: startID))
-        world.modifyComponent(type: TransformComponent.self, for: player) { t in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
             t.position = startDesc.bounds.center
         }
         system.update(deltaTime: 1.0, world: world)  // cooldown fully expired

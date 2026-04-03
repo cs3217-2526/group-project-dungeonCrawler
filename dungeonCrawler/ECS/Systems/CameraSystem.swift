@@ -23,7 +23,7 @@ public final class CameraSystem: System {
         let cameras = world.entities(with: ViewportComponent.self)
         guard let cameraEntity = cameras.first else { return }
 
-        world.modifyComponent(type: ViewportComponent.self, for: cameraEntity) { viewport in
+        world.modifyComponentIfExist(type: ViewportComponent.self, for: cameraEntity) { viewport in
             let t = min(smoothing * Float(deltaTime), 1.0)
             viewport.position = viewport.position + (targetPosition - viewport.position) * t
         }

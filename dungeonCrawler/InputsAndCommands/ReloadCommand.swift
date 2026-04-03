@@ -9,6 +9,4 @@ import Foundation
 
 struct ReloadCommand: Command {
     var id: CommandId
-    
-    var weaponSlot: WeaponType
 }

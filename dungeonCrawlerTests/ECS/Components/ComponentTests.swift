@@ -216,7 +216,7 @@ final class ComponentTests: XCTestCase {
         
         world.addComponent(component: TransformComponent(position: SIMD2<Float>(0, 0)), to: entity)
         
-        world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
+        world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
             transform.position = SIMD2<Float>(100, 200)
             transform.scale = 2.0
         }
