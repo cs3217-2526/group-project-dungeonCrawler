@@ -43,7 +43,7 @@ world.addComponent(component: HealthComponent(base: 50, max: 100), to: player)
 Damage is applied by directly decrementing `value.current` and calling `clampToMin()`:
 
 ```swift
-world.modifyComponent(type: HealthComponent.self, for: entity) { health in
+world.modifyComponentIfExist(type: HealthComponent.self, for: entity) { health in
     health.value.current -= damage
     health.value.clampToMin()
 }

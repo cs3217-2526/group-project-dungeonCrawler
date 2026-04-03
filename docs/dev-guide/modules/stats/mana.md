@@ -51,7 +51,7 @@ world.addComponent(
 To consume mana (e.g. when casting a spell), decrement `value.current` directly:
 
 ```swift
-world.modifyComponent(type: ManaComponent.self, for: player) { mana in
+world.modifyComponentIfExist(type: ManaComponent.self, for: player) { mana in
     mana.value.current -= spellCost
     mana.value.clampToMin()
 }

@@ -18,7 +18,7 @@ Every enemy entity is created with the following components:
 | `SpriteComponent` | Texture, derived from `EnemyType` at spawn time |
 | `EnemyTagComponent` | Marks the entity as an enemy; holds the resolved `textureName` and `scale` |
 | `VelocityComponent` | Movement vector, set each frame by `EnemyAISystem` |
-| `EnemyStateComponent` | AI mode (wander/chase) and related configurations |
+| `EnemyStateComponent` | AI mode (wander/chase), detection radii, and strategy instances |
 | `CollisionBoxComponent` | Axis-aligned bounding box, currently sized to `48 × 48 × scale` |
 
 ## Enemy Types
@@ -76,15 +76,20 @@ var mass: Int {
 }
 ```
 
-No changes to `EnemyTagComponent` or `EnemyAISystem` are needed. To give the new type different AI behaviour (e.g. faster chase speed), pass a custom `EnemyStateComponent` after creation:
+No changes to `EnemyTagComponent` or `EnemyAISystem` are needed. To give the new type different AI behaviour, pass a custom `EnemyStateComponent` when constructing the factory, or add one after creation.
 
-For example:
+For example, a stationary shooter that orbits the player when in chase mode:
 ```swift
 let enemy = EnemyEntityFactory(at: position, type: .goblin, baseScale: scale).make(in: world)
 world.addComponent(
-    component: EnemyStateComponent(detectionRadius: 200, chaseSpeed: 100),
+    component: EnemyStateComponent(
+        detectionRadius: 200,
+        loseRadius: 300,
+        wanderStrategy: StationaryStrategy(),
+        chaseStrategy: ShooterBasicStrategy(innerRadius: 120, outerRadius: 220)
+    ),
     to: enemy
 )
 ```
 
-See [Enemy AI System](./enemyAISystem.md) for all configurable fields.
+See [Enemy AI System](./enemyAISystem.md) for all available strategies and configurable fields.

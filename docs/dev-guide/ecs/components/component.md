@@ -46,10 +46,18 @@ if let transform = world.getComponent(type: TransformComponent.self, for: entity
 
 ### Mutate a component
 
-Components are value types (`struct`). Use `modifyComponent` to mutate in place — this avoids the copy-then-reassign pattern:
+Components are value types (`struct`). Use `modifyComponentIfExist` to mutate in place — this avoids the copy-then-reassign pattern, and silently no-ops if the component isn't present:
 
 ```swift
-world.modifyComponent(type: TransformComponent.self, for: entity) { transform in
+world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
+    transform.position += SIMD2<Float>(10, 0)
+}
+```
+
+If you need to mutate when it exists, or add a fallback component when it doesn't, use `modifyComponent`:
+
+```swift
+world.modifyComponent(type: TransformComponent.self, for: entity, component: TransformComponent(position: .zero)) { transform in
     transform.position += SIMD2<Float>(10, 0)
 }
 ```
