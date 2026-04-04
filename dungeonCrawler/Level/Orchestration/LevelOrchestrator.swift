@@ -184,7 +184,8 @@ public final class LevelOrchestrator {
                 attackSpeed: handgunDefinition.attackSpeed,
                 effects: WeaponEffectFactory.makeEffects(from: handgunDefinition),
                 anchorPoint: handgunDefinition.anchorPoint,
-                initRotation: handgunDefinition.initRotation
+                initRotation: handgunDefinition.initRotation,
+                initLocation: nil
             ).make(in: world)
             let sword = WeaponEntityFactory(
                 player: player,
@@ -195,7 +196,8 @@ public final class LevelOrchestrator {
                 attackSpeed: swordDefinition.attackSpeed,
                 effects: WeaponEffectFactory.makeEffects(from: swordDefinition),
                 anchorPoint: swordDefinition.anchorPoint,
-                initRotation: swordDefinition.initRotation
+                initRotation: swordDefinition.initRotation,
+                initLocation: nil
             ).make(in: world)
             world.addComponent(
                 component: SpriteComponent(

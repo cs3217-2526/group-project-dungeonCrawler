@@ -36,7 +36,7 @@ public final class LinearDungeonLayout: DungeonLayoutStrategy {
         // Start Room
         let startID = builder.placeStartRoom(
             bounds: RoomBounds(origin: SIMD2(-roomWidth / 2, -roomHeight / 2), size: size),
-            populator: EmptyRoomPopulator()
+            populator: WeaponRoomPopulator()
         )
         
         var currentID = startID
