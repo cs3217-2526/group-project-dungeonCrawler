@@ -195,7 +195,7 @@ public final class SpriteKitTileMapAdapter: TileMapRenderer {
         let sheetRows = CGFloat(entry.meta.sheetRows)
         let tilePoints = CGSize(width: CGFloat(entry.meta.tileSize), height: CGFloat(entry.meta.tileSize))
 
-        let mapping: [(TileRole, [TileCoord])] = [
+        var mapping: [(TileRole, [TileCoord])] = [
             (.floor,             entry.floor),
             (.wallTopCap,        entry.wallTopCap),
             (.wallTopFace,       entry.wallTopFace),
@@ -212,14 +212,17 @@ public final class SpriteKitTileMapAdapter: TileMapRenderer {
             (.wallTopDecoration, entry.wallTopDecoration),
             (.wallLeftFace,      entry.wallLeftFace),
             (.wallRightFace,     entry.wallRightFace),
+        ]
 
-            (.barrierLeft,       [entry.barrierLeft]),
-            (.barrierRight,      [entry.barrierRight]),
+        if let bl = entry.barrierLeft  { mapping.append((.barrierLeft,  [bl])) }
+        if let br = entry.barrierRight { mapping.append((.barrierRight, [br])) }
+        
+        mapping.append(contentsOf: [
             (.barrierVertical0,  entry.barrierVertical.indices.contains(0) ? [entry.barrierVertical[0]] : []),
             (.barrierVertical1,  entry.barrierVertical.indices.contains(1) ? [entry.barrierVertical[1]] : []),
             (.barrierVertical2,  entry.barrierVertical.indices.contains(2) ? [entry.barrierVertical[2]] : []),
             (.barrierVertical3,  entry.barrierVertical.indices.contains(3) ? [entry.barrierVertical[3]] : []),
-        ]
+        ])
 
         var roleMap:   [TileRole: TileGroupEntry] = [:]
         var allGroups: [SKTileGroup]              = []

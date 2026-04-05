@@ -22,7 +22,7 @@ public final class RoomClearSystem: System {
             
             // Check if any enemies remain in this room
             // We consider an "enemy" any entity with HealthComponent that is NOT the player.
-            let livingEnemiesInRoom = world.entities(with: HealthComponent.self).filter { entity in
+            let hasLivingEnemy = world.entities(with: HealthComponent.self).contains { entity in
                 // 1. Must be in this specific room
                 guard let member = world.getComponent(type: RoomMemberComponent.self, for: entity),
                       member.roomID == roomID 
@@ -36,7 +36,7 @@ public final class RoomClearSystem: System {
                 return health.value.current > 0
             }
             
-            if livingEnemiesInRoom.isEmpty {
+            if !hasLivingEnemy {
                 orchestrator.unlockRoom(roomID, world: world)
             }
         }

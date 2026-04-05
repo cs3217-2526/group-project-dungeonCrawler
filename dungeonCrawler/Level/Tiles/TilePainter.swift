@@ -133,13 +133,13 @@ public enum TilePainter {
             bounds: bounds, tileSize: tileSize, maxIndex: rows - 1
         )
 
-        // The top wall occupies the topmost 4 rows (cap, face1, face2, base).
-        // Side walls occupy col 0 and col cols-1 for rows 1 through rows-5.
+        // The top wall occupies the topmost rows defined by WorldConstants.
+        // Side walls occupy col 0 and col cols-1 for rows below the top wall zone.
         // Bottom wall occupies row 0 for cols 1 through cols-2.
         // Corners occupy the 4 extreme cells.
         // Everything else is floor.
 
-        let topWallStart = rows - 4   // row index where top wall zone begins
+        let topWallStart = rows - WorldConstants.topWallHeightTiles   // row index where top wall zone begins
 
         // The floor layer is always a solid bed.
         for r in 0..<rows { for c in 0..<cols { layers[.floor]![r][c] = .floor } }

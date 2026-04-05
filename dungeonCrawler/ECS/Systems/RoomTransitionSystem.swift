@@ -7,7 +7,7 @@ import simd
 /// If the player moves into a neighboring room's bounds, it triggers appropriate events.
 public final class RoomTransitionSystem: System {
 
-    public var dependencies: [System.Type] { [] }
+    public var dependencies: [System.Type] { [MovementSystem.self, CollisionSystem.self] }
 
     private let orchestrator: LevelOrchestrator
 
@@ -72,9 +72,9 @@ public final class RoomTransitionSystem: System {
     ) {
         guard let activeNodeID = state.activeNodeID else { return }
 
-        // Block transitions only if the room is locked AND the lockdown is no longer "pending"
+        // Block transitions only if the room requires lockdown AND the lockdown is no longer "pending"
         // (meaning the player has already crossed the 80-unit threshold).
-        if orchestrator.isRoomLocked(activeNodeID, in: world) && state.pendingLockdown == nil {
+        if orchestrator.requiresLockdown(activeNodeID, in: world) && state.pendingLockdown == nil {
             return
         }
 
@@ -83,9 +83,12 @@ public final class RoomTransitionSystem: System {
 
             if neighborSpec.bounds.contains(playerPos) {
                 // Determine the new active room and update pending lockdown state
+                // Only trigger a pending lockdown if the destination room actually requires one
+                let shouldLock = orchestrator.requiresLockdown(edge.toNodeID, in: world)
+
                 world.modifyComponentIfExist(type: LevelStateComponent.self, for: levelStateEntity) { state in
                     state.activeNodeID = edge.toNodeID
-                    state.pendingLockdown = (edge.toNodeID, playerPos)
+                    state.pendingLockdown = shouldLock ? (edge.toNodeID, playerPos) : nil
                 }
                 return
             }

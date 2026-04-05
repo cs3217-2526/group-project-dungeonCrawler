@@ -51,8 +51,8 @@ public struct TileRegistryEntry {
     public let wallRightFace:     [TileCoord]
 
     // Barriers — placed at locked room doorways
-    public let barrierLeft:     TileCoord
-    public let barrierRight:    TileCoord
+    public let barrierLeft:     TileCoord?
+    public let barrierRight:    TileCoord?
     public let barrierVertical: [TileCoord]  // 4 elements ordered bottom-to-top
 
     /// Deterministically picks a random tile coordinate for the given role.
