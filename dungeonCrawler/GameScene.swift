@@ -114,7 +114,8 @@ class GameScene: SKScene {
         )
         levelOrchestrator.tileMapRenderer = tileAdapter
 
-        systemManager.register(LevelTransitionSystem(orchestrator: levelOrchestrator))
+        systemManager.register(RoomTransitionSystem(orchestrator: levelOrchestrator))
+        systemManager.register(RoomClearSystem(orchestrator: levelOrchestrator))
         commandQueues.register(SwitchWeaponCommand.self)
         commandQueues.register(DropWeaponCommand.self)
         commandQueues.register(PickupCommand.self)
