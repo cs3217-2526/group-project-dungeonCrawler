@@ -181,4 +181,48 @@ struct RoomTransitionSystemTests {
         // Verify orchestrator confirms no lockdown required
         #expect(orchestrator.requiresLockdown(neighborID, in: world) == false)
     }
+
+    @Test func transitionBetweenCombatRoomsPreservesNewPendingState() throws {
+        let orchestrator = LevelOrchestrator(
+            layoutStrategy: LinearDungeonLayout(roomCount: 3, enemyPool: [.charger]),
+            roomConstructor: BoxRoomConstructor()
+        )
+        let world = World()
+        orchestrator.loadLevel(1, world: world)
+
+        let system = RoomTransitionSystem(orchestrator: orchestrator)
+        let stateEntity = try #require(world.entities(with: LevelStateComponent.self).first)
+        let player = try #require(world.entities(with: PlayerTagComponent.self).first)
+
+        // 1. Setup: Get Middle and End rooms (both combat)
+        let state = try #require(world.getComponent(type: LevelStateComponent.self, for: stateEntity))
+        let graph = try #require(state.graph)
+        let startID = try #require(state.activeNodeID)
+        
+        let midID = try #require(graph.edges(from: startID).first?.toNodeID)
+        let endID = try #require(graph.edges(from: midID).first { $0.toNodeID != startID }?.toNodeID)
+        
+        let endSpec = try #require(graph.specification(for: endID))
+
+        // 2. Simulate State: Active = Mid, Pending = Mid (player just crossed boundary into Mid)
+        world.modifyComponentIfExist(type: LevelStateComponent.self, for: stateEntity) { s in
+            s.activeNodeID = midID
+            s.pendingLockdown = (midID, SIMD2<Float>(100, 100))
+        }
+
+        // 3. Move player into End room
+        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
+            t.position = endSpec.bounds.center
+        }
+
+        // 4. Update
+        system.update(deltaTime: 0.016, world: world)
+
+        // 5. Verify:
+        // - Active ID should be End
+        // - Pending Lockdown should be End (and NOT nil, which was the bug!)
+        let finalState = try #require(world.getComponent(type: LevelStateComponent.self, for: stateEntity))
+        #expect(finalState.activeNodeID == endID)
+        #expect(finalState.pendingLockdown?.roomID == endID)
+    }
 }

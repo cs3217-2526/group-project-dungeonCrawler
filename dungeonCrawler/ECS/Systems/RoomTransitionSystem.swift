@@ -32,8 +32,10 @@ public final class RoomTransitionSystem: System {
         checkNeighborTransitions(playerPos: playerPos, world: world, state: state, levelStateEntity: levelStateEntity, graph: graph)
 
         // 3. Process Pending Lockdowns (Distance-based trigger)
-        if let pending = state.pendingLockdown {
-            processRoomEntryLockdown(pending: pending, playerPos: playerPos, world: world, state: state, levelStateEntity: levelStateEntity)
+        // Re-fetch the state from the world AFTER neighbor transitions, in case it was updated.
+        if let updatedState = world.getComponent(type: LevelStateComponent.self, for: levelStateEntity),
+           let pending = updatedState.pendingLockdown {
+            processRoomEntryLockdown(pending: pending, playerPos: playerPos, world: world, levelStateEntity: levelStateEntity, graph: graph)
         }
     }
 
@@ -41,10 +43,10 @@ public final class RoomTransitionSystem: System {
         pending: (roomID: UUID, entryPos: SIMD2<Float>),
         playerPos: SIMD2<Float>,
         world: World,
-        state: LevelStateComponent,
-        levelStateEntity: Entity
+        levelStateEntity: Entity,
+        graph: DungeonGraph
     ) {
-        guard let spec = state.graph?.specification(for: pending.roomID) else { return }
+        guard let spec = graph.specification(for: pending.roomID) else { return }
         
         let dist = simd_distance(playerPos, pending.entryPos)
         let isInside = spec.bounds.contains(playerPos)
@@ -52,13 +54,20 @@ public final class RoomTransitionSystem: System {
         
         if isInside && dist >= threshold {
             orchestrator.lockRoom(pending.roomID, world: world)
+            
+            // Guarded Clear: Only clear if the pending room is still the one we just locked
             world.modifyComponentIfExist(type: LevelStateComponent.self, for: levelStateEntity) { state in
-                state.pendingLockdown = nil
+                if state.pendingLockdown?.roomID == pending.roomID {
+                    state.pendingLockdown = nil
+                }
             }
         } else if !isInside {
-            // Player left the room before reaching the lockdown distance
+            // Player left the room before reaching the lockdown distance.
+            // Guarded Clear: Only clear if the pending room is still the one the player just left.
             world.modifyComponentIfExist(type: LevelStateComponent.self, for: levelStateEntity) { state in
-                state.pendingLockdown = nil
+                if state.pendingLockdown?.roomID == pending.roomID {
+                    state.pendingLockdown = nil
+                }
             }
         }
     }
