@@ -5,7 +5,7 @@ import simd
 ///
 /// It queries the Global `LevelStateComponent` and the `Player` entity's transform.
 /// If the player moves into a neighboring room's bounds, it triggers appropriate events.
-public final class LevelRoomTransitionSystem: System {
+public final class RoomTransitionSystem: System {
 
     public var dependencies: [System.Type] { [] }
 
@@ -42,7 +42,7 @@ public final class LevelRoomTransitionSystem: System {
             guard let neighborSpec = graph.specification(for: edge.toNodeID) else { continue }
 
             if neighborSpec.bounds.contains(playerPos) {
-                orchestrator.transition(to: edge.toNodeID, world: world)
+                orchestrator.transition(to: edge.toNodeID, playerPos: playerPos, world: world)
                 return
             }
         }
