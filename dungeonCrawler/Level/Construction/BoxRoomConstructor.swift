@@ -59,7 +59,7 @@ public final class BoxRoomConstructor: RoomConstructor {
             builder: builder
         )
         createHorizontalWall(
-            y: bounds.maxY - t / 2,
+            y: bounds.maxY - t / 2 - 2 * t,
             bounds: bounds, facing: .north, doorways: doorways,
             builder: builder
         )
