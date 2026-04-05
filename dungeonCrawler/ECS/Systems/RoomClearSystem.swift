@@ -15,28 +15,21 @@ public final class RoomClearSystem: System {
     }
 
     public func update(deltaTime: Double, world: World) {
-        // Find all rooms currently in combat
+        // 1. Gather the Room IDs of all living entities that have an EnemyTagComponent.
+        // This is a single pass O(enemiesWithHealth + healthEntities).
+        let livingEnemies = world.entities(with: HealthComponent.self, and: RoomMemberComponent.self, and: EnemyTagComponent.self)
+        
+        let roomsWithEnemies = Set(livingEnemies.compactMap { (entity, health, member, tag) -> UUID? in
+            return health.value.current > 0 ? member.roomID : nil
+        })
+
+        // 2. Process all rooms that are currently marked "In Combat"
         for roomEntity in world.entities(with: RoomInCombatTag.self) {
             guard let roomMember = world.getComponent(type: RoomMemberComponent.self, for: roomEntity) else { continue }
             let roomID = roomMember.roomID
             
-            // Check if any enemies remain in this room
-            // We consider an "enemy" any entity with HealthComponent that is NOT the player.
-            let hasLivingEnemy = world.entities(with: HealthComponent.self).contains { entity in
-                // 1. Must be in this specific room
-                guard let member = world.getComponent(type: RoomMemberComponent.self, for: entity),
-                      member.roomID == roomID 
-                else { return false }
-                
-                // 2. Must NOT be the player
-                guard world.getComponent(type: PlayerTagComponent.self, for: entity) == nil else { return false }
-                
-                // 3. Must be currently alive (not just enqueued for destruction)
-                guard let health = world.getComponent(type: HealthComponent.self, for: entity) else { return false }
-                return health.value.current > 0
-            }
-            
-            if !hasLivingEnemy {
+            // 3. If a combat room's ID is not in the "living enemies" set, it's clear!
+            if !roomsWithEnemies.contains(roomID) {
                 orchestrator.unlockRoom(roomID, world: world)
             }
         }

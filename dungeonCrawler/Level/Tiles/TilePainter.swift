@@ -249,8 +249,8 @@ public enum TilePainter {
 
         switch axis {
         case .horizontal:
-            // Top wall occupies the topmost 4 rows (same structure as rooms).
-            let topWallStart = max(1, rows - 4)
+            // Top wall occupies the topmost rows defined by WorldConstants (same structure as rooms).
+            let topWallStart = max(1, rows - WorldConstants.topWallHeightTiles)
 
             for row in 0..<rows {
                 for col in 0..<cols {
