@@ -1,22 +1,11 @@
 import Foundation
 import simd
 
-/// Manages the logical state of room transitions, locking combat rooms, and spawning barriers.
-public final class LevelTransitionManager {
+/// Manages the logical state of locking and unlocking combat rooms by spawning barriers.
+public final class RoomLockdownManager {
     
     public init() {}
     
-    public func transition(
-        to nodeID: UUID,
-        world: World
-    ) {
-        guard let stateEntity = world.entities(with: LevelStateComponent.self).first else { return }
-
-        world.modifyComponentIfExist(type: LevelStateComponent.self, for: stateEntity) { state in
-            state.activeNodeID = nodeID
-        }
-    }
-
     public func isRoomLocked(_ roomID: UUID, in world: World, builtRoomEntities: [UUID: Entity]) -> Bool {
         guard let roomEntity = builtRoomEntities[roomID] else { return false }
         return world.getComponent(type: RoomLockedTag.self, for: roomEntity) != nil

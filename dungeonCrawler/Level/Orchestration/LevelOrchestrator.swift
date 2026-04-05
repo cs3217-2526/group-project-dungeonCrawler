@@ -4,8 +4,8 @@ import simd
 
 /// Orchestrates the ECS lifecycle of dungeon levels.
 ///
-/// `LevelOrchestrator` acts as a facade, delegating generation to `LevelBuilder`
-/// and state management to `RoomTransitionManager`.
+/// `LevelOrchestrator` acts as a facade, delegating generation to `LevelGenerationManager`
+/// and state management to `RoomLockdownManager`.
 public final class LevelOrchestrator {
     
     // MARK: - Dependencies
@@ -19,7 +19,7 @@ public final class LevelOrchestrator {
     private var currentGraph: DungeonGraph?
     private var currentRNG: SeededGenerator?
     
-    private let transitionManager: LevelTransitionManager
+    private let lockdownManager: RoomLockdownManager
 
     public init(
         layoutStrategy: any DungeonLayoutStrategy,
@@ -27,7 +27,7 @@ public final class LevelOrchestrator {
     ) {
         self.layoutStrategy = layoutStrategy
         self.roomConstructor = roomConstructor
-        self.transitionManager = LevelTransitionManager()
+        self.lockdownManager = RoomLockdownManager()
     }
     
     // MARK: - Level Loading
@@ -56,17 +56,14 @@ public final class LevelOrchestrator {
     }
     
     public func isRoomLocked(_ roomID: UUID, in world: World) -> Bool {
-        transitionManager.isRoomLocked(roomID, in: world, builtRoomEntities: builtRoomEntities)
+        lockdownManager.isRoomLocked(roomID, in: world, builtRoomEntities: builtRoomEntities)
     }
     
-    public func transition(to nodeID: UUID, playerPos: SIMD2<Float>, world: World) {
-        transitionManager.transition(to: nodeID, playerPos: playerPos, world: world, builtRoomEntities: builtRoomEntities)
-    }
     
-    public func processPendingRoomLockdowns(playerPos: SIMD2<Float>, world: World) {
+    public func lockRoom(_ roomID: UUID, world: World) {
         // RNG is mutated in-place by the transition manager when spawning visual barriers
-        transitionManager.processPendingRoomLockdowns(
-            playerPos: playerPos,
+        lockdownManager.lockRoom(
+            roomID,
             world: world,
             graph: currentGraph,
             theme: currentTheme,
@@ -76,7 +73,7 @@ public final class LevelOrchestrator {
     }
     
     public func unlockRoom(_ roomID: UUID, world: World) {
-        transitionManager.unlockRoom(
+        lockdownManager.unlockRoom(
             roomID,
             world: world,
             builtRoomEntities: builtRoomEntities,
@@ -99,7 +96,6 @@ public final class LevelOrchestrator {
         
         builtRoomEntities.removeAll()
         currentGraph = nil
-        transitionManager.clearPending()
         tileMapRenderer?.tearDownAll()
     }
 }
