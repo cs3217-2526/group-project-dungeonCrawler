@@ -55,6 +55,24 @@ public enum TileRole: Hashable {
     case wallTopDecoration
     case wallLeftFace     // The vertical face of the left-side wall (placed to its right)
     case wallRightFace    // The vertical face of the right-side wall (placed to its left)
+
+    // Barriers — rendered on the overlay layer at locked room doorways
+    case barrierLeft       // West/left-side doorway of a horizontal corridor
+    case barrierRight      // East/right-side doorway of a horizontal corridor
+    case barrierVertical0  // Bottom row of a vertical corridor barrier
+    case barrierVertical1
+    case barrierVertical2
+    case barrierVertical3  // Top row
+}
+
+// MARK: - Barrier Side
+
+/// Which end of a corridor the barrier sits on. Determines tile selection and grid orientation.
+public enum BarrierSide {
+    case left   // West end of a horizontal corridor
+    case right  // East end of a horizontal corridor
+    case top    // North end of a vertical corridor
+    case bottom // South end of a vertical corridor
 }
 
 // MARK: - Tile Painter
@@ -322,5 +340,30 @@ public enum TilePainter {
             for r in max(0, start)...min(maxIndex, end) { gaps.insert(r) }
         }
         return gaps
+    }
+
+    // MARK: - Barrier
+
+    /// Returns a 2-D `[[TileRole?]]` grid for a barrier strip at a corridor doorway.
+    ///
+    /// - For `.left` / `.right` sides (horizontal corridor): 1 col × `rows` rows,
+    ///   all cells filled with `barrierLeft` or `barrierRight`.
+    /// - For `.top` / `.bottom` sides (vertical corridor): `cols` cols × 4 rows,
+    ///   each row filled with the matching `barrierVertical0–3` role (bottom → top).
+    public static func paintBarrier(cols: Int, rows: Int, side: BarrierSide) -> [[TileRole?]] {
+        var grid = Array(repeating: Array(repeating: Optional<TileRole>.none, count: cols), count: rows)
+        switch side {
+        case .left:
+            for r in 0..<rows { grid[r][0] = .barrierLeft }
+        case .right:
+            for r in 0..<rows { grid[r][0] = .barrierRight }
+        case .bottom, .top:
+            let verticalRoles: [TileRole] = [.barrierVertical0, .barrierVertical1, .barrierVertical2, .barrierVertical3]
+            let rowCount = min(rows, verticalRoles.count)
+            for r in 0..<rowCount {
+                for c in 0..<cols { grid[r][c] = verticalRoles[r] }
+            }
+        }
+        return grid
     }
 }

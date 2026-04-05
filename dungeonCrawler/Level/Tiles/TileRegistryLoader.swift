@@ -47,15 +47,18 @@ private struct RawRegistry: Decodable {
     let meta: TileMeta
     let floor: RawFloor
     let wall: RawWall
+    let barrier: RawBarrier?
 
     func toEntry() -> TileRegistryEntry {
-        TileRegistryEntry(
+        // Fallback barrier tiles (col 0, row 0) used when the JSON key is absent.
+        let fallbackCoord = TileCoord(col: 0, row: 0)
+        return TileRegistryEntry(
             meta: meta,
             floor:        [floor.plain, floor.variant1, floor.variant2,
                            floor.variant3, floor.variant4].compactMap { $0 },
             wallTopCap:   wall.top.capRow,
             wallTopFace:  wall.top.faceRow,
-            wallTopFace2: wall.top.faceRow2 ?? wall.top.faceRow, // fallback to faceRow if not provided
+            wallTopFace2: wall.top.faceRow2 ?? wall.top.faceRow,
             wallTopBase:  wall.top.baseRow,
             wallBottom:   wall.bottom,
             wallLeft:     wall.left,
@@ -67,9 +70,18 @@ private struct RawRegistry: Decodable {
             floorDecoration:   floor.decorations ?? [],
             wallTopDecoration: wall.top.decorations ?? [],
             wallLeftFace:      wall.leftFace ?? [],
-            wallRightFace:     wall.rightFace ?? []
+            wallRightFace:     wall.rightFace ?? [],
+            barrierLeft:     barrier?.left     ?? fallbackCoord,
+            barrierRight:    barrier?.right    ?? fallbackCoord,
+            barrierVertical: barrier?.vertical ?? []
         )
     }
+}
+
+private struct RawBarrier: Decodable {
+    let left:     TileCoord
+    let right:    TileCoord
+    let vertical: [TileCoord]
 }
 
 private struct RawFloor: Decodable {

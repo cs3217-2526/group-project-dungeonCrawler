@@ -31,6 +31,23 @@ public protocol TileMapRenderer: AnyObject {
         using generator: inout SeededGenerator
     )
 
+    /// Paint barrier tiles at a single locked-room doorway.
+    ///
+    /// - Parameters:
+    ///   - roomID: The locked room that owns this barrier. Used to group barriers for teardown.
+    ///   - bounds: World-space bounds of the barrier strip.
+    ///   - side:   Which side of the corridor this barrier sits on.
+    func renderBarrier(
+        roomID: UUID,
+        bounds: RoomBounds,
+        side:   BarrierSide,
+        theme:  TileTheme,
+        using generator: inout SeededGenerator
+    )
+
+    /// Remove all barrier tile maps associated with `roomID` (called when a room is cleared).
+    func tearDownBarriers(roomID: UUID)
+
     /// Remove all tile map nodes from the scene (called on level teardown).
     func tearDownAll()
 }
