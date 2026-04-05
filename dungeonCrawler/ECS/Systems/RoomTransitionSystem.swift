@@ -28,13 +28,13 @@ public final class RoomTransitionSystem: System {
 
         let playerPos = transform.position
 
-        // 2. Process Pending Lockdowns (Distance-based trigger)
+        // 2. Sensor: Check for neighbor room transitions (Must run BEFORE lockdown checks to allow peeks)
+        checkNeighborTransitions(playerPos: playerPos, world: world, state: state, levelStateEntity: levelStateEntity, graph: graph)
+
+        // 3. Process Pending Lockdowns (Distance-based trigger)
         if let pending = state.pendingLockdown {
             processRoomEntryLockdown(pending: pending, playerPos: playerPos, world: world, state: state, levelStateEntity: levelStateEntity)
         }
-
-        // 3. Sensor: Check for neighbor room transitions
-        checkNeighborTransitions(playerPos: playerPos, world: world, state: state, levelStateEntity: levelStateEntity, graph: graph)
     }
 
     private func processRoomEntryLockdown(
@@ -72,8 +72,9 @@ public final class RoomTransitionSystem: System {
     ) {
         guard let activeNodeID = state.activeNodeID else { return }
 
-        // Block transitions while the active room is still locked (has enemies).
-        if orchestrator.isRoomLocked(activeNodeID, in: world) {
+        // Block transitions only if the room is locked AND the lockdown is no longer "pending"
+        // (meaning the player has already crossed the 80-unit threshold).
+        if orchestrator.isRoomLocked(activeNodeID, in: world) && state.pendingLockdown == nil {
             return
         }
 
