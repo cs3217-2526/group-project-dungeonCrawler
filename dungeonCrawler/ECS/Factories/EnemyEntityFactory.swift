@@ -50,6 +50,24 @@ public enum EnemyType {
         case .tower:   return 15.0
         }
     }
+
+    var wanderStrategy: any EnemyAIStrategy {
+        switch self {
+        case .charger: return WanderStrategy()
+        case .mummy:   return WanderStrategy()
+        case .ranger:  return WanderStrategy()
+        case .tower:   return StationaryStrategy()
+        }
+    }
+
+    var chaseStrategy: any EnemyAIStrategy {
+        switch self {
+        case .charger: return StraightLineChaseStrategy()
+        case .mummy:   return StraightLineChaseStrategy()
+        case .ranger:  return ShooterBasicStrategy()
+        case .tower:   return StationaryStrategy()
+        }
+    }
 }
 
 // Components attached:
@@ -98,7 +116,10 @@ public struct EnemyEntityFactory: EntityFactory {
         ), to: entity)
         
         world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: EnemyStateComponent(), to: entity)
+        world.addComponent(component: EnemyStateComponent(
+            wanderStrategy: type.wanderStrategy,
+            chaseStrategy: type.chaseStrategy
+        ), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: SIMD2(WorldConstants.playerSize * finalScale, WorldConstants.playerSize * finalScale)), to: entity)
         world.addComponent(component: MassComponent(mass: type.mass), to: entity)
         world.addComponent(component: ContactDamageComponent(damage: type.contactDamage), to: entity)

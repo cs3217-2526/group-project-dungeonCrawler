@@ -42,19 +42,15 @@ public final class PickupSystem: System {
                 let weaponOffset = world.getComponent(type: OwnerComponent.self, for: equipped.primaryWeapon)?.offset
                     ?? defaultWeaponOffset
 
-                world.addComponent(
-                    component: OwnerComponent(ownerEntity: player, offset: weaponOffset),
-                    to: pickedWeapon
-                )
-                world.addComponent(component: FacingComponent(facing: ownerFacing), to: pickedWeapon)
-
                 world.modifyComponentIfExist(type: EquippedWeaponComponent.self, for: player) { equippedWeapons in
-                    if equippedWeapons.secondaryWeapon != nil {
-                        commandQueues.push(DropWeaponCommand(id: CommandId()))
-                    } else {
-                        world.removeComponent(type: SpriteComponent.self, from: pickedWeapon)
-                    }
+                    guard equippedWeapons.secondaryWeapon == nil else { return }
+                    world.removeComponent(type: SpriteComponent.self, from: pickedWeapon)
                     equippedWeapons.secondaryWeapon = pickedWeapon
+                    world.addComponent(
+                        component: OwnerComponent(ownerEntity: player, offset: weaponOffset),
+                        to: pickedWeapon
+                    )
+                    world.addComponent(component: FacingComponent(facing: ownerFacing), to: pickedWeapon)
                 }
             }
         }
