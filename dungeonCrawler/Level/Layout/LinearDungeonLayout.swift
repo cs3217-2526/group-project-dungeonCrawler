@@ -18,7 +18,7 @@ public final class LinearDungeonLayout: DungeonLayoutStrategy {
 
     public init(roomCount: Int, enemyPool: [EnemyType], corridorLength: Float = 200) {
         self.roomCount     = max(2, roomCount)
-        self.enemyPool     = enemyPool.isEmpty ? [.charger] : enemyPool
+        self.enemyPool     = enemyPool
         self.corridorLength = max(50, corridorLength)
     }
 

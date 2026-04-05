@@ -55,20 +55,20 @@ public final class LevelOrchestrator {
         builtRoomEntities[roomID]
     }
     
-    public func isRoomLocked(_ roomID: UUID, in world: World) -> Bool {
-        lockdownManager.isRoomLocked(roomID, in: world, builtRoomEntities: builtRoomEntities)
+    public func requiresLockdown(_ roomID: UUID, in world: World) -> Bool {
+        lockdownManager.requiresLockdown(roomID, in: world, builtRoomEntities: builtRoomEntities)
     }
     
     
     public func lockRoom(_ roomID: UUID, world: World) {
-        // RNG is mutated in-place by the transition manager when spawning visual barriers
+        // RNG is passed as a read-only copy for visual randomization
         lockdownManager.lockRoom(
             roomID,
             world: world,
             graph: currentGraph,
             theme: currentTheme,
             tileMapRenderer: tileMapRenderer,
-            rng: &currentRNG
+            rng: currentRNG
         )
     }
     

@@ -101,9 +101,9 @@ public final class LevelGenerationManager {
             using: &currentRNG
         )
 
-        if !specification.isStartRoom {
-            world.addComponent(component: RoomLockedTag(),   to: roomEntity)
-            world.addComponent(component: RoomInCombatTag(), to: roomEntity)
+        if !specification.isStartRoom && specification.populator.requiresCombatEncounter {
+            world.addComponent(component: CombatEncounterTag(), to: roomEntity)
+            world.addComponent(component: RoomInCombatTag(),    to: roomEntity)
         }
     }
 

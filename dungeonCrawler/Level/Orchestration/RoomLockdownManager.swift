@@ -6,9 +6,9 @@ public final class RoomLockdownManager {
     
     public init() {}
     
-    public func isRoomLocked(_ roomID: UUID, in world: World, builtRoomEntities: [UUID: Entity]) -> Bool {
+    public func requiresLockdown(_ roomID: UUID, in world: World, builtRoomEntities: [UUID: Entity]) -> Bool {
         guard let roomEntity = builtRoomEntities[roomID] else { return false }
-        return world.getComponent(type: RoomLockedTag.self, for: roomEntity) != nil
+        return world.getComponent(type: CombatEncounterTag.self, for: roomEntity) != nil
     }
 
     public func unlockRoom(
@@ -19,7 +19,7 @@ public final class RoomLockdownManager {
     ) {
         guard let roomEntity = builtRoomEntities[roomID] else { return }
 
-        world.removeComponent(type: RoomLockedTag.self,   from: roomEntity)
+        world.removeComponent(type: CombatEncounterTag.self, from: roomEntity)
         world.removeComponent(type: RoomInCombatTag.self, from: roomEntity)
 
         for entity in world.entities(with: BarrierTag.self) {
@@ -38,7 +38,7 @@ public final class RoomLockdownManager {
         graph: DungeonGraph?,
         theme: TileTheme,
         tileMapRenderer: (any TileMapRenderer)?,
-        rng: inout SeededGenerator?
+        rng: SeededGenerator?
     ) {
         let doorways = graph?.doorways(for: roomID) ?? []
         for doorway in doorways {
@@ -48,7 +48,7 @@ public final class RoomLockdownManager {
                 world: world,
                 theme: theme,
                 tileMapRenderer: tileMapRenderer,
-                rng: &rng
+                rng: rng
             )
         }
     }
@@ -59,9 +59,8 @@ public final class RoomLockdownManager {
         world: World,
         theme: TileTheme,
         tileMapRenderer: (any TileMapRenderer)?,
-        rng: inout SeededGenerator?
+        rng: SeededGenerator?
     ) {
-        guard var currentRNG = rng else { return }
         let t = WorldConstants.tileSize
         let w = doorway.width
 
@@ -95,15 +94,19 @@ public final class RoomLockdownManager {
             side = .bottom
         }
 
-        tileMapRenderer?.renderBarrier(
-            roomID: roomID,
-            bounds: barrierBounds,
-            side:   side,
-            theme:  theme,
-            using:  &currentRNG
-        )
-        rng = currentRNG
+        // 1. Visuals: Only render if renderer and RNG are both available.
+        if let currentRNG = rng {
+            var renderRNG = currentRNG
+            tileMapRenderer?.renderBarrier(
+                roomID: roomID,
+                bounds: barrierBounds,
+                side:   side,
+                theme:  theme,
+                using:  &renderRNG
+            )
+        }
 
+        // 2. Physics: Create the collision barrier entity unconditionally.
         let entity = world.createEntity()
         world.addComponent(component: TransformComponent(position: barrierBounds.center), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: barrierBounds.size), to: entity)
