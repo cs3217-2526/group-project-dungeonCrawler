@@ -16,9 +16,6 @@ public enum WorldConstants {
     /// This ensures actors look the same relative to room sizes (currently ~0.853).
     public static let standardEntityScale: Float = 1024.0 * 0.04 / 48.0
 
-    /// Time in seconds before a transition can be triggered again.
-    public static let transitionCooldown: Float = 0.5
-
     /// Distance from room boundary to spawn/position player during transitions.
     public static let roomEntryInset: Float = 80.0
 }
