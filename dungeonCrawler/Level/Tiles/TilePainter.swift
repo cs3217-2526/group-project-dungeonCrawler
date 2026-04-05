@@ -8,13 +8,17 @@ public enum TileLayer: CaseIterable {
     case floor
     case structural
     case decoration
-    
+    /// Foreground tiles that render above gameplay entities (e.g. south/bottom wall face).
+    case overlay
+
     /// Provides a relative z-offset within the tilemap rendering space.
+    /// Final SKTileMapNode z = -1.0 + zOffset.
     public var zOffset: Float {
         switch self {
         case .floor:      return 0.0
         case .structural: return 0.1
         case .decoration: return 0.2
+        case .overlay:    return 7.5   // z = 6.5 — above entities (6), below weapons (7)
         }
     }
 }
@@ -83,7 +87,8 @@ public enum TilePainter {
         var layers: [TileLayer: [[TileRole?]]] = [
             .floor: Array(repeating: Array(repeating: nil, count: cols), count: rows),
             .structural: Array(repeating: Array(repeating: nil, count: cols), count: rows),
-            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows)
+            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows),
+            .overlay: Array(repeating: Array(repeating: nil, count: cols), count: rows)
         ]
 
         guard cols >= 2, rows >= 5 else {
@@ -125,10 +130,12 @@ public enum TilePainter {
             for col in 0..<cols {
 
                 // -- Corners (take precedence over everything) --
+                // Top corners stay on the structural layer (rendered below entities).
+                // Bottom corners go on the overlay layer so they appear in front of the player.
                 if row == rows - 1 && col == 0          { layers[.structural]![row][col] = .cornerTopLeft;     continue }
                 if row == rows - 1 && col == cols - 1   { layers[.structural]![row][col] = .cornerTopRight;    continue }
-                if row == 0        && col == 0          { layers[.structural]![row][col] = .cornerBottomLeft;  continue }
-                if row == 0        && col == cols - 1   { layers[.structural]![row][col] = .cornerBottomRight; continue }
+                if row == 0        && col == 0          { layers[.overlay]![row][col]     = .cornerBottomLeft;  continue }
+                if row == 0        && col == cols - 1   { layers[.overlay]![row][col]     = .cornerBottomRight; continue }
 
                 // -- Top wall zone (rows topWallStart … rows-1, inner cols only) --
                 if row >= topWallStart && col > 0 && col < cols - 1 {
@@ -147,9 +154,10 @@ public enum TilePainter {
                 }
 
                 // -- Bottom wall (row 0, inner cols) --
+                // Placed on the overlay layer so it renders in front of the player.
                 if row == 0 && col > 0 && col < cols - 1 {
                     if !southGaps.contains(col) {
-                        layers[.structural]![row][col] = .wallBottom
+                        layers[.overlay]![row][col] = .wallBottom
                     }
                     continue
                 }
@@ -210,7 +218,8 @@ public enum TilePainter {
         var layers: [TileLayer: [[TileRole?]]] = [
             .floor: Array(repeating: Array(repeating: nil, count: cols), count: rows),
             .structural: Array(repeating: Array(repeating: nil, count: cols), count: rows),
-            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows)
+            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows),
+            .overlay: Array(repeating: Array(repeating: nil, count: cols), count: rows)
         ]
 
         guard cols >= 2, rows >= 2 else {
@@ -227,11 +236,11 @@ public enum TilePainter {
 
             for row in 0..<rows {
                 for col in 0..<cols {
-                    // Corners
+                    // Corners — bottom corners go on overlay so they render in front of the player.
                     if row == rows - 1 && col == 0          { layers[.structural]![row][col] = .cornerTopLeft;     continue }
                     if row == rows - 1 && col == cols - 1   { layers[.structural]![row][col] = .cornerTopRight;    continue }
-                    if row == 0        && col == 0          { layers[.structural]![row][col] = .cornerBottomLeft;  continue }
-                    if row == 0        && col == cols - 1   { layers[.structural]![row][col] = .cornerBottomRight; continue }
+                    if row == 0        && col == 0          { layers[.overlay]![row][col]     = .cornerBottomLeft;  continue }
+                    if row == 0        && col == cols - 1   { layers[.overlay]![row][col]     = .cornerBottomRight; continue }
 
                     // Top wall
                     if row >= topWallStart {
@@ -247,8 +256,8 @@ public enum TilePainter {
                         continue
                     }
 
-                    // Bottom wall
-                    if row == 0 { layers[.structural]![row][col] = .wallBottom; continue }
+                    // Bottom wall overlay so it renders in front of the player.
+                    if row == 0 { layers[.overlay]![row][col] = .wallBottom; continue }
                 }
             }
 
