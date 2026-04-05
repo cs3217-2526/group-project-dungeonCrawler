@@ -4,41 +4,17 @@ import simd
 /// Manages the logical state of room transitions, locking combat rooms, and spawning barriers.
 public final class LevelTransitionManager {
     
-    private var pendingLockdowns: [UUID: SIMD2<Float>] = [:]
-    
     public init() {}
-    
-    public func clearPending() {
-        pendingLockdowns.removeAll()
-    }
     
     public func transition(
         to nodeID: UUID,
-        playerPos: SIMD2<Float>,
-        world: World,
-        builtRoomEntities: [UUID: Entity]
+        world: World
     ) {
         guard let stateEntity = world.entities(with: LevelStateComponent.self).first else { return }
 
         world.modifyComponentIfExist(type: LevelStateComponent.self, for: stateEntity) { state in
             state.activeNodeID = nodeID
         }
-
-        // Cancel any other pending lockdowns when entering a new room.
-        // A player is only ever "entering" one room at a time.
-        pendingLockdowns.removeAll()
-
-        guard let roomEntity = builtRoomEntities[nodeID],
-              world.getComponent(type: RoomInCombatTag.self, for: roomEntity) != nil
-        else { return }
-
-        let alreadySpawned = world.entities(with: BarrierTag.self).contains { entity in
-            world.getComponent(type: RoomMemberComponent.self, for: entity)?.roomID == nodeID
-        }
-        guard !alreadySpawned else { return }
-
-        // Start tracking the entry point for this newly entered room.
-        pendingLockdowns[nodeID] = playerPos
     }
 
     public func isRoomLocked(_ roomID: UUID, in world: World, builtRoomEntities: [UUID: Entity]) -> Bool {
@@ -67,41 +43,24 @@ public final class LevelTransitionManager {
         tileMapRenderer?.tearDownBarriers(roomID: roomID)
     }
 
-    public func processPendingRoomLockdowns(
-        playerPos: SIMD2<Float>,
+    public func lockRoom(
+        _ roomID: UUID,
         world: World,
         graph: DungeonGraph?,
         theme: TileTheme,
         tileMapRenderer: (any TileMapRenderer)?,
         rng: inout SeededGenerator?
     ) {
-        guard !pendingLockdowns.isEmpty else { return }
-        let inset = WorldConstants.roomEntryInset
-
-        var toSpawn: [UUID] = []
-        for (roomID, entryPos) in pendingLockdowns {
-            guard let spec = graph?.specification(for: roomID) else { continue }
-            
-            let dist = simd_distance(playerPos, entryPos)
-            let isInside = spec.bounds.contains(playerPos)
-            
-            if isInside && dist >= inset {
-                toSpawn.append(roomID)
-            }
-        }
-        for roomID in toSpawn {
-            pendingLockdowns.removeValue(forKey: roomID)
-            let doorways = graph?.doorways(for: roomID) ?? []
-            for doorway in doorways {
-                spawnBarrier(
-                    roomID: roomID,
-                    doorway: doorway,
-                    world: world,
-                    theme: theme,
-                    tileMapRenderer: tileMapRenderer,
-                    rng: &rng
-                )
-            }
+        let doorways = graph?.doorways(for: roomID) ?? []
+        for doorway in doorways {
+            spawnBarrier(
+                roomID: roomID,
+                doorway: doorway,
+                world: world,
+                theme: theme,
+                tileMapRenderer: tileMapRenderer,
+                rng: &rng
+            )
         }
     }
 
