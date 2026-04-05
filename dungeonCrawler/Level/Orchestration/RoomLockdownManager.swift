@@ -81,15 +81,17 @@ public final class RoomLockdownManager {
             )
             side = .left
         case .north:
+            let barrierHeight = Float(WorldConstants.topWallHeightTiles) * t
             barrierBounds = RoomBounds(
-                origin: SIMD2(doorway.position.x - w / 2, doorway.position.y - 4 * t),
-                size:   SIMD2(w, 4 * t)
+                origin: SIMD2(doorway.position.x - w / 2, doorway.position.y - barrierHeight),
+                size:   SIMD2(w, barrierHeight)
             )
             side = .top
         case .south:
+            let barrierHeight = Float(WorldConstants.topWallHeightTiles) * t
             barrierBounds = RoomBounds(
                 origin: SIMD2(doorway.position.x - w / 2, doorway.position.y),
-                size:   SIMD2(w, 4 * t)
+                size:   SIMD2(w, barrierHeight)
             )
             side = .bottom
         }
