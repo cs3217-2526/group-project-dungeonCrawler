@@ -150,8 +150,11 @@ public final class SpriteKitTileMapAdapter: TileMapRenderer {
     }
 
     public func tearDownAll() {
-        tileMaps.keys.forEach { tearDownRoom(roomID: $0) }
-        barrierMaps.keys.forEach { tearDownBarriers(roomID: $0) }
+        let tileMapRoomIDs = Array(tileMaps.keys)
+        tileMapRoomIDs.forEach { tearDownRoom(roomID: $0) }
+
+        let barrierRoomIDs = Array(barrierMaps.keys)
+        barrierRoomIDs.forEach { tearDownBarriers(roomID: $0) }
     }
 
     // MARK: - Private — Tile map helpers
