@@ -24,6 +24,8 @@ final class InputSystemTests: XCTestCase {
         commandQueues.register(MoveCommand.self)
         commandQueues.register(AimCommand.self)
         commandQueues.register(FireCommand.self)
+        commandQueues.register(DropWeaponCommand.self)
+        commandQueues.register(PickupCommand.self)
         system = InputSystem(commandQueues: commandQueues)
     }
 
@@ -263,4 +265,3 @@ final class InputSystemTests: XCTestCase {
         XCTAssertEqual(input1, input2)
     }
 }
-

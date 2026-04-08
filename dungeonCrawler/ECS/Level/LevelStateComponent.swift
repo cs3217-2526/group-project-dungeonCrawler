@@ -9,11 +9,12 @@ public class LevelStateComponent: Component {
     /// The ID of the currently active room node.
     public var activeNodeID: UUID?
     
-    /// Cooldown timer to prevent rapid-fire transitions.
-    public var transitionCooldown: Float = 0
-
+    /// The ID and entry position of a room that is currently being entered but not yet locked.
+    public var pendingLockdown: (roomID: UUID, entryPos: SIMD2<Float>)?
+    
     public init(graph: DungeonGraph? = nil, activeNodeID: UUID? = nil) {
         self.graph = graph
         self.activeNodeID = activeNodeID
+        self.pendingLockdown = nil
     }
 }

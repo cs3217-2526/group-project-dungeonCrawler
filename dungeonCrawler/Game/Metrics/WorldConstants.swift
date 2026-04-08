@@ -16,9 +16,14 @@ public enum WorldConstants {
     /// This ensures actors look the same relative to room sizes (currently ~0.853).
     public static let standardEntityScale: Float = 1024.0 * 0.04 / 48.0
 
-    /// Time in seconds before a transition can be triggered again.
-    public static let transitionCooldown: Float = 0.5
-
     /// Distance from room boundary to spawn/position player during transitions.
     public static let roomEntryInset: Float = 80.0
+
+    /// The number of tile rows used to render the "thickness" of the top wall.
+    /// This creates the 2.5D perspective effect.
+    public static let topWallHeightTiles: Int = 4
+
+    /// The vertical inset applied to the north wall collision box to align it
+    /// with the base of the rendered top wall.
+    public static let topWallCollisionInset: Float = Float(topWallHeightTiles - 2) * wallThickness
 }

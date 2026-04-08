@@ -8,7 +8,7 @@ sidebar_position: 5
 
 The health module tracks hit points for every entity that can be damaged or destroyed. It is composed of `HealthComponent`, `HealthSystem`, and `PlayerDeathEvent`.
 
-For how damage is applied to `HealthComponent`, see [Damage Module](./damage.md).
+For how damage is applied to `HealthComponent`, see [Damage Module](../damage/damage.md).
 
 ---
 

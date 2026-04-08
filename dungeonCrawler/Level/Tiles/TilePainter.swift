@@ -8,13 +8,17 @@ public enum TileLayer: CaseIterable {
     case floor
     case structural
     case decoration
-    
+    /// Foreground tiles that render above gameplay entities (e.g. south/bottom wall face).
+    case overlay
+
     /// Provides a relative z-offset within the tilemap rendering space.
+    /// Final SKTileMapNode z = -1.0 + zOffset.
     public var zOffset: Float {
         switch self {
         case .floor:      return 0.0
         case .structural: return 0.1
         case .decoration: return 0.2
+        case .overlay:    return 7.5   // z = 6.5 — above entities (6), below weapons (7)
         }
     }
 }
@@ -51,6 +55,24 @@ public enum TileRole: Hashable {
     case wallTopDecoration
     case wallLeftFace     // The vertical face of the left-side wall (placed to its right)
     case wallRightFace    // The vertical face of the right-side wall (placed to its left)
+
+    // Barriers — rendered on the overlay layer at locked room doorways
+    case barrierLeft       // West/left-side doorway of a horizontal corridor
+    case barrierRight      // East/right-side doorway of a horizontal corridor
+    case barrierVertical0  // Bottom row of a vertical corridor barrier
+    case barrierVertical1
+    case barrierVertical2
+    case barrierVertical3  // Top row
+}
+
+// MARK: - Barrier Side
+
+/// Which end of a corridor the barrier sits on. Determines tile selection and grid orientation.
+public enum BarrierSide {
+    case left   // West end of a horizontal corridor
+    case right  // East end of a horizontal corridor
+    case top    // North end of a vertical corridor
+    case bottom // South end of a vertical corridor
 }
 
 // MARK: - Tile Painter
@@ -83,7 +105,8 @@ public enum TilePainter {
         var layers: [TileLayer: [[TileRole?]]] = [
             .floor: Array(repeating: Array(repeating: nil, count: cols), count: rows),
             .structural: Array(repeating: Array(repeating: nil, count: cols), count: rows),
-            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows)
+            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows),
+            .overlay: Array(repeating: Array(repeating: nil, count: cols), count: rows)
         ]
 
         guard cols >= 2, rows >= 5 else {
@@ -110,13 +133,13 @@ public enum TilePainter {
             bounds: bounds, tileSize: tileSize, maxIndex: rows - 1
         )
 
-        // The top wall occupies the topmost 4 rows (cap, face1, face2, base).
-        // Side walls occupy col 0 and col cols-1 for rows 1 through rows-5.
+        // The top wall occupies the topmost rows defined by WorldConstants.
+        // Side walls occupy col 0 and col cols-1 for rows below the top wall zone.
         // Bottom wall occupies row 0 for cols 1 through cols-2.
         // Corners occupy the 4 extreme cells.
         // Everything else is floor.
 
-        let topWallStart = rows - 4   // row index where top wall zone begins
+        let topWallStart = rows - WorldConstants.topWallHeightTiles   // row index where top wall zone begins
 
         // The floor layer is always a solid bed.
         for r in 0..<rows { for c in 0..<cols { layers[.floor]![r][c] = .floor } }
@@ -125,10 +148,12 @@ public enum TilePainter {
             for col in 0..<cols {
 
                 // -- Corners (take precedence over everything) --
+                // Top corners stay on the structural layer (rendered below entities).
+                // Bottom corners go on the overlay layer so they appear in front of the player.
                 if row == rows - 1 && col == 0          { layers[.structural]![row][col] = .cornerTopLeft;     continue }
                 if row == rows - 1 && col == cols - 1   { layers[.structural]![row][col] = .cornerTopRight;    continue }
-                if row == 0        && col == 0          { layers[.structural]![row][col] = .cornerBottomLeft;  continue }
-                if row == 0        && col == cols - 1   { layers[.structural]![row][col] = .cornerBottomRight; continue }
+                if row == 0        && col == 0          { layers[.overlay]![row][col]     = .cornerBottomLeft;  continue }
+                if row == 0        && col == cols - 1   { layers[.overlay]![row][col]     = .cornerBottomRight; continue }
 
                 // -- Top wall zone (rows topWallStart … rows-1, inner cols only) --
                 if row >= topWallStart && col > 0 && col < cols - 1 {
@@ -147,9 +172,10 @@ public enum TilePainter {
                 }
 
                 // -- Bottom wall (row 0, inner cols) --
+                // Placed on the overlay layer so it renders in front of the player.
                 if row == 0 && col > 0 && col < cols - 1 {
                     if !southGaps.contains(col) {
-                        layers[.structural]![row][col] = .wallBottom
+                        layers[.overlay]![row][col] = .wallBottom
                     }
                     continue
                 }
@@ -210,7 +236,8 @@ public enum TilePainter {
         var layers: [TileLayer: [[TileRole?]]] = [
             .floor: Array(repeating: Array(repeating: nil, count: cols), count: rows),
             .structural: Array(repeating: Array(repeating: nil, count: cols), count: rows),
-            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows)
+            .decoration: Array(repeating: Array(repeating: nil, count: cols), count: rows),
+            .overlay: Array(repeating: Array(repeating: nil, count: cols), count: rows)
         ]
 
         guard cols >= 2, rows >= 2 else {
@@ -222,16 +249,16 @@ public enum TilePainter {
 
         switch axis {
         case .horizontal:
-            // Top wall occupies the topmost 4 rows (same structure as rooms).
-            let topWallStart = max(1, rows - 4)
+            // Top wall occupies the topmost rows defined by WorldConstants (same structure as rooms).
+            let topWallStart = max(1, rows - WorldConstants.topWallHeightTiles)
 
             for row in 0..<rows {
                 for col in 0..<cols {
-                    // Corners
+                    // Corners — bottom corners go on overlay so they render in front of the player.
                     if row == rows - 1 && col == 0          { layers[.structural]![row][col] = .cornerTopLeft;     continue }
                     if row == rows - 1 && col == cols - 1   { layers[.structural]![row][col] = .cornerTopRight;    continue }
-                    if row == 0        && col == 0          { layers[.structural]![row][col] = .cornerBottomLeft;  continue }
-                    if row == 0        && col == cols - 1   { layers[.structural]![row][col] = .cornerBottomRight; continue }
+                    if row == 0        && col == 0          { layers[.overlay]![row][col]     = .cornerBottomLeft;  continue }
+                    if row == 0        && col == cols - 1   { layers[.overlay]![row][col]     = .cornerBottomRight; continue }
 
                     // Top wall
                     if row >= topWallStart {
@@ -247,8 +274,8 @@ public enum TilePainter {
                         continue
                     }
 
-                    // Bottom wall
-                    if row == 0 { layers[.structural]![row][col] = .wallBottom; continue }
+                    // Bottom wall overlay so it renders in front of the player.
+                    if row == 0 { layers[.overlay]![row][col] = .wallBottom; continue }
                 }
             }
 
@@ -313,5 +340,30 @@ public enum TilePainter {
             for r in max(0, start)...min(maxIndex, end) { gaps.insert(r) }
         }
         return gaps
+    }
+
+    // MARK: - Barrier
+
+    /// Returns a 2-D `[[TileRole?]]` grid for a barrier strip at a corridor doorway.
+    ///
+    /// - For `.left` / `.right` sides (horizontal corridor): 1 col × `rows` rows,
+    ///   all cells filled with `barrierLeft` or `barrierRight`.
+    /// - For `.top` / `.bottom` sides (vertical corridor): `cols` cols × 4 rows,
+    ///   each row filled with the matching `barrierVertical0–3` role (bottom → top).
+    public static func paintBarrier(cols: Int, rows: Int, side: BarrierSide) -> [[TileRole?]] {
+        var grid = Array(repeating: Array(repeating: Optional<TileRole>.none, count: cols), count: rows)
+        switch side {
+        case .left:
+            for r in 0..<rows { grid[r][0] = .barrierLeft }
+        case .right:
+            for r in 0..<rows { grid[r][0] = .barrierRight }
+        case .bottom, .top:
+            let verticalRoles: [TileRole] = [.barrierVertical0, .barrierVertical1, .barrierVertical2, .barrierVertical3]
+            let rowCount = min(rows, verticalRoles.count)
+            for r in 0..<rowCount {
+                for c in 0..<cols { grid[r][c] = verticalRoles[r] }
+            }
+        }
+        return grid
     }
 }

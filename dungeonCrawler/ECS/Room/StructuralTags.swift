@@ -21,3 +21,6 @@ public struct DoorTag: Component {
  
 /// Tag: Marks a door as locked
 public struct LockedDoorTag: Component {}
+
+/// Tag: Marks an entity as a barrier 
+public struct BarrierTag: Component {}

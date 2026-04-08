@@ -8,7 +8,7 @@ import Foundation
 import simd
 
 public struct WeaponEntityFactory: EntityFactory {
-    let player: Entity
+    let player: Entity?
     let textureName: String
     let offset: SIMD2<Float>
     let scale: Float
@@ -18,9 +18,10 @@ public struct WeaponEntityFactory: EntityFactory {
     let effects: [any WeaponEffect]
     let anchorPoint: SIMD2<Float>
     let initRotation: Float
+    var initLocation: SIMD2<Float>? = nil
 
     public init(
-        player: Entity,
+        player: Entity?,
         textureName: String,
         offset: SIMD2<Float> = .zero,
         scale: Float = 1,
@@ -29,7 +30,8 @@ public struct WeaponEntityFactory: EntityFactory {
         attackSpeed: Float?,
         effects: [any WeaponEffect],
         anchorPoint: SIMD2<Float>?,
-        initRotation: Float?
+        initRotation: Float?,
+        initLocation: SIMD2<Float>?
     ) {
         self.player = player
         self.textureName = textureName
@@ -41,23 +43,35 @@ public struct WeaponEntityFactory: EntityFactory {
         self.effects = effects
         self.anchorPoint = anchorPoint ?? SIMD2<Float>(0.5, 0.5)
         self.initRotation = initRotation ?? 0
+        self.initLocation = initLocation
     }
 
+    /// Components include:
+    /// Transform Component
+    /// Facing Component
+    /// Owner Component
+    /// Weapon Timing Component
+    /// Weapon Effects Component
+    /// Weapon Render Component
     @discardableResult
     public func make(in world: World) -> Entity {
         let entity = world.createEntity()
-        let startPos = world.getComponent(type: TransformComponent.self, for: player)?.position ?? .zero
-        let ownerFacing = world.getComponent(type: FacingComponent.self, for: player)?.facing ?? .right
-
+        
+        var startPos: SIMD2<Float>? = nil
+        if let player = player {
+            startPos = world.getComponent(type: TransformComponent.self, for: player)?.position ?? .zero
+            let ownerFacing = world.getComponent(type: FacingComponent.self, for: player)?.facing ?? .right
+            world.addComponent(component: FacingComponent(facing: ownerFacing), to: entity)
+            world.addComponent(component: OwnerComponent(ownerEntity: player, offset: offset), to: entity)
+        }
+        let weaponPosition = startPos ?? self.initLocation ?? { fatalError("No location for weapon") }()
         world.addComponent(
             component: TransformComponent(
-                position: startPos + offset,
+                position: weaponPosition + offset,
                 rotation: initRotation,
                 scale: scale),
             to: entity
         )
-        world.addComponent(component: FacingComponent(facing: ownerFacing), to: entity)
-        world.addComponent(component: OwnerComponent(ownerEntity: player, offset: offset), to: entity)
         world.addComponent(
             component: WeaponTimingComponent(
                 lastFiredAt: lastFiredAt,

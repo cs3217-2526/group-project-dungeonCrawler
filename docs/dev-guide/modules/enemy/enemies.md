@@ -23,17 +23,16 @@ Every enemy entity is created with the following components:
 
 ## Enemy Types
 
-Enemy types are defined in the `EnemyType` enum inside `EnemyEntityFactory.swift`. Each type maps to a texture asset, a scale multiplier, and a mass value.
+Enemy types are defined as static constants on the `EnemyType` struct in `ECS/Enemy/EnemyType.swift`. Each constant bundles all properties of that enemy in one place: texture, scale, mass, contact damage, and AI strategies.
 
 **Current Enemy Types**:
 
-| Type | Texture | Scale | Mass |
-|---|---|---|---|
-| `.charger` | "Charger" | 1.0 | 15 |
-| `.mummy` | "Mummy" | 1.0 | 10 |
-| `.ranger` | "Ranger" | 0.75 | 5 |
-| `.tower` | "Tower" | 1.5 | 20 |
-
+| Type | Texture | Scale | Mass | Contact Damage | Wander Strategy | Chase Strategy |
+|---|---|---|---|---|---|---|
+| `.charger` | "Charger" | 1.0 | 15 | 20.0 | `WanderStrategy` | `StraightLineChaseStrategy` |
+| `.mummy` | "Mummy" | 1.0 | 10 | 10.0 | `WanderStrategy` | `StraightLineChaseStrategy` |
+| `.ranger` | "Ranger" | 0.75 | 5 | 5.0 | `WanderStrategy` | `ShooterBasicStrategy` |
+| `.tower` | "Tower" | 1.5 | 20 | 15.0 | `StationaryStrategy` | `StationaryStrategy` |
 
 The final in-world scale is `baseScale × type.scale`, where `baseScale` is passed in at spawn time (derived from screen size).
 
@@ -52,33 +51,25 @@ In normal gameplay, enemies are spawned by `MapSystem` at the enemy spawn points
 
 ## Adding a New Enemy Type
 
-1. **Add a case** to `EnemyType` in `EnemyEntityFactory.swift`.
-2. **Add a `textureName`** entry — add the corresponding asset to the asset catalog.
-3. **Add a `scale`** entry — `1.0` is the baseline character size.
+Add a single `static let` block to `EnemyType.swift` — no other files need to change:
 
-For example:
 ```swift
-case goblin
-
-var textureName: String {
-    // ...
-    case .goblin: return "Goblin"
-}
-
-var scale: Float {
-    // ...
-    case .goblin: return 0.85
-}
-
-var mass: Int {
-    // ...
-    case .goblin: return 7.5
-}
+public static let goblin = EnemyType(
+    textureName: "Goblin",
+    scale: 0.85,
+    mass: 8,
+    contactDamage: 12.0,
+    wanderStrategy: WanderStrategy(),
+    chaseStrategy: StraightLineChaseStrategy()
+)
 ```
 
-No changes to `EnemyTagComponent` or `EnemyAISystem` are needed. To give the new type different AI behaviour, pass a custom `EnemyStateComponent` when constructing the factory, or add one after creation.
+Also add the corresponding texture asset to the asset catalog.
 
-For example, a stationary shooter that orbits the player when in chase mode:
+All properties are required by the compiler, so a new definition cannot be accidentally left incomplete.
+
+No changes to `EnemyTagComponent` or `EnemyAISystem` are needed. To give the new type different AI behaviour, replace the `EnemyStateComponent` on the entity after creation using `world.addComponent` (which overwrites any existing component of the same type):
+
 ```swift
 let enemy = EnemyEntityFactory(at: position, type: .goblin, baseScale: scale).make(in: world)
 world.addComponent(
@@ -91,5 +82,7 @@ world.addComponent(
     to: enemy
 )
 ```
+
+`EnemyStateComponent`'s initializer has defaults for all parameters (`detectionRadius: 150`, `loseRadius: 225`, `wanderStrategy: WanderStrategy()`, `chaseStrategy: StraightLineChaseStrategy()`), so you only need to supply the fields you want to override.
 
 See [Enemy AI System](./enemyAISystem.md) for all available strategies and configurable fields.

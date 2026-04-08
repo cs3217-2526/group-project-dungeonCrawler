@@ -1,7 +1,7 @@
 import Foundation
 
-/// Tag: Room entrance is locked, preventing player from leaving
-public struct RoomLockedTag: Component {}
+/// Tag: Room requires a lockdown action (has not yet been cleared)
+public struct CombatEncounterTag: Component {}
  
 /// Tag: Room is currently in combat (enemies active)
 public struct RoomInCombatTag: Component {}

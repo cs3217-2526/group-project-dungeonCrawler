@@ -5,7 +5,9 @@ public struct EnemyRoomPopulator: RoomPopulatorStrategy {
     /// Number of enemies to spawn.
     public let enemyCount: Int
     /// Pool of potential enemy types to choose from.
-    public let enemyPool: [EnemyType]
+    public var enemyPool: [EnemyType]
+
+    public var requiresCombatEncounter: Bool { enemyCount > 0 && !enemyPool.isEmpty }
 
     public init(enemyCount: Int, enemyPool: [EnemyType]) {
         self.enemyCount = enemyCount

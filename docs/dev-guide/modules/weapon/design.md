@@ -4,6 +4,86 @@ description: "Design decisions and architecture of the Weapon module."
 sidebar_position: 1
 ---
 
+## Diagram
+
+```mermaid
+---
+config:
+  layout: dagre
+---
+classDiagram
+direction TB
+    class Weapon {
+	    EntityID id
+    }
+
+    class TransformComponent {
+	    position
+	    rotation
+	    scale
+    }
+
+    class FacingComponent {
+	    facing
+    }
+
+    class OwnerComponent {
+	    ownerEntity
+	    offset
+    }
+
+    class WeaponTimingComponent {
+	    coolDownInterval
+	    attackSpeed
+	    lastFiredAt
+    }
+
+    class WeaponRenderComponent {
+	    textureName
+	    anchorPoint
+	    initRotation
+    }
+
+    class WeaponEffectsComponent {
+    }
+
+    class WeaponEffect {
+    }
+
+    class SpriteComponent {
+	    content
+	    tint
+	    layer
+	    renderSize
+	    anchorPoint
+    }
+
+    class ConsumeManaEffect {
+	    amount
+    }
+
+    class SpawnProjectileEffect {
+	    speed
+	    effectiveRange
+	    damage
+	    spriteName
+	    collisionSize
+    }
+
+	<<interface>> WeaponEffect
+
+    Weapon *-- TransformComponent
+    Weapon *-- FacingComponent
+    Weapon *-- OwnerComponent
+    Weapon *-- WeaponTimingComponent
+    Weapon *-- WeaponRenderComponent
+    Weapon *-- WeaponEffectsComponent
+    WeaponEffectsComponent o-- "0..*" WeaponEffect : effects
+    Weapon <.. SpriteComponent
+    WeaponEffect <|-- ConsumeManaEffect
+    WeaponEffect <|-- SpawnProjectileEffect
+```
+
 ## Patterns
 
 ### Command pattern

@@ -277,4 +277,64 @@ final class EntityFactoryTests: XCTestCase {
         XCTAssertEqual(enemies.count, 1)
         XCTAssertNotEqual(players.first, enemies.first)
     }
+
+    // MARK: - EnemyType: strategy properties (Updated on Sprint 2)
+
+    func testChargerWanderStrategyIsWanderStrategy() {
+        XCTAssertTrue(EnemyType.charger.wanderStrategy is WanderStrategy)
+    }
+
+    func testMummyWanderStrategyIsWanderStrategy() {
+        XCTAssertTrue(EnemyType.mummy.wanderStrategy is WanderStrategy)
+    }
+
+    func testRangerWanderStrategyIsWanderStrategy() {
+        XCTAssertTrue(EnemyType.ranger.wanderStrategy is WanderStrategy)
+    }
+
+    func testTowerWanderStrategyIsStationaryStrategy() {
+        XCTAssertTrue(EnemyType.tower.wanderStrategy is StationaryStrategy)
+    }
+
+    func testChargerChaseStrategyIsStraightLineChase() {
+        XCTAssertTrue(EnemyType.charger.chaseStrategy is StraightLineChaseStrategy)
+    }
+
+    func testMummyChaseStrategyIsStraightLineChase() {
+        XCTAssertTrue(EnemyType.mummy.chaseStrategy is StraightLineChaseStrategy)
+    }
+
+    func testRangerChaseStrategyIsShooterBasic() {
+        XCTAssertTrue(EnemyType.ranger.chaseStrategy is ShooterBasicStrategy)
+    }
+
+    func testTowerChaseStrategyIsStationaryStrategy() {
+        XCTAssertTrue(EnemyType.tower.chaseStrategy is StationaryStrategy)
+    }
+
+    // MARK: - makeEnemy: EnemyStateComponent strategies
+
+    func testMakeEnemyWanderStrategyMatchesType() {
+        for enemyType in [EnemyType.charger, .mummy, .ranger, .tower] {
+            let enemy = EnemyEntityFactory(at: .zero, type: enemyType).make(in: world)
+            let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
+            XCTAssertNotNil(state, "Missing EnemyStateComponent for \(enemyType)")
+            XCTAssertTrue(
+                type(of: state!.wanderStrategy) == type(of: enemyType.wanderStrategy),
+                "wanderStrategy type mismatch for \(enemyType)"
+            )
+        }
+    }
+
+    func testMakeEnemyChaseStrategyMatchesType() {
+        for enemyType in [EnemyType.charger, .mummy, .ranger, .tower] {
+            let enemy = EnemyEntityFactory(at: .zero, type: enemyType).make(in: world)
+            let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
+            XCTAssertNotNil(state, "Missing EnemyStateComponent for \(enemyType)")
+            XCTAssertTrue(
+                type(of: state!.chaseStrategy) == type(of: enemyType.chaseStrategy),
+                "chaseStrategy type mismatch for \(enemyType)"
+            )
+        }
+    }
 }

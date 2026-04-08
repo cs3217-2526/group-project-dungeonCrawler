@@ -47,15 +47,16 @@ private struct RawRegistry: Decodable {
     let meta: TileMeta
     let floor: RawFloor
     let wall: RawWall
+    let barrier: RawBarrier?
 
     func toEntry() -> TileRegistryEntry {
-        TileRegistryEntry(
+        return TileRegistryEntry(
             meta: meta,
             floor:        [floor.plain, floor.variant1, floor.variant2,
                            floor.variant3, floor.variant4].compactMap { $0 },
             wallTopCap:   wall.top.capRow,
             wallTopFace:  wall.top.faceRow,
-            wallTopFace2: wall.top.faceRow2 ?? wall.top.faceRow, // fallback to faceRow if not provided
+            wallTopFace2: wall.top.faceRow2 ?? wall.top.faceRow,
             wallTopBase:  wall.top.baseRow,
             wallBottom:   wall.bottom,
             wallLeft:     wall.left,
@@ -67,9 +68,18 @@ private struct RawRegistry: Decodable {
             floorDecoration:   floor.decorations ?? [],
             wallTopDecoration: wall.top.decorations ?? [],
             wallLeftFace:      wall.leftFace ?? [],
-            wallRightFace:     wall.rightFace ?? []
+            wallRightFace:     wall.rightFace ?? [],
+            barrierLeft:     barrier?.left,
+            barrierRight:    barrier?.right,
+            barrierVertical: barrier?.vertical ?? []
         )
     }
+}
+
+private struct RawBarrier: Decodable {
+    let left:     TileCoord?
+    let right:    TileCoord?
+    let vertical: [TileCoord]?
 }
 
 private struct RawFloor: Decodable {

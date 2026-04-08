@@ -20,6 +20,8 @@ public final class SpriteKitTileMapAdapter: TileMapRenderer {
 
     private var tileSetCache: [TileTheme: TileCache] = [:]
     private var tileMaps:     [UUID: [SKTileMapNode]] = [:]
+    /// Barrier tile map nodes: roomID key that owns room barrier.
+    private var barrierMaps:  [UUID: [SKTileMapNode]] = [:]
 
     private struct TileCache {
         let set:     SKTileSet
@@ -114,8 +116,45 @@ public final class SpriteKitTileMapAdapter: TileMapRenderer {
         tileMaps.removeValue(forKey: roomID)
     }
 
+    // MARK: - TileMapRenderer — Barriers
+
+    public func renderBarrier(
+        roomID: UUID,
+        bounds: RoomBounds,
+        side:   BarrierSide,
+        theme:  TileTheme,
+        using generator: inout SeededGenerator
+    ) {
+        guard let worldLayer,
+              let entry = registryLoader.entry(for: theme),
+              let cache = buildCacheIfNeeded(theme: theme, entry: entry)
+        else { return }
+
+        let tileSize = entry.meta.tileSize
+        let cols = max(1, Int(ceil(bounds.size.x / Float(tileSize))))
+        let rows = max(1, Int(ceil(bounds.size.y / Float(tileSize))))
+
+        let grid = TilePainter.paintBarrier(cols: cols, rows: rows, side: side)
+
+        let tileMap = makeTileMap(cache: cache, cols: cols, rows: rows, tileSize: tileSize, zOffset: TileLayer.overlay.zOffset)
+        tileMap.position = CGPoint(x: CGFloat(bounds.center.x), y: CGFloat(bounds.center.y))
+        fillTileMap(tileMap, grid: grid, cache: cache, using: &generator)
+
+        worldLayer.addChild(tileMap)
+        barrierMaps[roomID, default: []].append(tileMap)
+    }
+
+    public func tearDownBarriers(roomID: UUID) {
+        barrierMaps[roomID]?.forEach { $0.removeFromParent() }
+        barrierMaps.removeValue(forKey: roomID)
+    }
+
     public func tearDownAll() {
-        tileMaps.keys.forEach { tearDownRoom(roomID: $0) }
+        let tileMapRoomIDs = Array(tileMaps.keys)
+        tileMapRoomIDs.forEach { tearDownRoom(roomID: $0) }
+
+        let barrierRoomIDs = Array(barrierMaps.keys)
+        barrierRoomIDs.forEach { tearDownBarriers(roomID: $0) }
     }
 
     // MARK: - Private — Tile map helpers
@@ -159,7 +198,7 @@ public final class SpriteKitTileMapAdapter: TileMapRenderer {
         let sheetRows = CGFloat(entry.meta.sheetRows)
         let tilePoints = CGSize(width: CGFloat(entry.meta.tileSize), height: CGFloat(entry.meta.tileSize))
 
-        let mapping: [(TileRole, [TileCoord])] = [
+        var mapping: [(TileRole, [TileCoord])] = [
             (.floor,             entry.floor),
             (.wallTopCap,        entry.wallTopCap),
             (.wallTopFace,       entry.wallTopFace),
@@ -175,8 +214,18 @@ public final class SpriteKitTileMapAdapter: TileMapRenderer {
             (.floorDecoration,   entry.floorDecoration),
             (.wallTopDecoration, entry.wallTopDecoration),
             (.wallLeftFace,      entry.wallLeftFace),
-            (.wallRightFace,     entry.wallRightFace)
+            (.wallRightFace,     entry.wallRightFace),
         ]
+
+        if let bl = entry.barrierLeft  { mapping.append((.barrierLeft,  [bl])) }
+        if let br = entry.barrierRight { mapping.append((.barrierRight, [br])) }
+        
+        mapping.append(contentsOf: [
+            (.barrierVertical0,  entry.barrierVertical.indices.contains(0) ? [entry.barrierVertical[0]] : []),
+            (.barrierVertical1,  entry.barrierVertical.indices.contains(1) ? [entry.barrierVertical[1]] : []),
+            (.barrierVertical2,  entry.barrierVertical.indices.contains(2) ? [entry.barrierVertical[2]] : []),
+            (.barrierVertical3,  entry.barrierVertical.indices.contains(3) ? [entry.barrierVertical[3]] : []),
+        ])
 
         var roleMap:   [TileRole: TileGroupEntry] = [:]
         var allGroups: [SKTileGroup]              = []

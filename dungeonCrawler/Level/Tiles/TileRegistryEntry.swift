@@ -50,6 +50,11 @@ public struct TileRegistryEntry {
     public let wallLeftFace:      [TileCoord]
     public let wallRightFace:     [TileCoord]
 
+    // Barriers — placed at locked room doorways
+    public let barrierLeft:     TileCoord?
+    public let barrierRight:    TileCoord?
+    public let barrierVertical: [TileCoord]  // 4 elements ordered bottom-to-top
+
     /// Deterministically picks a random tile coordinate for the given role.
     public func randomCoord(for role: TileRole, using generator: inout SeededGenerator) -> TileCoord? {
         let pool: [TileCoord]?
@@ -70,8 +75,14 @@ public struct TileRegistryEntry {
         case .wallTopDecoration: pool = wallTopDecoration
         case .wallLeftFace:      pool = wallLeftFace
         case .wallRightFace:     pool = wallRightFace
+        case .barrierLeft:       return barrierLeft
+        case .barrierRight:      return barrierRight
+        case .barrierVertical0:  return barrierVertical.indices.contains(0) ? barrierVertical[0] : nil
+        case .barrierVertical1:  return barrierVertical.indices.contains(1) ? barrierVertical[1] : nil
+        case .barrierVertical2:  return barrierVertical.indices.contains(2) ? barrierVertical[2] : nil
+        case .barrierVertical3:  return barrierVertical.indices.contains(3) ? barrierVertical[3] : nil
         }
-        
+
         guard let validPool = pool, !validPool.isEmpty else { return nil }
         return validPool.randomElement(using: &generator)
     }

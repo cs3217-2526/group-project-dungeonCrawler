@@ -8,6 +8,10 @@ import Foundation
 public struct CompositeRoomPopulator: RoomPopulatorStrategy {
     private let strategies: [RoomPopulatorStrategy]
 
+    public var requiresCombatEncounter: Bool {
+        strategies.contains { $0.requiresCombatEncounter }
+    }
+
     public init(strategies: [RoomPopulatorStrategy]) {
         self.strategies = strategies
     }

@@ -75,7 +75,6 @@ public final class InputSystem: System {
                             content: .texture(name: render.textureName),
                             layer: .weapon,
                             anchorPoint: render.anchorPoint,
-                            
                         ),
                         to: newPrimary
                     )

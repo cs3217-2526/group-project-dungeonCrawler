@@ -36,6 +36,8 @@ class GameScene: SKScene {
     // MARK: - Input provider
     private lazy var touchInput = TouchJoystickInputProvider(commandQueues: commandQueues)
     private lazy var switchWeaponInput = SwitchWeaponButtonInputProvider(commandQueues: commandQueues)
+    private lazy var dropWeaponInput = DropWeaponButtonInputProvider(commandQueues: commandQueues)
+    private lazy var pickupInput = PickupButtonInputProvider(commandQueues: commandQueues)
     
     // MARK: - Game state
     private var isGameOver = false
@@ -50,11 +52,25 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
         view.addSubview(switchWeaponInput.button)
+        view.addSubview(dropWeaponInput.button)
+        view.addSubview(pickupInput.button)
         NSLayoutConstraint.activate([
             switchWeaponInput.button.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.07),
             switchWeaponInput.button.heightAnchor.constraint(equalTo: switchWeaponInput.button.widthAnchor),
             switchWeaponInput.button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -view.bounds.width * 0.2),
             switchWeaponInput.button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -view.bounds.height * 0.05),
+        ])
+        NSLayoutConstraint.activate([
+            dropWeaponInput.button.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.07),
+            dropWeaponInput.button.heightAnchor.constraint(equalTo: switchWeaponInput.button.widthAnchor),
+            dropWeaponInput.button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -view.bounds.width * 0.1),
+            dropWeaponInput.button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -view.bounds.height * 0.2),
+        ])
+        NSLayoutConstraint.activate([
+            pickupInput.button.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.07),
+            pickupInput.button.heightAnchor.constraint(equalTo: switchWeaponInput.button.widthAnchor),
+            pickupInput.button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -view.bounds.width * 0.2),
+            pickupInput.button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -view.bounds.height * 0.2),
         ])
     }
 
@@ -98,13 +114,20 @@ class GameScene: SKScene {
         )
         levelOrchestrator.tileMapRenderer = tileAdapter
 
-        systemManager.register(LevelTransitionSystem(orchestrator: levelOrchestrator))
+        systemManager.register(RoomTransitionSystem(orchestrator: levelOrchestrator))
+        systemManager.register(RoomClearSystem(orchestrator: levelOrchestrator))
         commandQueues.register(SwitchWeaponCommand.self)
+        commandQueues.register(DropWeaponCommand.self)
+        commandQueues.register(PickupCommand.self)
         commandQueues.register(MoveCommand.self)
         commandQueues.register(AimCommand.self)
         commandQueues.register(FireCommand.self)
         commandQueues.register(JoystickRenderCommand.self)
+
+        // Systems
         systemManager.register(InputSystem(commandQueues: commandQueues))
+        systemManager.register(WeaponDropSystem(commandQueues: commandQueues))
+        systemManager.register(PickupSystem(commandQueues: commandQueues))
         systemManager.register(EnemyAISystem())
         systemManager.register(HealthSystem(destructionQueue: destructionQueue, playerDeathEvent: playerDeathEvent))
         systemManager.register(ManaSystem())

@@ -8,50 +8,6 @@
 import Foundation
 import simd
 
-// new enemy types should go in here
-public enum EnemyType {
-    case charger
-    case mummy
-    case ranger
-    case tower
-
-    var textureName: String {
-        switch self {
-        case .charger: return "Charger"
-        case .mummy:   return "Mummy"
-        case .ranger:  return "Ranger"
-        case .tower:   return "Tower"
-        }
-    }
-
-    var scale: Float {
-        switch self {
-        case .charger: return 1.0
-        case .mummy:   return 1.0
-        case .ranger:  return 0.75
-        case .tower:   return 1.5
-        }
-    }
-
-    var mass: Int {
-        switch self {
-        case .charger: return 15
-        case .mummy:   return 10
-        case .ranger:  return 5
-        case .tower:   return 20
-        }
-    }
-    
-    var contactDamage: Float {
-        switch self {
-        case .charger: return 20.0
-        case .mummy:   return 10.0
-        case .ranger:  return 5.0
-        case .tower:   return 15.0
-        }
-    }
-}
-
 // Components attached:
 //   • TransformComponent     — position, rotation, scale
 //   • SpriteComponent        — visual representation
@@ -98,7 +54,10 @@ public struct EnemyEntityFactory: EntityFactory {
         ), to: entity)
         
         world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: EnemyStateComponent(), to: entity)
+        world.addComponent(component: EnemyStateComponent(
+            wanderStrategy: type.wanderStrategy,
+            chaseStrategy: type.chaseStrategy
+        ), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: SIMD2(WorldConstants.playerSize * finalScale, WorldConstants.playerSize * finalScale)), to: entity)
         world.addComponent(component: MassComponent(mass: type.mass), to: entity)
         world.addComponent(component: ContactDamageComponent(damage: type.contactDamage), to: entity)
