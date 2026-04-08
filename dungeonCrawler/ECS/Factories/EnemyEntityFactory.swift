@@ -8,68 +8,6 @@
 import Foundation
 import simd
 
-// new enemy types should go in here
-public enum EnemyType {
-    case charger
-    case mummy
-    case ranger
-    case tower
-
-    var textureName: String {
-        switch self {
-        case .charger: return "Charger"
-        case .mummy:   return "Mummy"
-        case .ranger:  return "Ranger"
-        case .tower:   return "Tower"
-        }
-    }
-
-    var scale: Float {
-        switch self {
-        case .charger: return 1.0
-        case .mummy:   return 1.0
-        case .ranger:  return 0.75
-        case .tower:   return 1.5
-        }
-    }
-
-    var mass: Int {
-        switch self {
-        case .charger: return 15
-        case .mummy:   return 10
-        case .ranger:  return 5
-        case .tower:   return 20
-        }
-    }
-    
-    var contactDamage: Float {
-        switch self {
-        case .charger: return 20.0
-        case .mummy:   return 10.0
-        case .ranger:  return 5.0
-        case .tower:   return 15.0
-        }
-    }
-
-    var wanderStrategy: any EnemyAIStrategy {
-        switch self {
-        case .charger: return WanderStrategy()
-        case .mummy:   return WanderStrategy()
-        case .ranger:  return WanderStrategy()
-        case .tower:   return StationaryStrategy()
-        }
-    }
-
-    var chaseStrategy: any EnemyAIStrategy {
-        switch self {
-        case .charger: return StraightLineChaseStrategy()
-        case .mummy:   return StraightLineChaseStrategy()
-        case .ranger:  return ShooterBasicStrategy()
-        case .tower:   return StationaryStrategy()
-        }
-    }
-}
-
 // Components attached:
 //   • TransformComponent     — position, rotation, scale
 //   • SpriteComponent        — visual representation
