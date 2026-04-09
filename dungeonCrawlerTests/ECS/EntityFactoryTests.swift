@@ -221,11 +221,11 @@ final class EntityFactoryTests: XCTestCase {
         XCTAssertNotNil(world.getComponent(type: EnemyStateComponent.self, for: enemy))
     }
 
-    func testMakeEnemyStartsInWanderMode() {
+    func testMakeEnemyStateComponentHasStrategy() {
         let enemy = EnemyEntityFactory(at: .zero, type: .charger).make(in: world)
         let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
         XCTAssertNotNil(state)
-        XCTAssertTrue(state!.mode == .wander)
+        XCTAssertTrue(state!.strategy is StandardStrategy)
     }
 
     // MARK: - makeEnemy: CollisionBoxComponent
@@ -278,62 +278,34 @@ final class EntityFactoryTests: XCTestCase {
         XCTAssertNotEqual(players.first, enemies.first)
     }
 
-    // MARK: - EnemyType: strategy properties (Updated on Sprint 2)
+    // MARK: - EnemyType: strategy properties
 
-    func testChargerWanderStrategyIsWanderStrategy() {
-        XCTAssertTrue(EnemyType.charger.wanderStrategy is WanderStrategy)
+    func testChargerStrategyIsStandardStrategy() {
+        XCTAssertTrue(EnemyType.charger.strategy is StandardStrategy)
     }
 
-    func testMummyWanderStrategyIsWanderStrategy() {
-        XCTAssertTrue(EnemyType.mummy.wanderStrategy is WanderStrategy)
+    func testMummyStrategyIsStandardStrategy() {
+        XCTAssertTrue(EnemyType.mummy.strategy is StandardStrategy)
     }
 
-    func testRangerWanderStrategyIsWanderStrategy() {
-        XCTAssertTrue(EnemyType.ranger.wanderStrategy is WanderStrategy)
+    func testRangerStrategyIsStandardStrategy() {
+        XCTAssertTrue(EnemyType.ranger.strategy is StandardStrategy)
     }
 
-    func testTowerWanderStrategyIsStationaryStrategy() {
-        XCTAssertTrue(EnemyType.tower.wanderStrategy is StationaryStrategy)
+    func testTowerStrategyIsStandardStrategy() {
+        XCTAssertTrue(EnemyType.tower.strategy is StandardStrategy)
     }
 
-    func testChargerChaseStrategyIsStraightLineChase() {
-        XCTAssertTrue(EnemyType.charger.chaseStrategy is StraightLineChaseStrategy)
-    }
+    // MARK: - makeEnemy: EnemyStateComponent strategy
 
-    func testMummyChaseStrategyIsStraightLineChase() {
-        XCTAssertTrue(EnemyType.mummy.chaseStrategy is StraightLineChaseStrategy)
-    }
-
-    func testRangerChaseStrategyIsShooterBasic() {
-        XCTAssertTrue(EnemyType.ranger.chaseStrategy is ShooterBasicStrategy)
-    }
-
-    func testTowerChaseStrategyIsStationaryStrategy() {
-        XCTAssertTrue(EnemyType.tower.chaseStrategy is StationaryStrategy)
-    }
-
-    // MARK: - makeEnemy: EnemyStateComponent strategies
-
-    func testMakeEnemyWanderStrategyMatchesType() {
+    func testMakeEnemyStrategyMatchesEnemyType() {
         for enemyType in [EnemyType.charger, .mummy, .ranger, .tower] {
             let enemy = EnemyEntityFactory(at: .zero, type: enemyType).make(in: world)
             let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
             XCTAssertNotNil(state, "Missing EnemyStateComponent for \(enemyType)")
             XCTAssertTrue(
-                type(of: state!.wanderStrategy) == type(of: enemyType.wanderStrategy),
-                "wanderStrategy type mismatch for \(enemyType)"
-            )
-        }
-    }
-
-    func testMakeEnemyChaseStrategyMatchesType() {
-        for enemyType in [EnemyType.charger, .mummy, .ranger, .tower] {
-            let enemy = EnemyEntityFactory(at: .zero, type: enemyType).make(in: world)
-            let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
-            XCTAssertNotNil(state, "Missing EnemyStateComponent for \(enemyType)")
-            XCTAssertTrue(
-                type(of: state!.chaseStrategy) == type(of: enemyType.chaseStrategy),
-                "chaseStrategy type mismatch for \(enemyType)"
+                type(of: state!.strategy) == type(of: enemyType.strategy),
+                "strategy type mismatch for \(enemyType)"
             )
         }
     }

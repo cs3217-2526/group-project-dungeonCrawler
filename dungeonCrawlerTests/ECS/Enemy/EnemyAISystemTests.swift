@@ -40,12 +40,13 @@ final class EnemyAISystemTests: XCTestCase {
     @discardableResult
     private func makeEnemy(at position: SIMD2<Float>,
                             detectionRadius: Float = 150,
-                            loseRadius: Float = 225) -> Entity {
+                            loseRadius: Float? = 225) -> Entity {
         let entity = world.createEntity()
         world.addComponent(component: TransformComponent(position: position), to: entity)
         world.addComponent(component: VelocityComponent(), to: entity)
-        world.addComponent(component: EnemyStateComponent(detectionRadius: detectionRadius,
-                                                          loseRadius: loseRadius), to: entity)
+        world.addComponent(component: EnemyStateComponent(
+            strategy: StandardStrategy(detectionRadius: detectionRadius, loseRadius: loseRadius)
+        ), to: entity)
         return entity
     }
 
@@ -59,7 +60,7 @@ final class EnemyAISystemTests: XCTestCase {
         XCTAssertEqual(vel!.linear.y, 0, accuracy: 0.001)
     }
 
-    // MARK: - Chase mode
+    // MARK: - Chase behaviour
 
     func testEnemySwitchesToChaseWhenPlayerWithinDetectionRadius() {
         makePlayer(at: SIMD2(100, 0))
@@ -67,9 +68,9 @@ final class EnemyAISystemTests: XCTestCase {
 
         system.update(deltaTime: 0.1, world: world)
 
-        let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
-        XCTAssertNotNil(state)
-        XCTAssertTrue(state!.mode == .chase)
+        let active = world.getComponent(type: ActiveBehaviourComponent.self, for: enemy)
+        XCTAssertNotNil(active)
+        XCTAssertEqual(active!.behaviourID, ChaseBehaviour().id)
     }
 
     func testEnemyVelocityPointsTowardPlayerWhenChasing() {
@@ -84,17 +85,17 @@ final class EnemyAISystemTests: XCTestCase {
         XCTAssertEqual(vel!.linear.y, 0, accuracy: 0.001)
     }
 
-    // MARK: - Wander mode
+    // MARK: - Wander behaviour
 
-    func testEnemyStaysInWanderWhenPlayerBeyondLoseRadius() {
+    func testEnemyWandersWhenPlayerBeyondLoseRadius() {
         makePlayer(at: SIMD2(300, 0))
         let enemy = makeEnemy(at: SIMD2(0, 0), detectionRadius: 150, loseRadius: 225)
 
         system.update(deltaTime: 0.1, world: world)
 
-        let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
-        XCTAssertNotNil(state)
-        XCTAssertTrue(state!.mode == .wander)
+        let active = world.getComponent(type: ActiveBehaviourComponent.self, for: enemy)
+        XCTAssertNotNil(active)
+        XCTAssertEqual(active!.behaviourID, WanderBehaviour().id)
     }
 
     func testEnemyInWanderProducesNonZeroVelocity() {
@@ -106,10 +107,10 @@ final class EnemyAISystemTests: XCTestCase {
         let vel = world.getComponent(type: VelocityComponent.self, for: enemy)
         XCTAssertNotNil(vel)
         XCTAssertGreaterThan(simd_length(vel!.linear), 0,
-                             "Wander strategy should produce a non-zero velocity toward its target")
+                             "Wander behaviour should produce a non-zero velocity toward its target")
     }
 
-    // MARK: - Knockback suppression, enemyAI shouldnt interfere
+    // MARK: - Knockback suppression
 
     func testEnemyInKnockbackIsSkipped() {
         makePlayer(at: SIMD2(50, 0))
@@ -118,9 +119,8 @@ final class EnemyAISystemTests: XCTestCase {
 
         system.update(deltaTime: 0.1, world: world)
 
-        // Enemy is within detection range but should be skipped due to knockback
-        let state = world.getComponent(type: EnemyStateComponent.self, for: enemy)
-        XCTAssertTrue(state!.mode == .wander)
+        // Strategy was never run so ActiveBehaviourComponent should not have been added
+        XCTAssertNil(world.getComponent(type: ActiveBehaviourComponent.self, for: enemy))
     }
 
     func testEnemyVelocityNotOverwrittenDuringKnockback() {
