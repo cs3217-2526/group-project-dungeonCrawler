@@ -56,18 +56,16 @@ public final class RoomTransitionSystem: System {
             orchestrator.lockRoom(pending.roomID, world: world)
             
             // Guarded Clear: Only clear if the pending room is still the one we just locked
-            world.modifyComponentIfExist(type: LevelStateComponent.self, for: levelStateEntity) { state in
-                if state.pendingLockdown?.roomID == pending.roomID {
-                    state.pendingLockdown = nil
-                }
+            if let state = world.getComponent(type: LevelStateComponent.self, for: levelStateEntity),
+               state.pendingLockdown?.roomID == pending.roomID {
+                state.pendingLockdown = nil
             }
         } else if !isInside {
             // Player left the room before reaching the lockdown distance.
             // Guarded Clear: Only clear if the pending room is still the one the player just left.
-            world.modifyComponentIfExist(type: LevelStateComponent.self, for: levelStateEntity) { state in
-                if state.pendingLockdown?.roomID == pending.roomID {
-                    state.pendingLockdown = nil
-                }
+            if let state = world.getComponent(type: LevelStateComponent.self, for: levelStateEntity),
+               state.pendingLockdown?.roomID == pending.roomID {
+                state.pendingLockdown = nil
             }
         }
     }
@@ -95,7 +93,7 @@ public final class RoomTransitionSystem: System {
                 // Only trigger a pending lockdown if the destination room actually requires one
                 let shouldLock = orchestrator.requiresLockdown(edge.toNodeID, in: world)
 
-                world.modifyComponentIfExist(type: LevelStateComponent.self, for: levelStateEntity) { state in
+                if let state = world.getComponent(type: LevelStateComponent.self, for: levelStateEntity) {
                     state.activeNodeID = edge.toNodeID
                     state.pendingLockdown = shouldLock ? (edge.toNodeID, playerPos) : nil
                 }

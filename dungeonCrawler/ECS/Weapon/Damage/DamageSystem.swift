@@ -34,11 +34,10 @@ public final class DamageSystem: System {
             guard world.isAlive(entity: event.projectile),
                   world.isAlive(entity: event.enemy) else { continue }
  
-            if !processedProjectiles.contains(event.projectile) {
-                world.modifyComponentIfExist(type: HealthComponent.self, for: event.enemy) { health in
-                    health.value.current -= event.damage
-                    health.value.clampToMin()
-                }
+            if !processedProjectiles.contains(event.projectile),
+               let health = world.getComponent(type: HealthComponent.self, for: event.enemy) {
+                health.value.current -= event.damage
+                health.value.clampToMin()
                 processedProjectiles.insert(event.projectile)
             }
  
@@ -55,7 +54,7 @@ public final class DamageSystem: System {
             // Skip if entity is currently in invincibility frames
             guard world.getComponent(type: InvincibilityComponent.self, for: event.player) == nil else { continue }
 
-            world.modifyComponentIfExist(type: HealthComponent.self, for: event.player) { health in
+            if let health = world.getComponent(type: HealthComponent.self, for: event.player) {
                 health.value.current -= event.damage
                 health.value.clampToMin()
             }

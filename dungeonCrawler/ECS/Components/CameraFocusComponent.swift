@@ -11,7 +11,7 @@ import simd
 
 /// Marks an entity as the subject the camera should follow.
 /// Only one entity should carry this component at a time.
-public struct CameraFocusComponent: Component {
+public class CameraFocusComponent: Component {
     /// Optional world-space offset applied on top of the entity's position.
     public var lookOffset: SIMD2<Float>
 

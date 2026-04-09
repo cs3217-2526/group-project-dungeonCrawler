@@ -201,9 +201,7 @@ public final class CollisionSystem: System {
     /// Dynamic entity (player or enemy) hits a static entity (wall, obstacle).
     /// Only the dynamic entity is displaced; the static one never moves.
     private func resolveStaticCollision(dynamic: Entity, mtv: SIMD2<Float>, world: World) {
-        world.modifyComponentIfExist(type: TransformComponent.self, for: dynamic) {
-            $0.position += mtv
-        }
+        world.getComponent(type: TransformComponent.self, for: dynamic)?.position += mtv
     }
 
     /// Player and Enemy knockback are scaled inversely to their mass
@@ -222,12 +220,10 @@ public final class CollisionSystem: System {
         let enemyKnockbackSpeed = baseKnockbackSpeed / enemyMass
         let playerKnockbackSpeed = baseKnockbackSpeed / playerMass
 
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) {
-            $0.position += pushTowardPlayer * (enemyMass / totalMass)
-        }
-        world.modifyComponentIfExist(type: TransformComponent.self, for: enemy) {
-            $0.position -= pushTowardPlayer * (playerMass / totalMass)
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position += pushTowardPlayer * (enemyMass / totalMass)
+        
+        world.getComponent(type: TransformComponent.self, for: enemy)?.position -= pushTowardPlayer * (playerMass / totalMass)
+    
         applyKnockbackIfNeeded(to: player, velocity:  playerKnockbackSpeed * bounceDir,
                                duration: knockbackDuration, world: world)
         applyKnockbackIfNeeded(to: enemy,  velocity: -enemyKnockbackSpeed * bounceDir,
@@ -238,8 +234,8 @@ public final class CollisionSystem: System {
  
     /// Two enemies overlap — equal positional split, no knockback.
     private func resolveEnemyEnemyCollision(entityA: Entity, entityB: Entity, mtv: SIMD2<Float>, world: World) {
-        world.modifyComponentIfExist(type: TransformComponent.self, for: entityA) { $0.position += mtv * 0.5 }
-        world.modifyComponentIfExist(type: TransformComponent.self, for: entityB) { $0.position -= mtv * 0.5 }
+        world.getComponent(type: TransformComponent.self, for: entityA)?.position += mtv * 0.5
+        world.getComponent(type: TransformComponent.self, for: entityB)?.position -= mtv * 0.5
     }
  
     /// Adds a KnockbackComponent only if the entity is not already being knocked back.

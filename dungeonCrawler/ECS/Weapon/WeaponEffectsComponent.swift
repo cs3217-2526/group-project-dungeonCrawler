@@ -7,6 +7,10 @@
 
 import Foundation
 
-public struct WeaponEffectsComponent: Component {
+public class WeaponEffectsComponent: Component {
     var effects: [any WeaponEffect]
+    
+    public init(effects: [any WeaponEffect] = []) {
+        self.effects = effects
+    }
 }

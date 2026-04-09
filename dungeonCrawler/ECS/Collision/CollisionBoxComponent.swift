@@ -6,7 +6,7 @@
 //
 import simd
 
-public struct CollisionBoxComponent: Component {
+public class CollisionBoxComponent: Component {
     public var size: SIMD2<Float>
 
     public var width: Float {

@@ -8,7 +8,7 @@
 import Foundation
 import simd
 
-public struct KnockbackComponent: Component {
+public class KnockbackComponent: Component {
     public var velocity: SIMD2<Float>
     public var remainingTime: Float
 

@@ -14,115 +14,131 @@ final class KnockbackSystemTests: XCTestCase {
 
     var world: World!
     var system: KnockbackSystem!
+    var entity1: Entity!
+    var entity2: Entity!
+    var transform1: TransformComponent!
+    var transform2: TransformComponent!
+    var knockback1: KnockbackComponent!
+    var knockback2: KnockbackComponent!
+    var diagKnockback: KnockbackComponent!
 
     override func setUp() {
         super.setUp()
-        world = World()
-        system = KnockbackSystem()
+        world      = World()
+        system     = KnockbackSystem()
+        entity1    = world.createEntity()
+        entity2    = world.createEntity()
+        transform1 = TransformComponent(position: .zero)
+        transform2 = TransformComponent(position: .zero)
+        knockback1 = KnockbackComponent(velocity: SIMD2<Float>(100, 0), remainingTime: 1.0)
+        knockback2 = KnockbackComponent(velocity: SIMD2<Float>(0, 100), remainingTime: 1.0)
+        diagKnockback = KnockbackComponent(velocity: SIMD2<Float>(-200, 150), remainingTime: 1.0)
     }
 
     override func tearDown() {
-        world = nil
-        system = nil
+        world      = nil
+        system     = nil
+        entity1    = nil
+        entity2    = nil
+        transform1 = nil
+        transform2 = nil
+        knockback1 = nil
+        knockback2 = nil
+        diagKnockback = nil
         super.tearDown()
     }
 
     // MARK: - Position integration
 
     func testKnockbackMovesEntityByVelocityTimesDeltaTime() {
-        let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: .zero), to: entity)
-        world.addComponent(component: KnockbackComponent(velocity: SIMD2(100, 0), remainingTime: 1.0), to: entity)
+        world.addComponent(component: transform1, to: entity1)
+        world.addComponent(component: knockback1, to: entity1)
 
         system.update(deltaTime: 0.5, world: world)
 
-        let transform = world.getComponent(type: TransformComponent.self, for: entity)
+        let transform = world.getComponent(type: TransformComponent.self, for: entity1)
         XCTAssertNotNil(transform)
-        XCTAssertEqual(transform!.position.x, 50, accuracy: 0.001)
-        XCTAssertEqual(transform!.position.y, 0, accuracy: 0.001)
+        XCTAssertEqual(transform?.position.x ?? 0, 50, accuracy: 0.001)
+        XCTAssertEqual(transform?.position.y ?? 0, 0, accuracy: 0.001)
     }
 
     func testKnockbackMovesInCorrectDirection() {
-        let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: .zero), to: entity)
-        world.addComponent(component: KnockbackComponent(velocity: SIMD2(-200, 150), remainingTime: 1.0), to: entity)
+        world.addComponent(component: transform1, to: entity1)
+        world.addComponent(component: diagKnockback, to: entity1)
 
         system.update(deltaTime: 1.0, world: world)
 
-        let transform = world.getComponent(type: TransformComponent.self, for: entity)
-        XCTAssertNotNil(transform)
-        XCTAssertEqual(transform!.position.x, -200, accuracy: 0.001)
-        XCTAssertEqual(transform!.position.y, 150, accuracy: 0.001)
+        let transform = world.getComponent(type: TransformComponent.self, for: entity1)
+        XCTAssertEqual(transform?.position.x ?? 0, -200, accuracy: 0.001)
+        XCTAssertEqual(transform?.position.y ?? 0, 150, accuracy: 0.001)
     }
 
     // MARK: - Timer countdown
 
     func testRemainingTimeDecreasesByDeltaTime() {
-        let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: .zero), to: entity)
-        world.addComponent(component: KnockbackComponent(velocity: .zero, remainingTime: 0.5), to: entity)
+        knockback1.remainingTime = 0.5
+        world.addComponent(component: transform1, to: entity1)
+        world.addComponent(component: knockback1, to: entity1)
 
         system.update(deltaTime: 0.2, world: world)
 
-        let kb = world.getComponent(type: KnockbackComponent.self, for: entity)
+        let kb = world.getComponent(type: KnockbackComponent.self, for: entity1)
         XCTAssertNotNil(kb)
-        XCTAssertEqual(kb!.remainingTime, 0.3, accuracy: 0.001)
+        XCTAssertEqual(kb?.remainingTime ?? 0, 0.3, accuracy: 0.001)
     }
 
     // MARK: - Component removal
 
     func testKnockbackComponentRemovedWhenExpired() {
-        let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: .zero), to: entity)
-        world.addComponent(component: KnockbackComponent(velocity: .zero, remainingTime: 0.1), to: entity)
+        knockback1.remainingTime = 0.1
+        world.addComponent(component: transform1, to: entity1)
+        world.addComponent(component: knockback1, to: entity1)
 
         system.update(deltaTime: 0.2, world: world)
 
-        XCTAssertNil(world.getComponent(type: KnockbackComponent.self, for: entity))
+        XCTAssertNil(world.getComponent(type: KnockbackComponent.self, for: entity1))
     }
 
     func testKnockbackComponentKeptWhenNotExpired() {
-        let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: .zero), to: entity)
-        world.addComponent(component: KnockbackComponent(velocity: .zero, remainingTime: 0.5), to: entity)
+        knockback1.remainingTime = 0.5
+        world.addComponent(component: transform1, to: entity1)
+        world.addComponent(component: knockback1, to: entity1)
 
         system.update(deltaTime: 0.1, world: world)
 
-        XCTAssertNotNil(world.getComponent(type: KnockbackComponent.self, for: entity))
+        XCTAssertNotNil(world.getComponent(type: KnockbackComponent.self, for: entity1))
     }
 
     // MARK: - Entities without knockback unaffected
 
     func testEntityWithoutKnockbackNotMoved() {
-        let entity = world.createEntity()
-        world.addComponent(component: TransformComponent(position: SIMD2(50, 50)), to: entity)
+        transform1.position = SIMD2<Float>(50, 50)
+        world.addComponent(component: transform1, to: entity1)
 
         system.update(deltaTime: 1.0, world: world)
 
-        let transform = world.getComponent(type: TransformComponent.self, for: entity)
-        XCTAssertNotNil(transform)
-        XCTAssertEqual(transform!.position.x, 50, accuracy: 0.001)
-        XCTAssertEqual(transform!.position.y, 50, accuracy: 0.001)
+        let transform = world.getComponent(type: TransformComponent.self, for: entity1)
+        XCTAssertEqual(transform?.position.x ?? 0, 50, accuracy: 0.001)
+        XCTAssertEqual(transform?.position.y ?? 0, 50, accuracy: 0.001)
     }
 
     // MARK: - Multiple entities
 
     func testMultipleEntitiesHandledIndependently() {
-        let entityA = world.createEntity()
-        world.addComponent(component: TransformComponent(position: .zero), to: entityA)
-        world.addComponent(component: KnockbackComponent(velocity: SIMD2(100, 0), remainingTime: 1.0), to: entityA)
+        world.addComponent(component: transform1, to: entity1)
+        world.addComponent(component: knockback1, to: entity1) // Velocity (100, 0)
 
-        let entityB = world.createEntity()
-        world.addComponent(component: TransformComponent(position: .zero), to: entityB)
-        world.addComponent(component: KnockbackComponent(velocity: SIMD2(0, 100), remainingTime: 1.0), to: entityB)
+        world.addComponent(component: transform2, to: entity2)
+        world.addComponent(component: knockback2, to: entity2) // Velocity (0, 100)
 
         system.update(deltaTime: 1.0, world: world)
 
-        let transformA = world.getComponent(type: TransformComponent.self, for: entityA)
-        let transformB = world.getComponent(type: TransformComponent.self, for: entityB)
-        XCTAssertEqual(transformA!.position.x, 100, accuracy: 0.001)
-        XCTAssertEqual(transformA!.position.y, 0,   accuracy: 0.001)
-        XCTAssertEqual(transformB!.position.x, 0,   accuracy: 0.001)
-        XCTAssertEqual(transformB!.position.y, 100, accuracy: 0.001)
+        let t1 = world.getComponent(type: TransformComponent.self, for: entity1)
+        let t2 = world.getComponent(type: TransformComponent.self, for: entity2)
+        
+        XCTAssertEqual(t1?.position.x ?? 0, 100, accuracy: 0.001)
+        XCTAssertEqual(t1?.position.y ?? 0, 0,   accuracy: 0.001)
+        XCTAssertEqual(t2?.position.x ?? 0, 0,   accuracy: 0.001)
+        XCTAssertEqual(t2?.position.y ?? 0, 100, accuracy: 0.001)
     }
 }

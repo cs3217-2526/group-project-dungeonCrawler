@@ -1,6 +1,6 @@
 import Foundation
 
-public struct WeaponSwingComponent: Component {
+public class WeaponSwingComponent: Component {
     var elapsed: Float
     var duration: Float
     var baseRotation: Float

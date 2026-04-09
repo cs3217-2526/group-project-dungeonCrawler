@@ -4,7 +4,7 @@ import simd
 /// The "Blueprint Data" for a specific room entity.
 /// 
 /// Attached only to the abstract "Room Entity" that represents the whole room.
-public struct RoomMetadataComponent: Component {
+public class RoomMetadataComponent: Component {
     public let roomID: UUID
     public var bounds: RoomBounds
     public var doorways: [Doorway]

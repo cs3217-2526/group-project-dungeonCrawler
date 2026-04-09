@@ -34,7 +34,7 @@ final class CameraSystemTests: XCTestCase {
     }
 
     func testNoFocusEntityDoesNotMoveCamera() {
-        world.modifyComponentIfExist(type: ViewportComponent.self, for: cameraEntity) { $0.position = SIMD2(10, 20) }
+        world.getComponent(type: ViewportComponent.self, for: cameraEntity)?.position = SIMD2(10, 20)
         system.update(deltaTime: 0.016, world: world)
         let pos = viewportPosition()
         XCTAssertEqual(pos.x, 10, accuracy: 0.001)

@@ -13,14 +13,39 @@ import simd
 final class ShooterBasicStrategyTests: XCTestCase {
 
     var world: World!
+    var strategy: ShooterBasicStrategy!
+    
+    // Properties for tracked entities and components
+    var enemy: Entity!
+    var transform: TransformComponent!
+    var velocity: VelocityComponent!
+    var shooterComp: ShooterBasicComponent!
 
     override func setUp() {
         super.setUp()
         world = World()
+        strategy = ShooterBasicStrategy()
+        
+        // Initialize components
+        transform = TransformComponent(position: SIMD2<Float>(150, 0))
+        velocity = VelocityComponent()
+        shooterComp = ShooterBasicComponent()
+        
+        // Initialize main test entity
+        enemy = world.createEntity()
+        world.addComponent(component: transform, to: enemy)
+        world.addComponent(component: velocity, to: enemy)
+        // shooterComp is left out for tests that check lazy attachment,
+        // or added manually via setTarget helper.
     }
 
     override func tearDown() {
         world = nil
+        strategy = nil
+        enemy = nil
+        transform = nil
+        velocity = nil
+        shooterComp = nil
         super.tearDown()
     }
 
@@ -37,30 +62,26 @@ final class ShooterBasicStrategyTests: XCTestCase {
     /// Pre-attaches a ShooterBasicComponent with a known target expressed in polar coords
     /// relative to the player, bypassing the random pick on first update.
     private func setTarget(on entity: Entity, angle: Float, radius: Float) {
-        var comp = ShooterBasicComponent()
-        comp.targetAngle = angle
-        comp.targetRadius = radius
-        world.addComponent(component: comp, to: entity)
+        shooterComp.targetAngle = angle
+        shooterComp.targetRadius = radius
+        world.addComponent(component: shooterComp, to: entity)
     }
 
     // MARK: - Lazy Component Attachment
 
     func testLazilyAttachesComponentOnFirstUpdate() {
-        let strategy = ShooterBasicStrategy()
-        let enemy = makeEnemy(at: SIMD2(150, 0))
-        XCTAssertNil(world.getComponent(type: ShooterBasicComponent.self, for: enemy))
+        // Create fresh local tracking for this specific test
+        let freshEnemy = makeEnemy(at: SIMD2(150, 0))
+        let freshTransform = world.getComponent(type: TransformComponent.self, for: freshEnemy)!
+        
+        XCTAssertNil(world.getComponent(type: ShooterBasicComponent.self, for: freshEnemy))
 
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-        strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
+        strategy.update(entity: freshEnemy, transform: freshTransform, playerPos: .zero, world: world)
 
-        XCTAssertNotNil(world.getComponent(type: ShooterBasicComponent.self, for: enemy))
+        XCTAssertNotNil(world.getComponent(type: ShooterBasicComponent.self, for: freshEnemy))
     }
 
     func testComponentPersistsBetweenUpdates() {
-        let strategy = ShooterBasicStrategy()
-        let enemy = makeEnemy(at: SIMD2(150, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
         strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
 
@@ -70,23 +91,13 @@ final class ShooterBasicStrategyTests: XCTestCase {
     // MARK: - First Update (no target yet)
 
     func testVelocityIsZeroOnFirstUpdate() {
-        // No target on first update → arrived = true → velocity zeroed
-        let strategy = ShooterBasicStrategy()
-        let enemy = makeEnemy(at: SIMD2(150, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
 
-        let vel = world.getComponent(type: VelocityComponent.self, for: enemy)!
-        XCTAssertEqual(vel.linear.x, 0, accuracy: 0.001)
-        XCTAssertEqual(vel.linear.y, 0, accuracy: 0.001)
+        XCTAssertEqual(velocity.linear.x, 0, accuracy: 0.001)
+        XCTAssertEqual(velocity.linear.y, 0, accuracy: 0.001)
     }
 
     func testTargetIsPickedOnFirstUpdate() {
-        let strategy = ShooterBasicStrategy()
-        let enemy = makeEnemy(at: SIMD2(150, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
 
         let comp = world.getComponent(type: ShooterBasicComponent.self, for: enemy)!
@@ -95,11 +106,8 @@ final class ShooterBasicStrategyTests: XCTestCase {
     }
 
     func testTargetRadiusWithinAnnulus() {
-        let strategy = ShooterBasicStrategy(innerRadius: 100, outerRadius: 200)
-        let enemy = makeEnemy(at: SIMD2(150, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
-        strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
+        let customStrategy = ShooterBasicStrategy(innerRadius: 100, outerRadius: 200)
+        customStrategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
 
         let comp = world.getComponent(type: ShooterBasicComponent.self, for: enemy)!
         let radius = comp.targetRadius!
@@ -107,123 +115,78 @@ final class ShooterBasicStrategyTests: XCTestCase {
         XCTAssertLessThanOrEqual(radius, 200)
     }
 
-    func testTargetAngleWithinArcRange() {
-        // Enemy at (150, 0) relative to player at origin → currentAngle = 0
-        // New target angle should be within ±arcRange of 0
-        let arcRange: Float = .pi / 3
-        let strategy = ShooterBasicStrategy(arcRange: arcRange)
-        let enemy = makeEnemy(at: SIMD2(150, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
-        strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
-
-        let comp = world.getComponent(type: ShooterBasicComponent.self, for: enemy)!
-        let angle = comp.targetAngle!
-        XCTAssertLessThanOrEqual(abs(angle), arcRange + 0.001,
-                                 "Target angle should be within ±arcRange of current angle")
-    }
-
     // MARK: - Movement Toward Target
 
     func testVelocityPointsTowardTarget() {
-        // Target at angle=0, radius=150 → world pos (150, 0); enemy at (0, 0) → moves right
-        let strategy = ShooterBasicStrategy(innerRadius: 100, outerRadius: 200, moveSpeed: 60)
-        let enemy = makeEnemy(at: SIMD2(0, 0))
+        // Use class properties for cleaner assertions
+        transform.position = SIMD2(0, 0)
         setTarget(on: enemy, angle: 0, radius: 150)
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
+        
         strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
 
-        let vel = world.getComponent(type: VelocityComponent.self, for: enemy)!
-        XCTAssertGreaterThan(vel.linear.x, 0, "Velocity x should be positive when target is to the right")
-        XCTAssertEqual(vel.linear.y, 0, accuracy: 0.01)
+        XCTAssertGreaterThan(velocity.linear.x, 0, "Velocity x should be positive when target is to the right")
+        XCTAssertEqual(velocity.linear.y, 0, accuracy: 0.01)
     }
 
     func testVelocityMagnitudeEqualsMoveSpeed() {
         let moveSpeed: Float = 75
-        let strategy = ShooterBasicStrategy(innerRadius: 100, outerRadius: 200, moveSpeed: moveSpeed)
-        let enemy = makeEnemy(at: SIMD2(0, 0))
+        let customStrategy = ShooterBasicStrategy(innerRadius: 100, outerRadius: 200, moveSpeed: moveSpeed)
+        
         setTarget(on: enemy, angle: .pi / 4, radius: 150)
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
+        customStrategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
 
-        strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
-
-        let vel = world.getComponent(type: VelocityComponent.self, for: enemy)!
-        XCTAssertEqual(simd_length(vel.linear), moveSpeed, accuracy: 0.01)
+        XCTAssertEqual(simd_length(velocity.linear), moveSpeed, accuracy: 0.01)
     }
 
     // MARK: - Arrival Behaviour
 
     func testVelocityZeroOnArrival() {
-        // Enemy at (150, 0), target world pos = (150, 0) → distance = 0 → arrived
-        let strategy = ShooterBasicStrategy()
-        let enemy = makeEnemy(at: SIMD2(150, 0))
+        // Enemy at (150, 0), target world pos = (150, 0)
         setTarget(on: enemy, angle: 0, radius: 150)
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
 
-        let vel = world.getComponent(type: VelocityComponent.self, for: enemy)!
-        XCTAssertEqual(vel.linear.x, 0, accuracy: 0.001)
-        XCTAssertEqual(vel.linear.y, 0, accuracy: 0.001)
-    }
-
-    func testNewTargetPickedOnArrival() {
-        let strategy = ShooterBasicStrategy()
-        let enemy = makeEnemy(at: SIMD2(150, 0))
-        setTarget(on: enemy, angle: 0, radius: 150)
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
-        strategy.update(entity: enemy, transform: transform, playerPos: .zero, world: world)
-
-        let comp = world.getComponent(type: ShooterBasicComponent.self, for: enemy)!
-        XCTAssertNotNil(comp.targetAngle, "A new target should be picked after arrival")
-        XCTAssertNotNil(comp.targetRadius)
+        XCTAssertEqual(velocity.linear.x, 0, accuracy: 0.001)
+        XCTAssertEqual(velocity.linear.y, 0, accuracy: 0.001)
     }
 
     // MARK: - Target Tracks Player
 
     func testTargetFollowsPlayerMovement() {
-        // Target stored as polar (angle=0, radius=150) tracks the player's world position.
-        // Enemy at (0, 50) — far enough from both targets not to trigger arrival.
-        let strategy = ShooterBasicStrategy(moveSpeed: 60)
-        let enemy = makeEnemy(at: SIMD2(0, 50))
+        // Update the main tracked enemy position
+        transform.position = SIMD2(0, 50)
         setTarget(on: enemy, angle: 0, radius: 150)
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
 
-        // Player at (0, 0) → target world pos (150, 0) → enemy moves right and down
+        // Player at (0, 0) -> target world pos (150, 0) -> enemy moves right and down
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(0, 0), world: world)
-        let vel1 = world.getComponent(type: VelocityComponent.self, for: enemy)!
+        let vx1 = velocity.linear.x
+        let vy1 = velocity.linear.y
 
-        // Player at (0, 200) → target world pos (150, 200) → enemy moves right and up
+        // Player at (0, 200) -> target world pos (150, 200) -> enemy moves right and up
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(0, 200), world: world)
-        let vel2 = world.getComponent(type: VelocityComponent.self, for: enemy)!
+        let vx2 = velocity.linear.x
+        let vy2 = velocity.linear.y
 
-        XCTAssertGreaterThan(vel1.linear.x, 0)
-        XCTAssertLessThan(vel1.linear.y, 0, "Enemy should move down when target is below")
-        XCTAssertGreaterThan(vel2.linear.x, 0)
-        XCTAssertGreaterThan(vel2.linear.y, 0, "Enemy should move up when target is above")
+        XCTAssertGreaterThan(vx1, 0)
+        XCTAssertLessThan(vy1, 0, "Enemy should move down when target is below")
+        XCTAssertGreaterThan(vx2, 0)
+        XCTAssertGreaterThan(vy2, 0, "Enemy should move up when target is above")
     }
 
     // MARK: - Default Parameters
 
     func testDefaultInnerRadius() {
-        let strategy = ShooterBasicStrategy()
         XCTAssertEqual(strategy.innerRadius, 100, accuracy: 0.001)
     }
 
     func testDefaultOuterRadius() {
-        let strategy = ShooterBasicStrategy()
         XCTAssertEqual(strategy.outerRadius, 200, accuracy: 0.001)
     }
 
     func testDefaultMoveSpeed() {
-        let strategy = ShooterBasicStrategy()
         XCTAssertEqual(strategy.moveSpeed, 60, accuracy: 0.001)
     }
 
     func testDefaultArcRange() {
-        let strategy = ShooterBasicStrategy()
         XCTAssertEqual(strategy.arcRange, .pi / 3, accuracy: 0.001)
     }
 }

@@ -8,6 +8,6 @@
 import Foundation
 
 /// Marks the entity controlled by the human player.
-public struct PlayerTagComponent: Component {
+public class PlayerTagComponent: Component {
     public init() {}
 }

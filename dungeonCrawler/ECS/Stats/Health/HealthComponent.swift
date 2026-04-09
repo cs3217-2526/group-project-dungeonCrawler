@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct HealthComponent: StatProvidable {
+public class HealthComponent: StatProvidable {
     public var value: StatValue
 
     /// Use when Starting Health is Max Health

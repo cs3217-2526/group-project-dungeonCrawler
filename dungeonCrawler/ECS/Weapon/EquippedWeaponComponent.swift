@@ -9,7 +9,7 @@
  *   - Add a way to pick up weapons
  */
 
-struct EquippedWeaponComponent: Component {
+class EquippedWeaponComponent: Component {
 //    public init(capacity: Int) {
 //        if capacity > 1 {
 //            weapons = []
@@ -19,4 +19,10 @@ struct EquippedWeaponComponent: Component {
 //    var weapons: [Entity?]
     var primaryWeapon: Entity
     var secondaryWeapon: Entity?
+    
+    public init(primaryWeapon: Entity, secondaryWeapon: Entity? = nil) {
+        self.primaryWeapon = primaryWeapon
+        self.secondaryWeapon = secondaryWeapon
+    }
+    
 }

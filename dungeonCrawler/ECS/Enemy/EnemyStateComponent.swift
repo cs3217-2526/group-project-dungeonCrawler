@@ -13,7 +13,7 @@ public enum EnemyMode {
     case chase
 }
 
-public struct EnemyStateComponent: Component {
+public class EnemyStateComponent: Component {
     public var mode: EnemyMode = .wander
     public var detectionRadius: Float
     public var loseRadius: Float

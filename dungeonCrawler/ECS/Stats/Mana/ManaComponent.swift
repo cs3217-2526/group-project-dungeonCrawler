@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ManaComponent: StatProvidable {
+public class ManaComponent: StatProvidable {
     public var value: StatValue
     public var regenRate: Float
 

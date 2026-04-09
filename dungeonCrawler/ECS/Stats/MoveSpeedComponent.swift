@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct MoveSpeedComponent: StatProvidable {
+public class MoveSpeedComponent: StatProvidable {
     public var value: StatValue
 
     public init(base: Float) {

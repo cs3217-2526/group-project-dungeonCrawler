@@ -2,7 +2,7 @@ import Foundation
 
 /// Holds the global state of the current level.
 /// Attached to a single "Global Entity" in the world.
-public struct LevelStateComponent: Component {
+public class LevelStateComponent: Component {
     /// The graph structure of the current level.
     public var graph: DungeonGraph?
     

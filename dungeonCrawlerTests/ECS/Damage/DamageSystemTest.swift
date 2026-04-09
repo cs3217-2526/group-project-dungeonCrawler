@@ -15,20 +15,35 @@ final class DamageSystemTests: XCTestCase {
     var events: CollisionEventBuffer!
     var system: DamageSystem!
     var destructionQueue: DestructionQueue!
+    var health: HealthComponent!
+    var playerTag: PlayerTagComponent!
+    var player: Entity!
+    var enemy: Entity!
 
     override func setUp() {
         super.setUp()
-        world  = World()
-        events = CollisionEventBuffer()
+        world            = World()
+        events           = CollisionEventBuffer()
         destructionQueue = DestructionQueue()
-        system = DamageSystem(events: events, destructionQueue: destructionQueue)
+        system           = DamageSystem(events: events, destructionQueue: destructionQueue)
+        health           = HealthComponent(base: 100)
+        playerTag        = PlayerTagComponent()
+        player           = world.createEntity()
+        enemy            = makeEnemy()
+        world.addComponent(component: health, to: player)
+        world.addComponent(component: playerTag, to: player)
+        
     }
 
     override func tearDown() {
-        system = nil
-        events = nil
+        system           = nil
+        events           = nil
         destructionQueue = nil
-        world  = nil
+        world            = nil
+        health           = nil
+        playerTag        = nil
+        player           = nil
+        enemy            = nil
         super.tearDown()
     }
 
@@ -58,8 +73,6 @@ final class DamageSystemTests: XCTestCase {
     // MARK: - Basic damage application
 
     func testDamageReducesPlayerHealth() {
-        let player = makePlayer(hp: 100)
-        let enemy  = makeEnemy()
         recordHit(player: player, enemy: enemy, damage: 20)
 
         system.update(deltaTime: 0.016, world: world)
@@ -70,7 +83,6 @@ final class DamageSystemTests: XCTestCase {
 
     func testDamageDoesNotGoBelowZero() {
         let player = makePlayer(hp: 10)
-        let enemy  = makeEnemy()
         recordHit(player: player, enemy: enemy, damage: 999)
 
         system.update(deltaTime: 0.016, world: world)
@@ -81,7 +93,6 @@ final class DamageSystemTests: XCTestCase {
 
     func testFullDamageAppliedExactly() {
         let player = makePlayer(hp: 50)
-        let enemy  = makeEnemy()
         recordHit(player: player, enemy: enemy, damage: 50)
 
         system.update(deltaTime: 0.016, world: world)
@@ -93,8 +104,6 @@ final class DamageSystemTests: XCTestCase {
     // MARK: - Invincibility frames granted after hit
 
     func testInvincibilityComponentAddedAfterDamage() {
-        let player = makePlayer()
-        let enemy  = makeEnemy()
         recordHit(player: player, enemy: enemy, damage: 10)
 
         system.update(deltaTime: 0.016, world: world)
@@ -103,8 +112,6 @@ final class DamageSystemTests: XCTestCase {
     }
 
     func testInvincibilityPreventsSecondHitSameFrame() {
-        let player = makePlayer(hp: 100)
-        let enemy  = makeEnemy()
         // Two events in the same frame
         recordHit(player: player, enemy: enemy, damage: 20)
         recordHit(player: player, enemy: enemy, damage: 20)
@@ -117,8 +124,6 @@ final class DamageSystemTests: XCTestCase {
     }
 
     func testEntityAlreadyInvincibleTakeNoDamage() {
-        let player = makePlayer(hp: 100)
-        let enemy  = makeEnemy()
         // Pre-attach invincibility
         world.addComponent(component: InvincibilityComponent(remainingTime: 0.5), to: player)
         recordHit(player: player, enemy: enemy, damage: 30)
@@ -132,7 +137,6 @@ final class DamageSystemTests: XCTestCase {
     // MARK: - Dead entity guard
 
     func testNoEventsMeansNoHealthChange() {
-        let player = makePlayer(hp: 100)
         // No events recorded
 
         system.update(deltaTime: 0.016, world: world)
@@ -142,9 +146,7 @@ final class DamageSystemTests: XCTestCase {
     }
 
     func testDeadEntityIsSkipped() {
-        let player = makePlayer(hp: 100)
-        let enemy  = makeEnemy()
-        recordHit(player: player, enemy: enemy, damage: 20)
+        recordHit(player: player, enemy: enemy, damage: 200)
 
         // Destroy the player before the system runs
         world.destroyEntity(entity: player)

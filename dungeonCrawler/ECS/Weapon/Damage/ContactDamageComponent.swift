@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ContactDamageComponent: Component {
+public class ContactDamageComponent: Component {
     public var damage: Float
     
     public init(damage: Float) {

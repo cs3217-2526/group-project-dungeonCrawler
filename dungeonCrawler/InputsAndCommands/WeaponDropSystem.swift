@@ -36,7 +36,7 @@ public final class WeaponDropSystem: System {
                         layer: .weapon,
                         anchorPoint: secondaryWeaponRender.anchorPoint),
                     to: secondaryWeapon)
-                world.modifyComponentIfExist(type: EquippedWeaponComponent.self, for: entity) { (equippedWeapons) -> Void in
+                if let equippedWeapons = world.getComponent(type: EquippedWeaponComponent.self, for: entity) {
                     equippedWeapons.primaryWeapon = secondaryWeapon
                     equippedWeapons.secondaryWeapon = nil
                 }

@@ -12,42 +12,59 @@ import XCTest
 final class HealthComponentTests: XCTestCase {
 
     var world: World!
+    var entity1: Entity!
+    var entity2: Entity!
+    var health1: HealthComponent!
+    var health2: HealthComponent!
+    var health3: HealthComponent!
 
     override func setUp() {
         super.setUp()
-        world = World()
+        world   = World()
+        entity1 = world.createEntity()
+        entity2 = world.createEntity()
+        
+        // Initializing common component configurations for testing
+        health1 = HealthComponent(base: 100)
+        health2 = HealthComponent(base: 50, max: 200)
+        health3 = HealthComponent(base: 80)
     }
 
     override func tearDown() {
-        world = nil
+        world   = nil
+        entity1 = nil
+        entity2 = nil
+        health1 = nil
+        health2 = nil
+        health3 = nil
         super.tearDown()
     }
 
+    // MARK: - Health Property Tests
+
     func testHealthDefaultMaxEqualsBase() {
-        let health = HealthComponent(base: 100)
-        XCTAssertEqual(health.value.max, Float(100))
+        XCTAssertEqual(health1.value.max, 100.0)
     }
 
     func testHealthCurrentEqualsBase() {
-        let health = HealthComponent(base: 80)
-        XCTAssertEqual(health.value.current, 80, accuracy: Float(0.001))
+        XCTAssertEqual(health3.value.current, 80, accuracy: 0.001)
     }
 
     func testHealthCustomMax() {
-        let health = HealthComponent(base: 50, max: 200)
-        XCTAssertEqual(health.value.max, Float(200))
+        XCTAssertEqual(health2.value.max, 200.0)
     }
 
     func testHealthReduceCurrent() {
-        var health = HealthComponent(base: 100)
-        health.value.current = 40
-        XCTAssertEqual(health.value.current, 40, accuracy: Float(0.001))
+        health1.value.current = 40
+        XCTAssertEqual(health1.value.current, 40, accuracy: 0.001)
     }
 
+    // MARK: - World Integration Tests
+
     func testHealthIsComponent() {
-        let entity = world.createEntity()
-        world.addComponent(component: HealthComponent(base: 100), to: entity)
-        let retrieved = world.getComponent(type: HealthComponent.self, for: entity)
+        world.addComponent(component: health1, to: entity1)
+        
+        let retrieved = world.getComponent(type: HealthComponent.self, for: entity1)
         XCTAssertNotNil(retrieved)
         XCTAssertEqual(retrieved!.value.current, 100, accuracy: Float(0.001))
     }

@@ -25,9 +25,7 @@ public final class InputSystem: System {
         while let moveCommand = commandQueues.pop(MoveCommand.self) {
             for entity in world.entities(with: InputComponent.self) {
                 guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
-                world.modifyComponentIfExist(type: InputComponent.self, for: entity) { input in
-                    input.moveDirection = moveCommand.rawMoveVector
-                }
+                world.getComponent(type: InputComponent.self, for: entity)?.moveDirection = moveCommand.rawMoveVector
             }
             finalMoveDirectionX = moveCommand.rawMoveVector.x
         }
@@ -36,15 +34,11 @@ public final class InputSystem: System {
             let aimDirection = aimCommand.rawAimVector
             for entity in world.entities(with: InputComponent.self) {
                 guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
-                world.modifyComponentIfExist(type: InputComponent.self, for: entity) { input in
-                    input.aimDirection = aimDirection
-                }
+                world.getComponent(type: InputComponent.self, for: entity)?.aimDirection = aimDirection
                 // Update facing: aim direction takes priority over move direction when aim input is present.
                 let facingX: Float? = aimDirection.x != 0 ? aimDirection.x : finalMoveDirectionX
                 guard let facingX = facingX, facingX != 0 else { continue }
-                world.modifyComponentIfExist(type: FacingComponent.self, for: entity) { facing in
-                    facing.facing = facingX > 0 ? .right : .left
-                }
+                world.getComponent(type: FacingComponent.self, for: entity)?.facing = facingX > 0 ? .right : .left
             }
         }
 
@@ -52,9 +46,7 @@ public final class InputSystem: System {
             let isShooting = fireCommand.shooting
             for entity in world.entities(with: InputComponent.self) {
                 guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
-                world.modifyComponentIfExist(type: InputComponent.self, for: entity) { input in
-                    input.isShooting = isShooting
-                }
+                world.getComponent(type: InputComponent.self, for: entity)?.isShooting = isShooting
             }
         }
 
@@ -80,9 +72,9 @@ public final class InputSystem: System {
                     )
                 }
 
-                world.modifyComponentIfExist(type: EquippedWeaponComponent.self, for: entity) { e in
-                    e.primaryWeapon = newPrimary
-                    e.secondaryWeapon = oldPrimary
+                if let weapon = world.getComponent(type: EquippedWeaponComponent.self, for: entity) {
+                    weapon.primaryWeapon = newPrimary
+                    weapon.secondaryWeapon = oldPrimary
                 }
             }
         }

@@ -37,12 +37,6 @@ public final class ComponentStorage {
     func get<T: Component>(type: T.Type, for entity: Entity) -> T? {
         store(for: type).get(for: entity.id)
     }
-    
-    public func modify<T: Component>(type: T.Type, for entity: Entity, body: (inout T) -> Void) {
-        var s = store(for: type)
-        s.modify(for: entity.id, body)
-        setStore(s, for: type)
-    }
 
     public func remove<T: Component>(type: T.Type, from entity: Entity) {
         var s = store(for: type)

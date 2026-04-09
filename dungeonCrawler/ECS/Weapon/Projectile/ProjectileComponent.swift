@@ -1,3 +1,3 @@
-struct ProjectileComponent: Component {
+class ProjectileComponent: Component {
     
 }

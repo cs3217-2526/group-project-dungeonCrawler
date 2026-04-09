@@ -12,36 +12,46 @@ import XCTest
 final class MoveSpeedComponentTests: XCTestCase {
 
     var world: World!
+    var entity1: Entity!
+    var moveSpeed1: MoveSpeedComponent!
 
     override func setUp() {
         super.setUp()
-        world = World()
+        world      = World()
+        entity1    = world.createEntity()
+        moveSpeed1 = MoveSpeedComponent(base: 90)
     }
 
     override func tearDown() {
-        world = nil
+        world      = nil
+        entity1    = nil
+        moveSpeed1 = nil
         super.tearDown()
     }
 
+    // MARK: - Properties
+
     func testMoveSpeedCurrentEqualsBase() {
-        let speed = MoveSpeedComponent(base: 90)
-        XCTAssertEqual(speed.value.current, 90, accuracy: Float(0.001))
+        XCTAssertEqual(moveSpeed1.value.current, 90, accuracy: 0.001)
     }
 
+    // MARK: - World Integration
+
     func testMoveSpeedIsComponent() {
-        let entity = world.createEntity()
-        world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
-        let retrieved = world.getComponent(type: MoveSpeedComponent.self, for: entity)
+        world.addComponent(component: moveSpeed1, to: entity1)
+        
+        let retrieved = world.getComponent(type: MoveSpeedComponent.self, for: entity1)
         XCTAssertNotNil(retrieved)
     }
 
     func testMoveSpeedCanBeModified() {
-        let entity = world.createEntity()
-        world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
-        world.modifyComponentIfExist(type: MoveSpeedComponent.self, for: entity) { speed in
-            speed.value.current = 150
+        world.addComponent(component: moveSpeed1, to: entity1)
+        
+        if let component = world.getComponent(type: MoveSpeedComponent.self, for: entity1) {
+            component.value.current = 150
         }
-        let retrieved = world.getComponent(type: MoveSpeedComponent.self, for: entity)
-        XCTAssertEqual(retrieved!.value.current, 150, accuracy: Float(0.001))
+        
+        let retrieved = world.getComponent(type: MoveSpeedComponent.self, for: entity1)
+        XCTAssertEqual(retrieved!.value.current, 150, accuracy: 0.001)
     }
 }

@@ -16,7 +16,7 @@ public final class InvincibilitySystem: System {
  
     public func update(deltaTime: Double, world: World) {
         for entity in world.entities(with: InvincibilityComponent.self) {
-            guard var invincibility = world.getComponent(type: InvincibilityComponent.self, for: entity)
+            guard let invincibility = world.getComponent(type: InvincibilityComponent.self, for: entity)
             else { continue }
  
             invincibility.remainingTime -= Float(deltaTime)
@@ -24,9 +24,7 @@ public final class InvincibilitySystem: System {
             if invincibility.remainingTime <= 0 {
                 world.removeComponent(type: InvincibilityComponent.self, from: entity)
             } else {
-                world.modifyComponentIfExist(type: InvincibilityComponent.self, for: entity) {
-                    $0.remainingTime = invincibility.remainingTime
-                }
+                world.getComponent(type: InvincibilityComponent.self, for: entity)?.remainingTime = invincibility.remainingTime
             }
         }
     }

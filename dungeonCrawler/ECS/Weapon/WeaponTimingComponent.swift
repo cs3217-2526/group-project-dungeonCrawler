@@ -1,7 +1,7 @@
 import Foundation
 import simd
 
-public struct WeaponTimingComponent: Component {
+public class WeaponTimingComponent: Component {
     var coolDownInterval: TimeInterval?
     var attackSpeed: Float?
     var lastFiredAt: Float

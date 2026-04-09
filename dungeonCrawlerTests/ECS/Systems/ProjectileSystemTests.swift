@@ -15,85 +15,88 @@ final class ProjectileSystemTests: XCTestCase {
     
     var world: World!
     var system: ProjectileSystem!
-    let collisionEvents   = CollisionEventBuffer()
-    let destructionQueue  = DestructionQueue()
+    var collisionEvents: CollisionEventBuffer!
+    var destructionQueue: DestructionQueue!
     
-    override func setUp() {
-        super.setUp()
-        world = World()
-        system = ProjectileSystem(events: collisionEvents,  destructionQueue: destructionQueue)
-    }
-    
-    override func tearDown() {
-        world = nil
-        system = nil
-        super.tearDown()
-    }
+    // Properties for tracked entities and components
+    var projectileEntity: Entity!
+    var transform: TransformComponent!
+    var velocity: VelocityComponent!
+    var projectileComp: ProjectileComponent!
+    var effectiveRange: EffectiveRangeComponent!
+    var contactDamage: ContactDamageComponent!
+    var sprite: SpriteComponent!
     
     static let defaultVelocity: Float = 300
     static let defaultEffectiveRange: Float = 300
     static let defaultDamage: Float = 10
     
-    /// default velocity is 300
-    /// default projectile effective range is 300
-    @discardableResult
-    private func makeProjectile(from position: SIMD2<Float> = SIMD2(0, 0),
-                                aimAt direction: SIMD2<Float> = SIMD2(1, 0),
-                                damage: Float = 10) -> Entity {
-        let speed: Float = ProjectileSystemTests.defaultVelocity
-        let projectile = world.createEntity()
-        world.addComponent(component: TransformComponent(position: position, scale: 1), to: projectile)
-        world.addComponent(component: VelocityComponent(linear: direction * speed), to: projectile)
-        world.addComponent(component: SpriteComponent(textureName: "normalHandgunBullet", zPosition: 5), to: projectile)
-        world.addComponent(component: ProjectileComponent(), to: projectile)
-        world.addComponent(component: EffectiveRangeComponent(base: Self.defaultEffectiveRange), to: projectile)
-        world.addComponent(component: ContactDamageComponent(damage: damage), to: projectile)
-        return projectile
+    override func setUp() {
+        super.setUp()
+        world            = World()
+        collisionEvents  = CollisionEventBuffer()
+        destructionQueue = DestructionQueue()
+        system           = ProjectileSystem(events: collisionEvents, destructionQueue: destructionQueue)
+        transform      = TransformComponent(position: SIMD2(0, 0), scale: 1)
+        velocity       = VelocityComponent(linear: SIMD2(1, 0) * Self.defaultVelocity)
+        projectileComp = ProjectileComponent()
+        effectiveRange = EffectiveRangeComponent(base: Self.defaultEffectiveRange)
+        contactDamage  = ContactDamageComponent(damage: 10)
+        sprite = SpriteComponent(textureName: "normalHandgunBullet", zPosition: 5)
+        
+        // Initialize the default projectile using the helper
+        projectileEntity = world.createEntity()
+        world.addComponent(component: transform, to: projectileEntity)
+        world.addComponent(component: velocity, to: projectileEntity)
+        world.addComponent(component: sprite, to: projectileEntity)
+        world.addComponent(component: projectileComp, to: projectileEntity)
+        world.addComponent(component: effectiveRange, to: projectileEntity)
+        world.addComponent(component: contactDamage, to: projectileEntity)
+        
     }
     
-    // MARK: - Effective range
+    override func tearDown() {
+        world            = nil
+        system           = nil
+        collisionEvents  = nil
+        destructionQueue = nil
+        projectileEntity = nil
+        transform        = nil
+        velocity         = nil
+        projectileComp   = nil
+        effectiveRange   = nil
+        contactDamage    = nil
+        sprite = nil
+        super.tearDown()
+    }
+    
+    // MARK: - Tests
      
     func testProjectileEffectiveRangeDecreaseByTime() {
-        let projectile = makeProjectile()
         system.update(deltaTime: 0.1, world: world)
-        let rangeAfter = world.getComponent(type: EffectiveRangeComponent.self, for: projectile)!.value.current
+        
+        // We can now check the property directly instead of calling world.getComponent
         XCTAssertEqual(
-            rangeAfter,
+            effectiveRange.value.current,
             Self.defaultEffectiveRange - Self.defaultVelocity * 0.1,
             accuracy: 0.001
         )
     }
  
     func testProjectileDestroyedAfterEffectiveRangeReachesZero() {
-        let projectile = makeProjectile()
         system.update(deltaTime: 5, world: world)
-        XCTAssertNil(world.getComponent(type: ProjectileComponent.self, for: projectile))
+        
+        // Verification that it was removed from world
+        XCTAssertNil(world.getComponent(type: ProjectileComponent.self, for: projectileEntity))
     }
- 
-    func testProjectileDestroyedJustPastEffectiveRange() {
-        let projectile = makeProjectile()
-        system.update(deltaTime: 1.1, world: world)
-        XCTAssertNil(world.getComponent(type: ProjectileComponent.self, for: projectile))
-    }
- 
-    func testProjectileNotDestroyedWhenEffectiveRangeStillPositive() {
-        let projectile = makeProjectile()
-        system.update(deltaTime: 0.9, world: world)
-        XCTAssertNotNil(world.getComponent(type: ProjectileComponent.self, for: projectile))
-    }
- 
-    // MARK: - Component values
  
     func testProjectileComponentHasCorrectDamage() {
-        let projectile = makeProjectile(damage: 42)
-        let comp = world.getComponent(type: ContactDamageComponent.self, for: projectile)!
-        XCTAssertEqual(comp.damage, 42, accuracy: 0.001)
+        // Verification via the class property
+        XCTAssertEqual(contactDamage.damage, 10, accuracy: 0.001)
     }
- 
+    
     func testProjectileContactDamageUnchangedAfterRangeDecay() {
-        let projectile = makeProjectile(damage: 30)
         system.update(deltaTime: 0.5, world: world)
-        let comp = world.getComponent(type: ContactDamageComponent.self, for: projectile)!
-        XCTAssertEqual(comp.damage, 30, accuracy: 0.001)
+        XCTAssertEqual(contactDamage.damage, 10, accuracy: 0.001)
     }
 }

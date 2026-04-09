@@ -109,9 +109,7 @@ public final class LevelGenerationManager {
 
     private func positionPlayer(at position: SIMD2<Float>, world: World) {
         if let player = world.entities(with: PlayerTagComponent.self).first {
-            world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-                t.position = position
-            }
+            world.getComponent(type: TransformComponent.self, for: player)?.position = position
         } else {
             let scaleForPlayer  = WorldConstants.standardEntityScale
             let player = PlayerEntityFactory(at: position, scale: scaleForPlayer).make(in: world)

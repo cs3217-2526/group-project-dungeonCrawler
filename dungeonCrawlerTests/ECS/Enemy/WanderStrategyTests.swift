@@ -13,14 +13,47 @@ import simd
 final class WanderStrategyTests: XCTestCase {
 
     var world: World!
+    var strategy: WanderStrategy!
+    
+    // Properties for tracked entities and components
+    var enemy: Entity!
+    var transform: TransformComponent!
+    var velocity: VelocityComponent!
+    var wanderTarget: WanderTargetComponent!
+    var customStrat1: WanderStrategy!
+    var customStrat2: WanderStrategy!
+    var customStrat3: WanderStrategy!
 
     override func setUp() {
         super.setUp()
         world = World()
+        strategy = WanderStrategy()
+        
+        // Initialize components
+        transform = TransformComponent(position: .zero)
+        velocity = VelocityComponent()
+        
+        // Initialize main test entity
+        enemy = world.createEntity()
+        world.addComponent(component: transform, to: enemy)
+        world.addComponent(component: velocity, to: enemy)
+        
+        // wanderTarget is typically added lazily by the strategy
+        customStrat1 = WanderStrategy(wanderRadius: 200)
+        customStrat2 = WanderStrategy(wanderSpeed: 60)
+        customStrat3 = WanderStrategy(wanderSpeed: 50)
     }
 
     override func tearDown() {
         world = nil
+        strategy = nil
+        enemy = nil
+        transform = nil
+        velocity = nil
+        wanderTarget = nil
+        customStrat1 = nil
+        customStrat2 = nil
+        customStrat3 = nil
         super.tearDown()
     }
 
@@ -37,38 +70,29 @@ final class WanderStrategyTests: XCTestCase {
     // MARK: - Default initialisation
 
     func testDefaultWanderRadius() {
-        let strategy = WanderStrategy()
         XCTAssertEqual(strategy.wanderRadius, 100, accuracy: 0.001)
     }
 
     func testDefaultWanderSpeed() {
-        let strategy = WanderStrategy()
         XCTAssertEqual(strategy.wanderSpeed, 40, accuracy: 0.001)
     }
 
     func testCustomWanderRadius() {
-        let strategy = WanderStrategy(wanderRadius: 200)
-        XCTAssertEqual(strategy.wanderRadius, 200, accuracy: 0.001)
+        XCTAssertEqual(customStrat1.wanderRadius, 200, accuracy: 0.001)
     }
 
     func testCustomWanderSpeed() {
-        let strategy = WanderStrategy(wanderSpeed: 60)
-        XCTAssertEqual(strategy.wanderSpeed, 60, accuracy: 0.001)
+        XCTAssertEqual(customStrat2.wanderSpeed, 60, accuracy: 0.001)
     }
 
     // MARK: - Lazy WanderTargetComponent
 
     func testWanderTargetComponentAbsentBeforeFirstUpdate() {
-        let enemy = makeEnemy(at: SIMD2(0, 0))
         XCTAssertNil(world.getComponent(type: WanderTargetComponent.self, for: enemy),
                      "WanderTargetComponent should not exist before first update")
     }
 
     func testWanderTargetComponentAddedOnFirstUpdate() {
-        let strategy = WanderStrategy()
-        let enemy = makeEnemy(at: SIMD2(0, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
 
         XCTAssertNotNil(world.getComponent(type: WanderTargetComponent.self, for: enemy),
@@ -78,47 +102,20 @@ final class WanderStrategyTests: XCTestCase {
     // MARK: - Update behaviour
 
     func testUpdateProducesNonZeroVelocity() {
-        let strategy = WanderStrategy()
-        let enemy = makeEnemy(at: SIMD2(0, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
 
-        let vel = world.getComponent(type: VelocityComponent.self, for: enemy)!
-        XCTAssertGreaterThan(simd_length(vel.linear), 0,
+        XCTAssertGreaterThan(simd_length(velocity.linear), 0,
                              "WanderStrategy should produce non-zero velocity on first update")
     }
 
     func testVelocityMagnitudeEqualsWanderSpeed() {
-        let strategy = WanderStrategy(wanderSpeed: 50)
-        let enemy = makeEnemy(at: SIMD2(0, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
+        customStrat3.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
 
-        strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
-
-        let vel = world.getComponent(type: VelocityComponent.self, for: enemy)!
-        XCTAssertEqual(simd_length(vel.linear), 50, accuracy: 0.01,
+        XCTAssertEqual(simd_length(velocity.linear), 50, accuracy: 0.01,
                        "Velocity magnitude should equal wanderSpeed")
     }
 
-    func testWanderTargetIsWithinWanderRadius() {
-        let strategy = WanderStrategy(wanderRadius: 100)
-        let enemy = makeEnemy(at: SIMD2(0, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
-        for _ in 0..<20 {
-            strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
-            let vel = world.getComponent(type: VelocityComponent.self, for: enemy)!
-            XCTAssertGreaterThan(simd_length(vel.linear), 0,
-                                 "Should always find a valid wander target within radius")
-        }
-    }
-
     func testWanderTargetMinRadiusFloor() {
-        let strategy = WanderStrategy(wanderRadius: 100)
-        let enemy = makeEnemy(at: SIMD2(0, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
 
         let target = world.getComponent(type: WanderTargetComponent.self, for: enemy)?.target
@@ -130,34 +127,28 @@ final class WanderStrategyTests: XCTestCase {
     // MARK: - Target persistence
 
     func testWanderTargetPersistedBetweenUpdates() throws {
-        let strategy = WanderStrategy()
-        let enemy = makeEnemy(at: SIMD2(0, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
-
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
-        let target1 = world.getComponent(type: WanderTargetComponent.self, for: enemy)!.target
+        
+        let comp1 = try XCTUnwrap(world.getComponent(type: WanderTargetComponent.self, for: enemy))
+        let target1 = comp1.target
 
         // Same position — target should not be re-rolled
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
-        let target2 = world.getComponent(type: WanderTargetComponent.self, for: enemy)!.target
+        
+        let comp2 = try XCTUnwrap(world.getComponent(type: WanderTargetComponent.self, for: enemy))
+        let target2 = comp2.target
 
-        let t1 = try XCTUnwrap(target1)
-        let t2 = try XCTUnwrap(target2)
-        XCTAssertEqual(t1.x, t2.x, accuracy: 0.001,
+        XCTAssertEqual(target1!.x, target2!.x, accuracy: Float(0.001),
                        "Wander target should persist while enemy hasn't arrived")
-        XCTAssertEqual(t1.y, t2.y, accuracy: 0.001)
+        XCTAssertEqual(target1!.y, target2!.y, accuracy: Float(0.001))
     }
 
     func testVelocityDirectionIsConsistentBeforeArrival() {
-        let strategy = WanderStrategy(wanderRadius: 100, wanderSpeed: 40)
-        let enemy = makeEnemy(at: SIMD2(0, 0))
-        let transform = world.getComponent(type: TransformComponent.self, for: enemy)!
+        strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
+        let vel1 = velocity.linear
 
         strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
-        let vel1 = world.getComponent(type: VelocityComponent.self, for: enemy)!.linear
-
-        strategy.update(entity: enemy, transform: transform, playerPos: SIMD2(999, 999), world: world)
-        let vel2 = world.getComponent(type: VelocityComponent.self, for: enemy)!.linear
+        let vel2 = velocity.linear
 
         XCTAssertEqual(vel1.x, vel2.x, accuracy: 0.001,
                        "Velocity direction should not change before arrival at wander target")

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct EnemyTagComponent: Component {
+public class EnemyTagComponent: Component {
     public let textureName: String
     public let scale: Float
 

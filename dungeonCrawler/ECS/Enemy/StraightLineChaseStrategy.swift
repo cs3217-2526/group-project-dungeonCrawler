@@ -21,8 +21,6 @@ public struct StraightLineChaseStrategy: EnemyAIStrategy {
         let delta = playerPos - transform.position
         guard simd_length_squared(delta) > 1e-6 else { return }
 
-        world.modifyComponentIfExist(type: VelocityComponent.self, for: entity) { vel in
-            vel.linear = normalize(delta) * self.chaseSpeed
-        }
+        world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(delta) * chaseSpeed
     }
 }

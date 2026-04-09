@@ -12,54 +12,62 @@ import XCTest
 final class InvincibilityComponentTests: XCTestCase {
     
     var world: World!
-    
+    var entity1: Entity!
+    var invincibility1: InvincibilityComponent!
+    var invincibility2: InvincibilityComponent!
+    var zeroComponent: InvincibilityComponent!
+
     override func setUp() {
         super.setUp()
-        world  = World()
+        world = World()
+        entity1 = world.createEntity()
+        invincibility1 = InvincibilityComponent()                 // Default 0.5s
+        invincibility2 = InvincibilityComponent(remainingTime: 1.0)
+        zeroComponent = InvincibilityComponent(remainingTime: 0)
     }
 
     override func tearDown() {
-        world  = nil
+        world = nil
+        entity1 = nil
+        invincibility1 = nil
+        invincibility2 = nil
+        zeroComponent = nil
         super.tearDown()
     }
- 
+    
     // MARK: - Initialisation
- 
+    
     func testDefaultRemainingTime() {
-        let component = InvincibilityComponent()
-        XCTAssertEqual(component.remainingTime, 0.5, accuracy: 0.001)
+        XCTAssertEqual(invincibility1.remainingTime, 0.5, accuracy: 0.001)
     }
- 
+    
     func testCustomRemainingTime() {
-        let component = InvincibilityComponent(remainingTime: 1.0)
-        XCTAssertEqual(component.remainingTime, 1.0, accuracy: 0.001)
+        XCTAssertEqual(invincibility2.remainingTime, 1.0, accuracy: 0.001)
     }
- 
+    
     func testZeroRemainingTime() {
-        let component = InvincibilityComponent(remainingTime: 0)
-        XCTAssertEqual(component.remainingTime, 0, accuracy: 0.001)
+        XCTAssertEqual(zeroComponent.remainingTime, 0, accuracy: 0.001)
     }
- 
+    
     // MARK: - Mutation
- 
+    
     func testRemainingTimeCanBeDecremented() {
-        var component = InvincibilityComponent(remainingTime: 0.5)
-        component.remainingTime -= 0.1
-        XCTAssertEqual(component.remainingTime, 0.4, accuracy: 0.001)
+        invincibility1.remainingTime -= 0.1
+        XCTAssertEqual(invincibility1.remainingTime, 0.4, accuracy: 0.001)
     }
- 
+    
     // MARK: - World integration
- 
+    
     func testComponentCanBeAddedToEntity() {
-        let entity = world.createEntity()
-        world.addComponent(component: InvincibilityComponent(remainingTime: 0.5), to: entity)
-        XCTAssertNotNil(world.getComponent(type: InvincibilityComponent.self, for: entity))
+        world.addComponent(component: invincibility1, to: entity1)
+        XCTAssertNotNil(world.getComponent(type: InvincibilityComponent.self, for: entity1))
     }
- 
+    
     func testComponentCanBeRemovedFromEntity() {
-        let entity = world.createEntity()
-        world.addComponent(component: InvincibilityComponent(), to: entity)
-        world.removeComponent(type: InvincibilityComponent.self, from: entity)
-        XCTAssertNil(world.getComponent(type: InvincibilityComponent.self, for: entity))
+        world.addComponent(component: invincibility1, to: entity1)
+        XCTAssertNotNil(world.getComponent(type: InvincibilityComponent.self, for: entity1))
+        
+        world.removeComponent(type: InvincibilityComponent.self, from: entity1)
+        XCTAssertNil(world.getComponent(type: InvincibilityComponent.self, for: entity1))
     }
 }

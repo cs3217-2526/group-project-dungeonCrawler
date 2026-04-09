@@ -8,7 +8,7 @@
 import Foundation
 import simd
 
-public struct InputComponent: Component {
+public class InputComponent: Component {
     /// Normalised direction the player wants to move.
     public var moveDirection: SIMD2<Float>
 

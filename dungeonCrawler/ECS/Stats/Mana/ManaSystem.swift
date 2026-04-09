@@ -24,10 +24,8 @@ public final class ManaSystem: System {
             let max = mana.value.max ?? mana.value.base
             guard mana.value.current < max else { continue }
             
-            world.modifyComponentIfExist(type: ManaComponent.self, for: entity) { m in
-                m.value.current += m.regenRate * Float(deltaTime)
-                m.value.clampToMax()
-            }
+            mana.value.current += mana.regenRate * Float(deltaTime)
+            mana.value.clampToMax()
         }
     }
 }

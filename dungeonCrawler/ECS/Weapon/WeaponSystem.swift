@@ -51,20 +51,16 @@ public final class WeaponSystem: System {
                     let progress = progressedElapsed / swing.duration
                     let offset = sin(2 * (0.25 - progress) * .pi) * swing.amplitude * swing.directionSign
                     renderedRotation = swing.baseRotation + offset
-                    world.modifyComponentIfExist(type: WeaponSwingComponent.self, for: weaponEntity) { activeSwing in
-                        activeSwing.elapsed = progressedElapsed
-                    }
+                    swing.elapsed = progressedElapsed
                 }
             }
 
-            world.modifyComponentIfExist(type: TransformComponent.self, for: weaponEntity) { transform in
+            if let transform = world.getComponent(type: TransformComponent.self, for: weaponEntity) {
                 transform.position = ownerTransform.position + mirroredOffset
                 transform.rotation = renderedRotation
             }
 
-            world.modifyComponentIfExist(type: FacingComponent.self, for: weaponEntity) { facing in
-                facing.facing = facingRight ? .right : .left
-            }
+            world.getComponent(type: FacingComponent.self, for: weaponEntity)?.facing = facingRight ? .right : .left
 
             if let equipped = world.getComponent(type: EquippedWeaponComponent.self, for: ownerEntity),
                equipped.primaryWeapon != weaponEntity {
@@ -101,9 +97,7 @@ public final class WeaponSystem: System {
 
             guard !blocked else { continue }
 
-            world.modifyComponentIfExist(type: WeaponTimingComponent.self, for: weaponEntity) { timing in
-                timing.lastFiredAt = gameTime
-            }
+            timing.lastFiredAt = gameTime
         }
     }
 

@@ -43,9 +43,7 @@ struct RoomTransitionSystemTests {
 
         // Place player inside the neighbour's bounds
         let player = try #require(world.entities(with: PlayerTagComponent.self).first)
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = neighborDesc.bounds.center
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = neighborDesc.bounds.center
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -74,9 +72,7 @@ struct RoomTransitionSystemTests {
 
         // 1. Enter the room (just inside boundary)
         let entryPoint = neighborSpec.bounds.origin + SIMD2<Float>(5, 5) // Just inside
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = entryPoint
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = entryPoint
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -86,18 +82,14 @@ struct RoomTransitionSystemTests {
         #expect(stateAfterEntry.pendingLockdown?.roomID == neighborID)
 
         // 2. Move 40 units (not enough for 80 unit threshold)
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = entryPoint + SIMD2<Float>(40, 0)
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = entryPoint + SIMD2<Float>(40, 0)
         system.update(deltaTime: 0.016, world: world)
 
         let stateAfter40 = try #require(world.getComponent(type: LevelStateComponent.self, for: stateEntity))
         #expect(stateAfter40.pendingLockdown != nil)
 
         // 3. Move 90 units (past 80 unit threshold)
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = entryPoint + SIMD2<Float>(90, 0)
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = entryPoint + SIMD2<Float>(90, 0)
         system.update(deltaTime: 0.016, world: world)
 
         // Verify lockdown triggered (pending state cleared, and room should be locked)
@@ -125,9 +117,7 @@ struct RoomTransitionSystemTests {
         let player = try #require(world.entities(with: PlayerTagComponent.self).first)
 
         // 1. Enter neighbor
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = neighborSpec.bounds.center
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = neighborSpec.bounds.center
         system.update(deltaTime: 0.016, world: world)
 
         let stateAfterEntry = try #require(world.getComponent(type: LevelStateComponent.self, for: stateEntity))
@@ -135,9 +125,7 @@ struct RoomTransitionSystemTests {
         #expect(stateAfterEntry.pendingLockdown != nil)
 
         // 2. Immediately step back into starting room (the "peek")
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = startSpec.bounds.center
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = startSpec.bounds.center
         system.update(deltaTime: 0.016, world: world)
 
         // Since we left the neighbor room's bounds, pendingLockdown should clear
@@ -167,9 +155,7 @@ struct RoomTransitionSystemTests {
         let player = try #require(world.entities(with: PlayerTagComponent.self).first)
 
         // Enter the empty neighbor room
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = neighborSpec.bounds.center
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = neighborSpec.bounds.center
 
         system.update(deltaTime: 0.016, world: world)
 
@@ -205,15 +191,13 @@ struct RoomTransitionSystemTests {
         let endSpec = try #require(graph.specification(for: endID))
 
         // 2. Simulate State: Active = Mid, Pending = Mid (player just crossed boundary into Mid)
-        world.modifyComponentIfExist(type: LevelStateComponent.self, for: stateEntity) { s in
+        if let s = world.getComponent(type: LevelStateComponent.self, for: stateEntity) {
             s.activeNodeID = midID
             s.pendingLockdown = (midID, SIMD2<Float>(100, 100))
         }
 
         // 3. Move player into End room
-        world.modifyComponentIfExist(type: TransformComponent.self, for: player) { t in
-            t.position = endSpec.bounds.center
-        }
+        world.getComponent(type: TransformComponent.self, for: player)?.position = endSpec.bounds.center
 
         // 4. Update
         system.update(deltaTime: 0.016, world: world)

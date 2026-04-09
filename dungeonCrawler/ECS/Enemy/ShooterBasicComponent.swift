@@ -9,7 +9,7 @@ import Foundation
 
 /// Tracks the current movement target for ShooterZigZagStrategy, expressed in polar
 /// coordinates relative to the player so the target follows the player as they move.
-public struct ShooterBasicComponent: Component {
+public class ShooterBasicComponent: Component {
     /// Angle (radians) of the target relative to the player.
     public var targetAngle: Float?
     public var targetRadius: Float?

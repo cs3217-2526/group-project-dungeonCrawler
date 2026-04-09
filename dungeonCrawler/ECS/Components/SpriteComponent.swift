@@ -26,7 +26,7 @@ public enum RenderLayer: CGFloat {
     case ui = 10
 }
 
-public struct SpriteComponent: Component {
+public class SpriteComponent: Component {
     public var content: SpriteContent
     public var tint: SIMD4<Float>
     public var layer: RenderLayer

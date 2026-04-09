@@ -13,13 +13,50 @@ final class CollisionSystemTests: XCTestCase {
 
     var world: World!
     var collisionSystem: CollisionSystem!
-    let collisionEvents   = CollisionEventBuffer()
-    let destructionQueue  = DestructionQueue()
+    var collisionEvents: CollisionEventBuffer!
+    var destructionQueue: DestructionQueue!
+
+    // Shared box size used by the majority of tests.
+    let defaultBox = SIMD2<Float>(20, 20)
+
+    // Shared transform + box components for the pure checkCollision tests.
+    var transformOrigin: TransformComponent!
+    var transformNear: TransformComponent!
+    var transformFar: TransformComponent!
+    var transformOverlapping: TransformComponent!
+    var transformBRotated: TransformComponent!
+    var smallBox: CollisionBoxComponent!
+    var largeBox: CollisionBoxComponent!
 
     override func setUp() {
         super.setUp()
-        world = World()
-        collisionSystem = CollisionSystem(events: collisionEvents,  destructionQueue: destructionQueue)
+        collisionEvents  = CollisionEventBuffer()
+        destructionQueue = DestructionQueue()
+        world            = World()
+        collisionSystem  = CollisionSystem(events: collisionEvents, destructionQueue: destructionQueue)
+
+        transformOrigin     = TransformComponent(position: SIMD2<Float>(0,   0), rotation: 0,        scale: 1)
+        transformNear       = TransformComponent(position: SIMD2<Float>(10,  0), rotation: 0,        scale: 1)
+        transformFar        = TransformComponent(position: SIMD2<Float>(100, 0), rotation: 0,        scale: 1)
+        transformOverlapping = TransformComponent(position: SIMD2<Float>(5,  0), rotation: 0,        scale: 1)
+        transformBRotated   = TransformComponent(position: SIMD2<Float>(10, 0),  rotation: .pi / 4,  scale: 1)
+        smallBox            = CollisionBoxComponent(size: SIMD2<Float>(10, 10))
+        largeBox            = CollisionBoxComponent(size: SIMD2<Float>(20, 20))
+    }
+
+    override func tearDown() {
+        world            = nil
+        collisionSystem  = nil
+        collisionEvents  = nil
+        destructionQueue = nil
+        transformOrigin      = nil
+        transformNear        = nil
+        transformFar         = nil
+        transformOverlapping = nil
+        transformBRotated    = nil
+        smallBox         = nil
+        largeBox         = nil
+        super.tearDown()
     }
     
     // MARK: - Entity helpers
@@ -97,79 +134,54 @@ final class CollisionSystemTests: XCTestCase {
     // no collision when entities do not overlap
 
     func testNoCollisionWhenSeparated() {
-        let box = SIMD2<Float>(10, 10)
-        let transformA = TransformComponent(position: SIMD2<Float>(0, 0), scale: 1)
-        let transformB = TransformComponent(position: SIMD2<Float>(10, 0), scale: 1) // 10 apart, 5 each side = touching exactly
-        let boxComp = CollisionBoxComponent(size: box)
-
         // Exactly touching (distance == sum of half-widths) is NOT a collision.
         XCTAssertFalse(collisionSystem.checkCollision(
-            transformA: transformA, boxA: boxComp,
-            transformB: transformB, boxB: boxComp
+            transformA: transformOrigin, boxA: smallBox,
+            transformB: transformNear,   boxB: smallBox
         ))
     }
 
 
     func testNoCollisionWhenClearlyApart() {
-        let box = SIMD2<Float>(10, 10)
-        let transformA = TransformComponent(position: SIMD2<Float>(0, 0), scale: 1)
-        let transformB = TransformComponent(position: SIMD2<Float>(100, 0), scale: 1)
-        let boxComp = CollisionBoxComponent(size: box)
-
         XCTAssertFalse(collisionSystem.checkCollision(
-            transformA: transformA, boxA: boxComp,
-            transformB: transformB, boxB: boxComp
+            transformA: transformOrigin, boxA: smallBox,
+            transformB: transformFar,    boxB: smallBox
         ))
     }
     
     // collision detected when entities overlap
 
     func testCollisionWhenOverlapping() {
-        let box = SIMD2<Float>(10, 10)
-        let transformA = TransformComponent(position: SIMD2<Float>(0, 0), scale: 1)
-        let transformB = TransformComponent(position: SIMD2<Float>(5, 0), scale: 1) // 5 apart, boxes overlap by 5
-        let boxComp = CollisionBoxComponent(size: box)
-
+        // transformOverlapping is 5 apart from origin — boxes overlap by 5.
         XCTAssertTrue(collisionSystem.checkCollision(
-            transformA: transformA, boxA: boxComp,
-            transformB: transformB, boxB: boxComp
+            transformA: transformOrigin,      boxA: smallBox,
+            transformB: transformOverlapping, boxB: smallBox
         ))
     }
     
     func testCollisionWithDifferentBoxSize() {
         // A at (0,0) size (10,10): right edge at x=5
         // B at (10,0) size (20,20): left edge at x=0, overlap of 5
-        let transformA = TransformComponent(position: SIMD2<Float>(0, 0), scale: 1)
-        let transformB = TransformComponent(position: SIMD2<Float>(10, 0), scale: 1)
-        let boxCompA = CollisionBoxComponent(size: SIMD2<Float>(10, 10))
-        let boxCompB = CollisionBoxComponent(size: SIMD2<Float>(20, 20))
-
         XCTAssertTrue(collisionSystem.checkCollision(
-            transformA: transformA, boxA: boxCompA,
-            transformB: transformB, boxB: boxCompB
+            transformA: transformOrigin, boxA: smallBox,
+            transformB: transformNear,   boxB: largeBox
         ))
     }
 
     func testCollisionWithRotation() {
         // A at (0,0) size (10,10): right edge at x=5
         // B at (10,0) size (20,20) rotated 45 degrees: left edge extends to x=-5, overlap of 10
-        let transformA = TransformComponent(position: SIMD2<Float>(0, 0), rotation: 0, scale: 1)
-        let transformB = TransformComponent(position: SIMD2<Float>(10, 0), rotation: .pi / 4, scale: 1)
-        let boxCompA = CollisionBoxComponent(size: SIMD2<Float>(10, 10))
-        let boxCompB = CollisionBoxComponent(size: SIMD2<Float>(20, 20))
-
         XCTAssertTrue(collisionSystem.checkCollision(
-            transformA: transformA, boxA: boxCompA,
-            transformB: transformB, boxB: boxCompB
+            transformA: transformOrigin, boxA: smallBox,
+            transformB: transformBRotated, boxB: largeBox
         ))
     }
     
     // MARK: dynamic vs static (wall)
      
     func test_playerHitsWall_onlyPlayerMoves() {
-        let box    = SIMD2<Float>(20, 20)
-        let wall   = makeStaticEntity(at: SIMD2(15, 0), size: box)
-        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
+        let wall   = makeStaticEntity(at: SIMD2(15, 0), size: defaultBox)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: defaultBox)
  
         let wallPosBefore = world.getComponent(type: TransformComponent.self, for: wall)!.position
         collisionSystem.update(deltaTime: 0.016, world: world)
@@ -183,9 +195,8 @@ final class CollisionSystemTests: XCTestCase {
     }
  
     func test_enemyHitsWall_onlyEnemyMoves() {
-        let box   = SIMD2<Float>(20, 20)
-        let wall  = makeStaticEntity(at: SIMD2(15, 0), size: box)
-        let enemy = makeLightWeightEnemyEntity( at: SIMD2(0,  0), size: box)
+        let wall  = makeStaticEntity(at: SIMD2(15, 0), size: defaultBox)
+        let enemy = makeLightWeightEnemyEntity( at: SIMD2(0,  0), size: defaultBox)
  
         let wallPosBefore = world.getComponent(type: TransformComponent.self, for: wall)!.position
         collisionSystem.update(deltaTime: 0.016, world: world)
@@ -199,9 +210,8 @@ final class CollisionSystemTests: XCTestCase {
     }
  
     func test_wallVsWall_neitherMoves() {
-        let box   = SIMD2<Float>(20, 20)
-        let wallA = makeStaticEntity(at: SIMD2(0,  0), size: box)
-        let wallB = makeStaticEntity(at: SIMD2(15, 0), size: box)
+        let wallA = makeStaticEntity(at: SIMD2(0,  0), size: defaultBox)
+        let wallB = makeStaticEntity(at: SIMD2(15, 0), size: defaultBox)
  
         let posABefore = world.getComponent(type: TransformComponent.self, for: wallA)!.position
         let posBBefore = world.getComponent(type: TransformComponent.self, for: wallB)!.position
@@ -214,9 +224,8 @@ final class CollisionSystemTests: XCTestCase {
     // MARK: player vs enemy
  
     func test_playerVsEnemy_bothReceiveKnockback() {
-        let box    = SIMD2<Float>(20, 20)
-        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: box)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: defaultBox)
+        let enemy  = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: defaultBox)
  
         collisionSystem.update(deltaTime: 0.016, world: world)
  
@@ -225,9 +234,8 @@ final class CollisionSystemTests: XCTestCase {
     }
  
     func test_playerVsEnemy_knockbackDirectionsAreOpposite() {
-        let box    = SIMD2<Float>(20, 20)
-        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: box)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: defaultBox)
+        let enemy  = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: defaultBox)
  
         collisionSystem.update(deltaTime: 0.016, world: world)
  
@@ -240,9 +248,8 @@ final class CollisionSystemTests: XCTestCase {
  
     // player (mass 10) vs light enemy (ranger, mass 5): enemy is lighter so gets displaced more
     func test_playerVsLightEnemy_enemyDisplacedMore() {
-        let box    = SIMD2<Float>(20, 20)
-        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: defaultBox)
+        let enemy  = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
 
         let playerPosBefore = world.getComponent(type: TransformComponent.self, for: player)!.position
         let enemyPosBefore  = world.getComponent(type: TransformComponent.self, for: enemy)!.position
@@ -257,9 +264,8 @@ final class CollisionSystemTests: XCTestCase {
 
     // player (mass 10) vs heavy enemy (tower, mass 20): player is lighter so gets displaced more
     func test_playerVsHeavyEnemy_playerDisplacedMore() {
-        let box    = SIMD2<Float>(20, 20)
-        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeHeavyWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: defaultBox)
+        let enemy  = makeHeavyWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
 
         let playerPosBefore = world.getComponent(type: TransformComponent.self, for: player)!.position
         let enemyPosBefore  = world.getComponent(type: TransformComponent.self, for: enemy)!.position
@@ -274,9 +280,8 @@ final class CollisionSystemTests: XCTestCase {
 
     // player (mass 10) vs same weight enemy (mummy, mass 10): displace equally
     func test_playerVsSameWeightEnemy_playerDisplacedEqually() {
-        let box    = SIMD2<Float>(20, 20)
-        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        let enemy  = makeSameWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: defaultBox)
+        let enemy  = makeSameWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
 
         let playerPosBefore = world.getComponent(type: TransformComponent.self, for: player)!.position
         let enemyPosBefore  = world.getComponent(type: TransformComponent.self, for: enemy)!.position
@@ -291,9 +296,8 @@ final class CollisionSystemTests: XCTestCase {
 
     // light enemy (ranger, mass 5) receives high knockback speed from player collision
     func test_lightEnemyReceivesHighKnockbackSpeed() {
-        let box = SIMD2<Float>(20, 20)
-        makePlayerEntity(at: SIMD2(0, 0), size: box)
-        let lightEnemy = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        makePlayerEntity(at: SIMD2(0, 0), size: defaultBox)
+        let lightEnemy = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
         collisionSystem.update(deltaTime: 0.016, world: world)
 
         let lightKB = world.getComponent(type: KnockbackComponent.self, for: lightEnemy)!
@@ -304,9 +308,8 @@ final class CollisionSystemTests: XCTestCase {
 
     // heavy enemy (tower, mass 20) receives low knockback speed from player collision
     func test_heavyEnemyReceivesLowKnockbackSpeed() {
-        let box = SIMD2<Float>(20, 20)
-        makePlayerEntity(at: SIMD2(0, 0), size: box)
-        let heavyEnemy = makeHeavyWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        makePlayerEntity(at: SIMD2(0, 0), size: defaultBox)
+        let heavyEnemy = makeHeavyWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
         collisionSystem.update(deltaTime: 0.016, world: world)
 
         let heavyKB = world.getComponent(type: KnockbackComponent.self, for: heavyEnemy)!
@@ -318,9 +321,8 @@ final class CollisionSystemTests: XCTestCase {
     // same weight enemy (mummy, mass 10) receives equal knockbackspeed as player
     // which should be 150
     func test_sameWeightEnemyReceivesSameKnockbackSpeed() {
-        let box = SIMD2<Float>(20, 20)
-        makePlayerEntity(at: SIMD2(0, 0), size: box)
-        let sameWeightEnemy = makeSameWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        makePlayerEntity(at: SIMD2(0, 0), size: defaultBox)
+        let sameWeightEnemy = makeSameWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
         collisionSystem.update(deltaTime: 0.016, world: world)
 
         let sameWeightKB = world.getComponent(type: KnockbackComponent.self, for: sameWeightEnemy)!
@@ -330,9 +332,8 @@ final class CollisionSystemTests: XCTestCase {
     }
 
     func test_playerVsEnemy_existingKnockbackNotOverwritten() {
-        let box    = SIMD2<Float>(20, 20)
-        let player = makePlayerEntity(at: SIMD2(0,  0), size: box)
-        _          = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: box)
+        let player = makePlayerEntity(at: SIMD2(0,  0), size: defaultBox)
+        _          = makeLightWeightEnemyEntity( at: SIMD2(15, 0), size: defaultBox)
  
         let existingVelocity = SIMD2<Float>(999, 0)
         world.addComponent(component: KnockbackComponent(velocity: existingVelocity, remainingTime: 1.0), to: player)
@@ -347,9 +348,8 @@ final class CollisionSystemTests: XCTestCase {
     // MARK: enemy vs enemy
  
     func test_enemyVsEnemy_equalDisplacement() {
-        let box    = SIMD2<Float>(20, 20)
-        let enemyA = makeLightWeightEnemyEntity(at: SIMD2(0,  0), size: box)
-        let enemyB = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        let enemyA = makeLightWeightEnemyEntity(at: SIMD2(0,  0), size: defaultBox)
+        let enemyB = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
  
         let posABefore = world.getComponent(type: TransformComponent.self, for: enemyA)!.position
         let posBBefore = world.getComponent(type: TransformComponent.self, for: enemyB)!.position
@@ -362,9 +362,8 @@ final class CollisionSystemTests: XCTestCase {
     }
  
     func test_enemyVsEnemy_noKnockbackApplied() {
-        let box    = SIMD2<Float>(20, 20)
-        let enemyA = makeLightWeightEnemyEntity(at: SIMD2(0,  0), size: box)
-        let enemyB = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: box)
+        let enemyA = makeLightWeightEnemyEntity(at: SIMD2(0,  0), size: defaultBox)
+        let enemyB = makeLightWeightEnemyEntity(at: SIMD2(15, 0), size: defaultBox)
  
         collisionSystem.update(deltaTime: 0.016, world: world)
  

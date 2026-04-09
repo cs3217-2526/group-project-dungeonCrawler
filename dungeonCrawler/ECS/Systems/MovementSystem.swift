@@ -28,16 +28,12 @@ public final class MovementSystem: System {
         for (entity, input, _, moveSpeed) in movable {
             guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
 
-            world.modifyComponentIfExist(type: VelocityComponent.self, for: entity) { velocity in
-                velocity.linear = input.moveDirection * moveSpeed.value.current
-            }
+            world.getComponent(type: VelocityComponent.self, for: entity)?.linear = input.moveDirection * moveSpeed.value.current
             
             guard let velocity = world.getComponent(type: VelocityComponent.self, for: entity)
             else { continue }
 
-            world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
-                transform.position += velocity.linear * dt
-            }
+            world.getComponent(type: TransformComponent.self, for: entity)?.position += velocity.linear * dt
         }
 
         // Integrate velocity for enemies (velocity is set by EnemyAISystem)
@@ -49,9 +45,7 @@ public final class MovementSystem: System {
         for (entity, _, velocity, _) in enemyMovable {
             guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
 
-            world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
-                transform.position += velocity.linear * dt
-            }
+            world.getComponent(type: TransformComponent.self, for: entity)?.position += velocity.linear * dt
         }
     }
 }

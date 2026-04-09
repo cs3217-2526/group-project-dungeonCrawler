@@ -22,10 +22,10 @@ public final class CameraSystem: System {
         // Find the camera entity and lerp its ViewportComponent toward the target.
         let cameras = world.entities(with: ViewportComponent.self)
         guard let cameraEntity = cameras.first else { return }
+        
+        guard let viewport = world.getComponent(type: ViewportComponent.self, for: cameraEntity) else { return }
 
-        world.modifyComponentIfExist(type: ViewportComponent.self, for: cameraEntity) { viewport in
-            let t = min(smoothing * Float(deltaTime), 1.0)
-            viewport.position = viewport.position + (targetPosition - viewport.position) * t
-        }
+        let t = min(smoothing * Float(deltaTime), 1.0)
+        viewport.position = viewport.position + (targetPosition - viewport.position) * t
     }
 }

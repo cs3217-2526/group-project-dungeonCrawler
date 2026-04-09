@@ -21,20 +21,19 @@ public final class ProjectileSystem: System {
     
     public func update(deltaTime: Double, world: World) {
         let dt = Float(deltaTime)
-        for (projectileEntity, _, velocityComponent, _, _) in world.entities(
+        for (projectileEntity, _, velocityComponent, _, rangeComponent) in world.entities(
             with: ProjectileComponent.self,
             and: VelocityComponent.self,
             and: TransformComponent.self,
             and: EffectiveRangeComponent.self) {
-            world.modifyComponentIfExist(type: TransformComponent.self, for: projectileEntity) { transform in
-                transform.position += velocityComponent.linear * dt
-            }
+            
+            world.getComponent(type: TransformComponent.self, for: projectileEntity)?.position += velocityComponent.linear * dt
             let distanceTraveled = simd_length(velocityComponent.linear) * dt
             var remainingRange: Float = .greatestFiniteMagnitude
-            world.modifyComponentIfExist(type: EffectiveRangeComponent.self, for: projectileEntity) { rangeComponent in
-                rangeComponent.value.current -= distanceTraveled
-                remainingRange = rangeComponent.value.current
-            }
+            
+            rangeComponent.value.current -= distanceTraveled
+            remainingRange = rangeComponent.value.current
+            
             if remainingRange <= 0 {
                 destructionQueue.enqueue(projectileEntity)
             }

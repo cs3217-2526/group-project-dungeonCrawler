@@ -18,16 +18,14 @@ struct ComponentStore<T: Component>: AnyComponentStore {
     private var _data: [EntityID: T] = [:]
 
     mutating func add(_ component: T, for entityID: EntityID) {
+        if _data[entityID] != nil {
+            _data[entityID] = nil
+        }
         _data[entityID] = component
     }
 
     func get(for entityID: EntityID) -> T? {
         _data[entityID]
-    }
-
-    mutating func modify(for entityID: EntityID, _ body: (inout T) -> Void) {
-        guard _data[entityID] != nil else { return }
-        body(&_data[entityID]!)
     }
 
     mutating func removeValue(for entityID: EntityID) {

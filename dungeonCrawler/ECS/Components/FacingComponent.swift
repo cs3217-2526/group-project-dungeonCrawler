@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct FacingComponent: Component {
+public class FacingComponent: Component {
     public var facing: FacingType
 
     public init(facing: FacingType) {
