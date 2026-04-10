@@ -29,19 +29,8 @@ extension PopulateContext {
     /// Spawns an weapon and automatically attaches a `RoomMemberComponent`.
     @discardableResult
     public mutating func spawnWeapon(at position: SIMD2<Float>) -> Entity {
-        guard let sniperDefinition = WeaponLibrary.definition(for: "sniper") else {
-            fatalError("Missing built-in starter weapon definitions")
-        }
-        let weapon = WeaponEntityFactory(
-            player: nil,
-            textureName: sniperDefinition.textureName,
-            coolDownIntervel: sniperDefinition.cooldown,
-            attackSpeed: sniperDefinition.attackSpeed,
-            effects: WeaponEffectFactory.makeEffects(from: sniperDefinition),
-            anchorPoint: sniperDefinition.anchorPoint,
-            initRotation: sniperDefinition.initRotation,
-            initLocation: position)
-            .make(in: world)
+        let sniperDefinition = WeaponType.sniper.baseDefinition
+        let weapon = WeaponEntityFactory(base: sniperDefinition).make(in: world, initLocation: position)
         world.addComponent(
             component: SpriteComponent(
                 content: .texture(name: sniperDefinition.textureName),

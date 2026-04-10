@@ -113,37 +113,10 @@ public final class LevelGenerationManager {
         } else {
             let scaleForPlayer  = WorldConstants.standardEntityScale
             let player = PlayerEntityFactory(at: position, scale: scaleForPlayer).make(in: world)
-            guard
-                let handgunDefinition = WeaponLibrary.definition(for: "handgun"),
-                let swordDefinition = WeaponLibrary.definition(for: "sword")
-            else {
-                fatalError("Missing built-in starter weapon definitions")
-            }
-            let handgun = WeaponEntityFactory(
-                player: player,
-                textureName: handgunDefinition.textureName,
-                offset: handgunDefinition.offset,
-                scale: handgunDefinition.scale,
-                lastFiredAt: 0,
-                coolDownIntervel: handgunDefinition.cooldown,
-                attackSpeed: handgunDefinition.attackSpeed,
-                effects: WeaponEffectFactory.makeEffects(from: handgunDefinition),
-                anchorPoint: handgunDefinition.anchorPoint,
-                initRotation: handgunDefinition.initRotation,
-                initLocation: nil
-            ).make(in: world)
-            let sword = WeaponEntityFactory(
-                player: player,
-                textureName: swordDefinition.textureName,
-                offset: swordDefinition.offset,
-                scale: swordDefinition.scale,
-                coolDownIntervel: swordDefinition.cooldown,
-                attackSpeed: swordDefinition.attackSpeed,
-                effects: WeaponEffectFactory.makeEffects(from: swordDefinition),
-                anchorPoint: swordDefinition.anchorPoint,
-                initRotation: swordDefinition.initRotation,
-                initLocation: nil
-            ).make(in: world)
+            let handgunDefinition = WeaponType.handgun.baseDefinition
+            let swordDefinition = WeaponType.sword.baseDefinition
+            let handgun = WeaponEntityFactory(base: handgunDefinition).make(in: world, player: player)
+            let sword = WeaponEntityFactory(base: swordDefinition).make(in: world, player: player)
             world.addComponent(
                 component: SpriteComponent(
                     content: .texture(name: handgunDefinition.textureName),
