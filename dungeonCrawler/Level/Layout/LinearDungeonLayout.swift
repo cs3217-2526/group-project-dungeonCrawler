@@ -16,7 +16,7 @@ public final class LinearDungeonLayout: DungeonLayoutStrategy {
     public let enemyPool: [EnemyType]
     public let corridorLength: Float
 
-    public init(roomCount: Int, enemyPool: [EnemyType], corridorLength: Float = 200) {
+    public init(roomCount: Int, enemyPool: [EnemyType], corridorLength: Float = 300) {
         self.roomCount     = max(2, roomCount)
         self.enemyPool     = enemyPool
         self.corridorLength = max(50, corridorLength)
