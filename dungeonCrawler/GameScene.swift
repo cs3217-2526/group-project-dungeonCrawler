@@ -43,7 +43,7 @@ class GameScene: SKScene {
     private var isGameOver = false
 
     // MARK: - Dungeon selection (set by LevelSelectScene before presenting)
-    var dungeonDefinition: DungeonDefinition = DungeonLibrary.all[0]
+    var dungeonDefinition: DungeonDefinition? = DungeonLibrary.all.first
 
     // MARK: - Collision Events
     let collisionEvents  = CollisionEventBuffer()
@@ -59,13 +59,14 @@ class GameScene: SKScene {
         background.position = .zero
         background.zPosition = -1
         addChild(background)
-
         addChild(worldLayer)
         addChild(uiLayer)
     }
 
     override func didMove(to view: SKView) {
         super.didMove(to: view)
+
+        view.isMultipleTouchEnabled = true
 
         setupSystems()
         startLevel(1)
@@ -107,6 +108,11 @@ class GameScene: SKScene {
         // Build the dungeon manager using the selected dungeon's layout + theme.
         var constructionConfig = BoxRoomConstructor.Config()
         constructionConfig.renderVisualSprites = false  // tilemap handles visuals
+        
+        guard let dungeonDefinition = dungeonDefinition else {
+            fatalError("No DungeonDefinition available.")
+        }
+        
         levelOrchestrator = LevelOrchestrator(
             layoutStrategy:  dungeonDefinition.layoutStrategy,
             roomConstructor: BoxRoomConstructor(config: constructionConfig)
