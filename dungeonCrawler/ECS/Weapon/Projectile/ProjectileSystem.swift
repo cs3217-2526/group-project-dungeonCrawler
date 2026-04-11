@@ -50,15 +50,20 @@ public final class ProjectileSystem: System {
             remainingRange = rangeComponent.value.current
 
             if remainingRange <= 0 {
+                let pos = world.getComponent(type: TransformComponent.self, for: projectileEntity)?.position ?? .zero
                 destructionQueue.enqueue(projectileEntity)
+                SpecialEffectZoneEntityFactory(textureName: "firearea", radius: 100, damagePerSecond: 100, duration: 1, elapsed: 1, position: pos).make(in: world)
             }
+
         }
         
         let hitProjectiles = Set(events.projectileHitSolid.map { $0.projectile.id })
         for id in hitProjectiles {
             let entity = Entity(id: id)
             guard world.isAlive(entity: entity) else { continue }
+            let pos = world.getComponent(type: TransformComponent.self, for: entity)?.position ?? .zero
             destructionQueue.enqueue(entity)
+            SpecialEffectZoneEntityFactory(textureName: "firearea", radius: 100, damagePerSecond: 100, duration: 1, elapsed: 1, position: pos).make(in: world)
         }
         destructionQueue.flush(world: world)
     }
