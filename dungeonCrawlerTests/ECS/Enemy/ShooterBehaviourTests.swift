@@ -42,7 +42,7 @@ final class ShooterBehaviourTests: XCTestCase {
     /// Pre-attaches a ShooterBasicComponent with a known target in polar coords
     /// relative to the player, bypassing the random pick on first update.
     private func setTarget(on entity: Entity, angle: Float, radius: Float) {
-        var comp = ShooterBasicComponent()
+        let comp = ShooterBasicComponent()
         comp.targetAngle = angle
         comp.targetRadius = radius
         world.addComponent(component: comp, to: entity)

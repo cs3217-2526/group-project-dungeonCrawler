@@ -11,7 +11,7 @@ import Foundation
 /// Stored on the entity so the strategy can detect transitions and
 /// fire onActivate / onDeactivate at the right moment.
 /// Added lazily by the strategy on first update.
-public struct ActiveBehaviourComponent: Component {
+public class ActiveBehaviourComponent: Component {
     /// The id of the currently active EnemyBehaviour, or nil if none
     public var behaviourID: String?
 

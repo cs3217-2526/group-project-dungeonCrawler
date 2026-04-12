@@ -33,9 +33,7 @@ final class TimidStrategyTests: XCTestCase {
         world.addComponent(component: VelocityComponent(), to: entity)
         world.addComponent(component: HealthComponent(base: 100), to: entity)
         if currentHP != 100 {
-            world.modifyComponentIfExist(type: HealthComponent.self, for: entity) {
-                $0.value.current = currentHP
-            }
+            world.getComponent(type: HealthComponent.self, for: entity)?.value.current = currentHP
         }
         return entity
     }
@@ -128,7 +126,7 @@ final class TimidStrategyTests: XCTestCase {
         XCTAssertNotNil(world.getComponent(type: WanderTargetComponent.self, for: enemy))
 
         // HP drops below threshold — should switch to flee and clean up wander state
-        world.modifyComponentIfExist(type: HealthComponent.self, for: enemy) { $0.value.current = 10 }
+        world.getComponent(type: HealthComponent.self, for: enemy)?.value.current = 10
         strategy.update(entity: enemy, context: makeContext(entity: enemy, playerPos: SIMD2(200, 0)))
 
         XCTAssertEqual(activeBehaviourID(for: enemy), FleeBehaviour().id)

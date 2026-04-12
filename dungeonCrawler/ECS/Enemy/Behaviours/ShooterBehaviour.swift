@@ -54,13 +54,13 @@ public struct ShooterBehaviour: EnemyBehaviour {
         } ?? true
 
         if arrived {
-            context.world.modifyComponentIfExist(type: VelocityComponent.self, for: entity) { $0.linear = .zero }
+            context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = SIMD2<Float>.zero
 
             if let (angle, radius) = pickTarget(from: context.transform.position,
                                                 playerPos: context.playerPos) {
-                context.world.modifyComponentIfExist(type: ShooterBasicComponent.self, for: entity) {
-                    $0.targetAngle = angle
-                    $0.targetRadius = radius
+                if let comp = context.world.getComponent(type: ShooterBasicComponent.self, for: entity) {
+                    comp.targetAngle = angle
+                    comp.targetRadius = radius
                 }
             }
             return
@@ -70,9 +70,7 @@ public struct ShooterBehaviour: EnemyBehaviour {
         let moveDir = target - context.transform.position
         guard simd_length_squared(moveDir) > 1e-6 else { return }
 
-        context.world.modifyComponentIfExist(type: VelocityComponent.self, for: entity) { vel in
-            vel.linear = normalize(moveDir) * self.moveSpeed
-        }
+        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(moveDir) * self.moveSpeed
     }
 
     /// Remove ShooterBasicComponent when no longer in use.

@@ -33,7 +33,7 @@ public struct WanderBehaviour: EnemyBehaviour {
         if currentTarget == nil ||
             simd_length(context.transform.position - currentTarget!) < arrivalThreshold {
             let newTarget = getCandidateTarget(from: context.transform.position) ?? currentTarget
-            context.world.modifyComponentIfExist(type: WanderTargetComponent.self, for: entity) { $0.target = newTarget }
+            context.world.getComponent(type: WanderTargetComponent.self, for: entity)?.target = newTarget
         }
 
         guard let target = context.world.getComponent(type: WanderTargetComponent.self,
@@ -42,9 +42,7 @@ public struct WanderBehaviour: EnemyBehaviour {
         let wanderDelta = target - context.transform.position
         guard simd_length_squared(wanderDelta) > 1e-6 else { return }
 
-        context.world.modifyComponentIfExist(type: VelocityComponent.self, for: entity) { vel in
-            vel.linear = normalize(wanderDelta) * self.wanderSpeed
-        }
+        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(wanderDelta) * self.wanderSpeed
     }
 
     /// Discard WanderTargetComponent when no longer in use

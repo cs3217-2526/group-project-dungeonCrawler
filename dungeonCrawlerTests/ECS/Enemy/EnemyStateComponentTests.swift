@@ -30,7 +30,7 @@ final class EnemyStateComponentTests: XCTestCase {
     // MARK: - Mutation
 
     func testStrategyCanBeMutated() {
-        var state = EnemyStateComponent()
+        let state = EnemyStateComponent()
         state.strategy = TimidStrategy()
         XCTAssertTrue(state.strategy is TimidStrategy)
     }

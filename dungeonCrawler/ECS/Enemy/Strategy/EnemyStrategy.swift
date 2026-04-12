@@ -52,8 +52,6 @@ public extension EnemyStrategy {
                               entity: Entity,
                               context: BehaviourContext) {
         behaviour.onActivate(entity: entity, context: context)
-        context.world.modifyComponentIfExist(type: ActiveBehaviourComponent.self, for: entity) {
-            $0.behaviourID = behaviour.id
-        }
+        context.world.getComponent(type: ActiveBehaviourComponent.self, for: entity)?.behaviourID = behaviour.id
     }
 }

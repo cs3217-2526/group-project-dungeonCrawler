@@ -49,8 +49,9 @@ final class StandardStrategyTests: XCTestCase {
         XCTAssertEqual(StandardStrategy().detectionRadius, 150, accuracy: 0.001)
     }
 
-    func testDefaultLoseRadius() {
-        XCTAssertEqual(StandardStrategy().loseRadius, 225, accuracy: 0.001)
+    func testDefaultLoseRadius() throws {
+        let loseRadius = try XCTUnwrap(StandardStrategy().loseRadius)
+        XCTAssertEqual(loseRadius, 225, accuracy: 0.001)
     }
 
     // MARK: - Wander when idle (applies to all configurations)
