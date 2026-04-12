@@ -39,7 +39,7 @@ final class ProjectileSystemTests: XCTestCase {
         system           = ProjectileSystem(events: collisionEvents, destructionQueue: destructionQueue)
         transform      = TransformComponent(position: SIMD2(0, 0), scale: 1)
         velocity       = VelocityComponent(linear: SIMD2(1, 0) * Self.defaultVelocity)
-        projectileComp = ProjectileComponent()
+        projectileComp = ProjectileComponent(hitEffects: [])
         effectiveRange = EffectiveRangeComponent(base: Self.defaultEffectiveRange)
         contactDamage  = ContactDamageComponent(damage: 10)
         sprite = SpriteComponent(textureName: "normalHandgunBullet", zPosition: 5)
