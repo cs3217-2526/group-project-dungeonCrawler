@@ -20,7 +20,7 @@ public struct SpecialEffectZoneEntityFactory: EntityFactory {
     public func make(in world: World) -> Entity {
         let fireZone = world.createEntity()
         world.addComponent(component: FireZoneComponent(radius: radius, damagePerSecond: damagePerSecond, duration: duration, elapsed: elapsed), to: fireZone)
-        world.addComponent(component: SpriteComponent(content: .texture(name: textureName), layer: .obstacle), to: fireZone)
+        world.addComponent(component: SpriteComponent(content: .texture(name: textureName), layer: .zone), to: fireZone)
         world.addComponent(component: TransformComponent(position: position), to: fireZone)
         return fireZone
     }

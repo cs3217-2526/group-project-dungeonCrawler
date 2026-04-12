@@ -27,9 +27,12 @@ enum WeaponType: CaseIterable {
                 effects: [
                     ConsumeManaEffect(amount: 5),
                     SpawnProjectileEffect(
-                        speed: 300, effectiveRange: 400,
-                        damage: 15, spriteName: "normalHandgunBullet",
-                        collisionSize: SIMD2<Float>(6, 6)),
+                        speed: 300,
+                        effectiveRange: 400,
+                        damage: 15,
+                        spriteName: "normalHandgunBullet",
+                        collisionSize: SIMD2<Float>(6, 6)
+                    ),
                 ],
                 anchorPoint: nil,
                 initRotation: nil,
@@ -45,8 +48,10 @@ enum WeaponType: CaseIterable {
                 effects: [
                     MeleeDamageEffect(
                         damage: 50, range: 100,
-                        halfAngleDegrees: 90, maxTargets: 1,
-                        swingDuration: 0.3, swingAngleDegrees: 40)
+                        halfAngleDegrees: 90,
+                        maxTargets: 1,
+                        swingDuration: 0.3,
+                        swingAngleDegrees: 40)
                 ],
                 anchorPoint: SIMD2<Float>(0.2, 0.5),
                 initRotation: .pi / 9

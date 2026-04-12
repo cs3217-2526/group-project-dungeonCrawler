@@ -17,6 +17,7 @@ public struct ProjectileEntityFactory: EntityFactory {
     let owner: Entity
     let spriteName: String
     let collisionBoxSize: SIMD2<Float>
+    let hitEffects: [any ProjectileHitEffect]
 
     public init(
         from position: SIMD2<Float>,
@@ -26,7 +27,8 @@ public struct ProjectileEntityFactory: EntityFactory {
         damage: Float = 10,
         owner: Entity,
         spriteName: String = "normalHandgunBullet",
-        collisionBoxSize: SIMD2<Float> = SIMD2<Float>(6, 6)
+        collisionBoxSize: SIMD2<Float> = SIMD2<Float>(6, 6),
+        hitEffects: [any ProjectileHitEffect]?
     ) {
         self.position = position
         self.direction = direction
@@ -36,6 +38,7 @@ public struct ProjectileEntityFactory: EntityFactory {
         self.owner = owner
         self.spriteName = spriteName
         self.collisionBoxSize = collisionBoxSize
+        self.hitEffects = hitEffects ?? []
     }
 
     @discardableResult
@@ -48,7 +51,7 @@ public struct ProjectileEntityFactory: EntityFactory {
         world.addComponent(component: TransformComponent(position: position, rotation: bulletRotation, scale: 1), to: entity)
         world.addComponent(component: VelocityComponent(linear: direction * speed), to: entity)
         world.addComponent(component: SpriteComponent(content: .texture(name: spriteName), layer: .projectile), to: entity)
-        world.addComponent(component: ProjectileComponent(), to: entity)
+        world.addComponent(component: ProjectileComponent(hitEffects: hitEffects), to: entity)
         world.addComponent(component: OwnerComponent(ownerEntity: owner), to: entity)
         world.addComponent(component: EffectiveRangeComponent(base: effectiveRange), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: collisionBoxSize), to: entity)

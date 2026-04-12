@@ -25,7 +25,7 @@ public final class ProjectileSystem: System {
     
     public func update(deltaTime: Double, world: World) {
         let dt = Float(deltaTime)
-        for (projectileEntity, _, velocityComponent, _, rangeComponent) in world.entities(
+        for (projectileEntity, projectileComponent, velocityComponent, _, rangeComponent) in world.entities(
             with: ProjectileComponent.self,
             and: VelocityComponent.self,
             and: TransformComponent.self,
@@ -52,9 +52,12 @@ public final class ProjectileSystem: System {
             if remainingRange <= 0 {
                 let pos = world.getComponent(type: TransformComponent.self, for: projectileEntity)?.position ?? .zero
                 destructionQueue.enqueue(projectileEntity)
-                SpecialEffectZoneEntityFactory(textureName: "firearea", radius: 100, damagePerSecond: 100, duration: 1, elapsed: 1, position: pos).make(in: world)
+                for effect in projectileComponent.hitEffects {
+                    effect.apply(
+                        context: ZoneContext(center: pos, world: world,
+                                             zoneBase: HitEffectsLibrary.fireZone.effectDefinition))
+                }
             }
-
         }
         
         let hitProjectiles = Set(events.projectileHitSolid.map { $0.projectile.id })
@@ -63,7 +66,12 @@ public final class ProjectileSystem: System {
             guard world.isAlive(entity: entity) else { continue }
             let pos = world.getComponent(type: TransformComponent.self, for: entity)?.position ?? .zero
             destructionQueue.enqueue(entity)
-            SpecialEffectZoneEntityFactory(textureName: "firearea", radius: 100, damagePerSecond: 100, duration: 1, elapsed: 1, position: pos).make(in: world)
+            guard let projectileComponent = world.getComponent(type: ProjectileComponent.self, for: entity) else { continue }
+            for effect in projectileComponent.hitEffects {
+                effect.apply(
+                    context: ZoneContext(center: pos, world: world,
+                                         zoneBase: HitEffectsLibrary.fireZone.effectDefinition))
+            }
         }
         destructionQueue.flush(world: world)
     }

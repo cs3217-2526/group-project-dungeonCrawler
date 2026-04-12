@@ -10,7 +10,7 @@ public final class WeaponSystem: System {
         self.gameTime = 0
     }
 
-    public func update(deltaTime: Foundation.TimeInterval, world: World) {
+    public func update(deltaTime: Double, world: World) {
         self.gameTime += Float(deltaTime)
         let delta = Float(deltaTime)
 

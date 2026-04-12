@@ -17,9 +17,10 @@ public enum SpriteContent: Equatable {
 /// Defines the Z-position layering conceptually.
 public enum RenderLayer: CGFloat {
     case floor = 0
-    case wall = 1
-    case obstacle = 2
-    case pickUp = 3
+    case zone = 1
+    case wall = 2
+    case obstacle = 3
+    case pickUp = 4
     case projectile = 5
     case entity = 6
     case weapon = 7

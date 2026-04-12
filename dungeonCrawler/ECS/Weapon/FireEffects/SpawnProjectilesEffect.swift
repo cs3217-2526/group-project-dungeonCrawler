@@ -37,7 +37,8 @@ struct SpawnProjectileEffect: WeaponEffect {
             damage: damage,
             owner: context.owner,
             spriteName: spriteName,
-            collisionBoxSize: collisionSize
+            collisionBoxSize: collisionSize,
+            hitEffects: []
         ).make(in: context.world)
 
         return .success
