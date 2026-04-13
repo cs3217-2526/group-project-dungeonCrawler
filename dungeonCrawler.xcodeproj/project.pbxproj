@@ -33,6 +33,7 @@
 		337108AB2F5EB5BA00D27C2E /* dungeonCrawlerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dungeonCrawlerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		337108B52F5EB5BA00D27C2E /* dungeonCrawlerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dungeonCrawlerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		58113AB62F6BDC7C0029734A /* dungeonCrawler.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = dungeonCrawler.xcodeproj; sourceTree = "<group>"; };
+		8D2657862F8C612700D63CCC /* dungeonCrawlerTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = dungeonCrawlerTests.xctestplan; sourceTree = "<group>"; };
 		8D8259BC2F5FFFBC00742D1A /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		8D8259BD2F5FFFBC00742D1A /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -83,6 +84,7 @@
 		337108892F5EB5B800D27C2E = {
 			isa = PBXGroup;
 			children = (
+				8D2657862F8C612700D63CCC /* dungeonCrawlerTests.xctestplan */,
 				337108942F5EB5B800D27C2E /* dungeonCrawler */,
 				337108AE2F5EB5BA00D27C2E /* dungeonCrawlerTests */,
 				337108B82F5EB5BA00D27C2E /* dungeonCrawlerUITests */,

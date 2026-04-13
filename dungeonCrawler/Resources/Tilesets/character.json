@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "sheet": "character",
+    "tileSize": 16,
+    "sheetCols": 32,
+    "sheetRows": 32
+  },
+  "frameDuration": 0.1,
+  "animations": {
+    "idleDown":      [{"col": 0, "row": 3}],
+    "idleLeft":      [{"col": 0, "row": 2}],
+    "idleRight":     [{"col": 0, "row": 0}],
+    "idleUp":        [{"col": 0, "row": 1}],
+    "idleDownLeft":  [{"col": 0, "row": 5}],
+    "idleDownRight": [{"col": 0, "row": 4}],
+    "idleUpLeft":    [{"col": 0, "row": 6}],
+    "idleUpRight":   [{"col": 0, "row": 7}],
+    "walkDown":      [{"col": 0, "row": 3}, {"col": 1, "row": 3}, {"col": 2, "row": 3}, {"col": 3, "row": 3}, {"col": 4, "row": 3}, {"col": 5, "row": 3}],
+    "walkLeft":      [{"col": 0, "row": 2}, {"col": 1, "row": 2}, {"col": 2, "row": 2}, {"col": 3, "row": 2}, {"col": 4, "row": 2}, {"col": 5, "row": 2}],
+    "walkRight":     [{"col": 0, "row": 0}, {"col": 1, "row": 0}, {"col": 2, "row": 0}, {"col": 3, "row": 0}, {"col": 4, "row": 0}, {"col": 5, "row": 0}],
+    "walkUp":        [{"col": 0, "row": 1}, {"col": 1, "row": 1}, {"col": 2, "row": 1}, {"col": 3, "row": 1}, {"col": 4, "row": 1}, {"col": 5, "row": 1}],
+    "walkDownLeft":  [{"col": 0, "row": 5}, {"col": 1, "row": 5}, {"col": 2, "row": 5}, {"col": 3, "row": 5}, {"col": 4, "row": 5}, {"col": 5, "row": 5}],
+    "walkDownRight": [{"col": 0, "row": 4}, {"col": 1, "row": 4}, {"col": 2, "row": 4}, {"col": 3, "row": 4}, {"col": 4, "row": 4}, {"col": 5, "row": 4}],
+    "walkUpLeft":    [{"col": 0, "row": 6}, {"col": 1, "row": 6}, {"col": 2, "row": 6}, {"col": 3, "row": 6}, {"col": 4, "row": 6}, {"col": 5, "row": 6}],
+    "walkUpRight":   [{"col": 0, "row": 7}, {"col": 1, "row": 7}, {"col": 2, "row": 7}, {"col": 3, "row": 7}, {"col": 4, "row": 7}, {"col": 5, "row": 7}]
+  },
+  "soul": {
+    "frames": [{"col": 3, "row": 16}],
+    "frameDuration": 0.1
+  }
+}

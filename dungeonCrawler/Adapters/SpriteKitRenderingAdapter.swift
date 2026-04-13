@@ -13,9 +13,16 @@ public final class SpriteKitRenderingAdapter: RenderingBackend {
 
     private weak var worldLayer: SKNode?
     private var nodeRegistry: [Entity: SKSpriteNode] = [:]
+    private var textureCache: [String: SKTexture] = [:]
 
     public init(worldLayer: SKNode) {
         self.worldLayer = worldLayer
+    }
+
+    /// Pre-registers a texture under `name` so it is used instead of `SKTexture(imageNamed:)`.
+    /// Call this for every frame extracted from a spritesheet before the first render tick.
+    public func registerTexture(_ texture: SKTexture, forName name: String) {
+        textureCache[name] = texture
     }
 
     public func syncNode(
@@ -49,7 +56,11 @@ public final class SpriteKitRenderingAdapter: RenderingBackend {
         case .solidColor(let color):
             baseColor = color
             isColourContent = true
-        case .texture:
+        case .texture(let name):
+            // Check if the texture name changed (e.g., from AnimationSystem advancing a frame)
+            // and only trigger a SpriteKit texture change if it's actually different.
+            let tex = textureCache[name] ?? SKTexture(imageNamed: name)
+            if node.texture !== tex { node.texture = tex }
             baseColor = SIMD4<Float>(1, 1, 1, 1)
             isColourContent = false
         }
@@ -98,7 +109,7 @@ public final class SpriteKitRenderingAdapter: RenderingBackend {
                 alpha: CGFloat(colorVal.w)
             ), size: size)
         case .texture(let name):
-            let texture = SKTexture(imageNamed: name)
+            let texture = textureCache[name] ?? SKTexture(imageNamed: name)
             node = SKSpriteNode(texture: texture)
         }
         

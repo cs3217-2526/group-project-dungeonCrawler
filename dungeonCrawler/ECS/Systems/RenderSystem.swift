@@ -9,7 +9,7 @@ import Foundation
 
 public final class RenderSystem: System {
 
-    public var dependencies: [System.Type] { [CameraSystem.self, HUDSystem.self, ProjectileSystem.self] }
+    public var dependencies: [System.Type] { [CameraSystem.self, HUDSystem.self, ProjectileSystem.self, AnimationSystem.self] }
 
     private weak var backend: RenderingBackend?
     private var seenEntities: Set<Entity> = []
@@ -32,13 +32,14 @@ public final class RenderSystem: System {
 
         for (entity, transform, sprite) in renderables {
             currentEntities.insert(entity)
-            let facing = world.getComponent(type: FacingComponent.self, for: entity)
+            let facing   = world.getComponent(type: FacingComponent.self, for: entity)
             let velocity = world.getComponent(type: VelocityComponent.self, for: entity)
-            
+
             let isPlayer = world.getComponent(type: PlayerTagComponent.self, for: entity) != nil
-            let health = !isPlayer ? world.getComponent(type: HealthComponent.self, for: entity) : nil
-            
-            backend.syncNode(for: entity, transform: transform, sprite: sprite, facing: facing, velocity: velocity, health: health)
+            let health   = !isPlayer ? world.getComponent(type: HealthComponent.self, for: entity) : nil
+
+            backend.syncNode(for: entity, transform: transform, sprite: sprite,
+                             facing: facing, velocity: velocity, health: health)
         }
 
         // Remove nodes for entities that no longer have both components.

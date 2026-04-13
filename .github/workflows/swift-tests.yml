@@ -32,6 +32,15 @@ jobs:
     - name: Show available schemes
       run: xcodebuild -list -project dungeonCrawler.xcodeproj
       
+    - name: Cache DerivedData
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-xcode-${{ hashFiles('**/project.pbxproj') }}
+        restore-keys: |
+          ${{ runner.os }}-xcode-
+      
     - name: Build and Test
       run: |
         xcodebuild test \
@@ -42,4 +51,3 @@ jobs:
           -only-testing:dungeonCrawlerTests \
           IPHONEOS_DEPLOYMENT_TARGET=18.5 \
           ONLY_ACTIVE_ARCH=YES
-      

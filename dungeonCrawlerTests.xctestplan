@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "D933308A-94D7-4603-B359-60CA2415B1FD",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:dungeonCrawler.xcodeproj",
+        "identifier" : "337108AA2F5EB5BA00D27C2E",
+        "name" : "dungeonCrawlerTests"
+      }
+    }
+  ],
+  "version" : 1
+}

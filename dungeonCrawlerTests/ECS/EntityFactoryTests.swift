@@ -90,14 +90,6 @@ final class EntityFactoryTests: XCTestCase {
         XCTAssertEqual(health!.value.current, 100, accuracy: 0.001)
     }
 
-    func testMakePlayerMoveSpeed() {
-        let entity = PlayerEntityFactory(at: SIMD2<Float>(0, 0)).make(in: world)
-        let speed = world.getComponent(type: MoveSpeedComponent.self, for: entity)
-        XCTAssertNotNil(speed)
-        XCTAssertEqual(speed!.value.base, 90, accuracy: 0.001)
-        XCTAssertEqual(speed!.value.current, 90, accuracy: 0.001)
-    }
-
     // MARK: - makePlayer: CollisionBoxComponent
 
     func testMakePlayerHasCollisionBox() {

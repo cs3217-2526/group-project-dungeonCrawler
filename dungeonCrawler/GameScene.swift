@@ -45,6 +45,9 @@ class GameScene: SKScene {
     // MARK: - Dungeon selection (set by LevelSelectScene before presenting)
     var dungeonDefinition: DungeonDefinition? = DungeonLibrary.all.first
 
+    // MARK: - Character animation (loaded once, reused across restarts)
+    private var characterSheet: CharacterSheet?
+
     // MARK: - Collision Events
     let collisionEvents  = CollisionEventBuffer()
     let destructionQueue = DestructionQueue()
@@ -122,6 +125,16 @@ class GameScene: SKScene {
 
         systemManager.register(RoomTransitionSystem(orchestrator: levelOrchestrator))
         systemManager.register(RoomClearSystem(orchestrator: levelOrchestrator))
+
+        // Load character spritesheet and register animation textures with the rendering backend
+        let sheetLoader = CharacterSheetLoader()
+        if let sheet = sheetLoader.load() {
+            characterSheet = sheet
+            for (name, texture) in sheet.textureRegistry {
+                renderingBackend.registerTexture(texture, forName: name)
+            }
+            systemManager.register(AnimationSystem())
+        }
         commandQueues.register(SwitchWeaponCommand.self)
         commandQueues.register(DropWeaponCommand.self)
         commandQueues.register(PickupCommand.self)
@@ -162,6 +175,16 @@ class GameScene: SKScene {
         }
         if let player = world.entities(with: PlayerTagComponent.self).first {
             world.addComponent(component: CameraFocusComponent(), to: player)
+
+            // Attach animation if the character sheet loaded successfully
+            if let sheet = characterSheet {
+                // Scale 16px character frames
+                world.getComponent(type: TransformComponent.self, for: player)?.scale = 70.0 / 16.0
+                world.addComponent(component: AnimationComponent(
+                    animations:    sheet.animations,
+                    frameDuration: sheet.frameDuration
+                ), to: player)
+            }
         }
     }
     

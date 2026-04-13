@@ -19,9 +19,9 @@ import simd
 //   • CollisionBoxComponent  — axis-aligned bounding box for collision
 //   • MassComponent          — current mass used by KnockbackSystem
 //
-// Future additions:
-//   • WeaponSlotComponent    — which weapon is equipped
-//   • AnimationComponent     — walk / idle / attack animation state machine
+// Notes:
+//   • WeaponSlotComponent    — (future) which weapon is equipped
+//   • AnimationComponent     — added by GameScene after spawn, once the character sheet is loaded
 
 public struct PlayerEntityFactory: EntityFactory {
     let position: SIMD2<Float>
@@ -53,7 +53,7 @@ public struct PlayerEntityFactory: EntityFactory {
         world.addComponent(component: CameraFocusComponent(), to: entity)
         world.addComponent(component: HealthComponent(base: 100), to: entity)
         world.addComponent(component: ManaComponent(base: 100, max: 100, regenRate: 2), to: entity)
-        world.addComponent(component: MoveSpeedComponent(base: 90), to: entity)
+        world.addComponent(component: MoveSpeedComponent(base: 180), to: entity)
         world.addComponent(component: CollisionBoxComponent(size: SIMD2(WorldConstants.playerSize * scale, WorldConstants.playerSize * scale)), to: entity)
         world.addComponent(component: FacingComponent(), to: entity)
         world.addComponent(component: MassComponent(), to: entity)
