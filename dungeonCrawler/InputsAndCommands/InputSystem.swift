@@ -65,7 +65,7 @@ public final class InputSystem: System {
                     world.addComponent(
                         component: SpriteComponent(
                             content: .texture(name: render.textureName),
-                            layer: .weapon,
+                            layer: .weaponFront,
                             anchorPoint: render.anchorPoint,
                         ),
                         to: newPrimary

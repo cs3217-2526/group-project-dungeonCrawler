@@ -33,7 +33,7 @@ public final class WeaponDropSystem: System {
                 world.addComponent(
                     component: SpriteComponent(
                         content: .texture(name: secondaryWeaponRender.textureName),
-                        layer: .weapon,
+                        layer: .weaponFront,
                         anchorPoint: secondaryWeaponRender.anchorPoint),
                     to: secondaryWeapon)
                 if let equippedWeapons = world.getComponent(type: EquippedWeaponComponent.self, for: entity) {

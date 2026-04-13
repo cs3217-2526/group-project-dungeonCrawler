@@ -120,7 +120,7 @@ public final class LevelGenerationManager {
             world.addComponent(
                 component: SpriteComponent(
                     content: .texture(name: handgunDefinition.textureName),
-                    layer: .weapon,
+                    layer: .weaponFront,
                     anchorPoint: handgunDefinition.anchorPoint ?? SIMD2<Float>(0.5, 0.5)),
                 to: handgun)
             world.addComponent(

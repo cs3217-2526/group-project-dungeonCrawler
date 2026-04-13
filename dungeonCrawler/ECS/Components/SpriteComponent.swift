@@ -22,8 +22,9 @@ public enum RenderLayer: CGFloat {
     case obstacle = 3
     case pickUp = 4
     case projectile = 5
+    case weaponBack = 5.5
     case entity = 6
-    case weapon = 7
+    case weaponFront = 7
     case ui = 10
 }
 
@@ -64,7 +65,7 @@ public class SpriteComponent: Component {
         switch zPosition {
         case 0: self.layer = .floor
         case 1: self.layer = .wall
-        case 4: self.layer = .weapon
+        case 4: self.layer = .weaponFront
         case 5: self.layer = .projectile
         default: self.layer = .entity
         }

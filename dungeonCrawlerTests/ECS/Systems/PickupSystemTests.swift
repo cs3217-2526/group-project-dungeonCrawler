@@ -75,7 +75,7 @@ final class PickupSystemTests: XCTestCase {
 
         // --- Near dropped weapon (within pickup range) ---
         nearWeaponTransform = TransformComponent(position: Self.defaultNearWeaponPosition)
-        nearWeaponSprite    = SpriteComponent(content: .texture(name: "handgun"), layer: .weapon)
+        nearWeaponSprite    = SpriteComponent(content: .texture(name: "handgun"), layer: .weaponFront)
         nearWeaponTiming    = WeaponTimingComponent(lastFiredAt: 0, coolDownInterval: nil, attackSpeed: nil)
         nearWeaponRender    = WeaponRenderComponent(
             textureName: "handgun",
@@ -93,7 +93,7 @@ final class PickupSystemTests: XCTestCase {
 
         // --- Far dropped weapon (also within pickup range, but farther) ---
         farWeaponTransform = TransformComponent(position: Self.defaultFarWeaponPosition)
-        farWeaponSprite    = SpriteComponent(content: .texture(name: "handgun"), layer: .weapon)
+        farWeaponSprite    = SpriteComponent(content: .texture(name: "handgun"), layer: .weaponFront)
         farWeaponTiming    = WeaponTimingComponent(lastFiredAt: 0, coolDownInterval: nil, attackSpeed: nil)
         farWeaponRender    = WeaponRenderComponent(
             textureName: "handgun",

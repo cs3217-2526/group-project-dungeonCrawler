@@ -34,7 +34,7 @@ extension PopulateContext {
         world.addComponent(
             component: SpriteComponent(
                 content: .texture(name: sniperDefinition.textureName),
-                layer: .weapon,
+                layer: .weaponFront,
                 anchorPoint: sniperDefinition.anchorPoint ?? SIMD2<Float>(0.5, 0.5)),
             to: weapon)
         world.addComponent(
@@ -50,7 +50,7 @@ extension PopulateContext {
             world.addComponent(
                 component: SpriteComponent(
                     content: .texture(name: bazookaDef.textureName),
-                    layer: .weapon,
+                    layer: .weaponFront,
                     anchorPoint: bazookaDef.anchorPoint ?? SIMD2<Float>(0.5, 0.5)),
                 to: bazookaWeapon)
             world.addComponent(

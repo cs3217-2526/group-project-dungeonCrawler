@@ -43,16 +43,20 @@ public final class SpriteKitRenderingAdapter: RenderingBackend {
         // Entities whose textures already encode left/right (directional animations)
         // must not be xScale-mirrored — the frame itself carries the facing.
         var flipFactor: CGFloat = node.xScale < 0 ? -1.0 : 1.0
-        if hasDirectionalAnimation {
+        if hasDirectionalAnimation { // character
             flipFactor = 1.0
         } else if let facing {
             flipFactor = facing.facing == .right ? 1.0 : -1.0
         } else if let velocity, velocity.linear.x != 0 {
             flipFactor = velocity.linear.x > 0 ? 1.0 : -1.0
         }
+        if sprite.layer == RenderLayer.weaponBack || sprite.layer == RenderLayer.weaponFront {
+            sprite.layer = flipFactor == -1.0 ? .weaponBack : .weaponFront
+        }
 
         node.xScale = CGFloat(transform.scale) * flipFactor
         node.yScale = CGFloat(transform.scale)
+        node.zPosition = sprite.layer.rawValue
         
         let baseColor: SIMD4<Float>
         let isColourContent: Bool
