@@ -20,7 +20,7 @@ struct MeleeDamageEffect: WeaponEffect {
 
         let origin = context.firePosition
         let facing = context.world.getComponent(type: FacingComponent.self, for: context.weapon)?.facing ?? .right
-        let directionSign: Float = facing == .right ? 1 : -1
+        let directionSign: Float = facing.isLeft ? -1 : 1
         let amplitude = swingAngleDegrees * .pi / 180
         let baseRotation = context.world.getComponent(type: TransformComponent.self, for: context.weapon)?.rotation ?? 0
         
@@ -45,7 +45,7 @@ struct MeleeDamageEffect: WeaponEffect {
 
         var forward = context.fireDirection
         if simd_length_squared(forward) < 0.0001 {
-            forward = facing == .right ? SIMD2<Float>(1, 0) : SIMD2<Float>(-1, 0)
+            forward = facing.isLeft ? SIMD2<Float>(-1, 0) : SIMD2<Float>(1, 0)
         } else {
             forward = simd_normalize(forward)
         }

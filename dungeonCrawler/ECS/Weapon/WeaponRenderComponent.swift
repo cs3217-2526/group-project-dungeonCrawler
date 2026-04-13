@@ -12,10 +12,12 @@ public class WeaponRenderComponent: Component {
     let textureName: String
     let anchorPoint: SIMD2<Float>
     let initRotation: Float
-    
-    public init(textureName: String, anchorPoint: SIMD2<Float>, initRotation: Float) {
+    let offset: SIMD2<Float>
+
+    public init(textureName: String, anchorPoint: SIMD2<Float>, initRotation: Float, offset: SIMD2<Float>) {
         self.textureName = textureName
         self.anchorPoint = anchorPoint
         self.initRotation = initRotation
+        self.offset = offset
     }
 }

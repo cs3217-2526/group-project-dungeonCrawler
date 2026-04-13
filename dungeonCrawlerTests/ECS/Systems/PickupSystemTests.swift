@@ -66,7 +66,7 @@ final class PickupSystemTests: XCTestCase {
         world.addComponent(component: playerTransform, to: playerEntity)
         world.addComponent(component: playerFacing,    to: playerEntity)
 
-        primaryWeaponOwner = OwnerComponent(ownerEntity: playerEntity, offset: SIMD2<Float>(10, -5))
+        primaryWeaponOwner = OwnerComponent(ownerEntity: playerEntity)
         primaryWeapon = world.createEntity()
         world.addComponent(component: primaryWeaponOwner, to: primaryWeapon)
 
@@ -80,7 +80,8 @@ final class PickupSystemTests: XCTestCase {
         nearWeaponRender    = WeaponRenderComponent(
             textureName: "handgun",
             anchorPoint: SIMD2<Float>(0.5, 0.5),
-            initRotation: 0
+            initRotation: 0,
+            offset: SIMD2(10.0, 5.0)
         )
         nearWeaponEffects = WeaponEffectsComponent(effects: [])
 
@@ -98,7 +99,8 @@ final class PickupSystemTests: XCTestCase {
         farWeaponRender    = WeaponRenderComponent(
             textureName: "handgun",
             anchorPoint: SIMD2<Float>(0.5, 0.5),
-            initRotation: 0
+            initRotation: 0,
+            offset: SIMD2(10.0, 5.0)
         )
         farWeaponEffects = WeaponEffectsComponent(effects: [])
 

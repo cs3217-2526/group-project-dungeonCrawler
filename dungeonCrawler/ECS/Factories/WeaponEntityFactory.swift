@@ -50,7 +50,8 @@ public struct WeaponEntityFactory: EntityFactory {
             component: WeaponRenderComponent(
                 textureName: textureName,
                 anchorPoint: anchorPoint,
-                initRotation: initRotation
+                initRotation: initRotation,
+                offset: offset
             ),
             to: entity)
         world.addComponent(component: WeaponEffectsComponent(effects: effects), to: entity)
@@ -74,7 +75,7 @@ public struct WeaponEntityFactory: EntityFactory {
         let ownerFacing = world.getComponent(type: FacingComponent.self, for: player)?.facing ?? .right
         let initLocation = world.getComponent(type: TransformComponent.self, for: player)?.position ?? .zero
         world.addComponent(component: FacingComponent(facing: ownerFacing), to: entity)
-        world.addComponent(component: OwnerComponent(ownerEntity: player, offset: offset), to: entity)
+        world.addComponent(component: OwnerComponent(ownerEntity: player), to: entity)
         world.addComponent(component: TransformComponent(position: initLocation + offset, rotation: initRotation, scale: scale), to: entity)
         return entity
     }

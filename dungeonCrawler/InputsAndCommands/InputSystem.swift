@@ -21,13 +21,13 @@ public final class InputSystem: System {
     }
 
     public func update(deltaTime: Double, world: World) {
-        var finalMoveDirectionX: Float? = nil
+        var finalMoveVector: SIMD2<Float>? = nil
         while let moveCommand = commandQueues.pop(MoveCommand.self) {
             for entity in world.entities(with: InputComponent.self) {
                 guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
                 world.getComponent(type: InputComponent.self, for: entity)?.moveDirection = moveCommand.rawMoveVector
             }
-            finalMoveDirectionX = moveCommand.rawMoveVector.x
+            finalMoveVector = moveCommand.rawMoveVector
         }
 
         while let aimCommand = commandQueues.pop(AimCommand.self) {
@@ -36,9 +36,9 @@ public final class InputSystem: System {
                 guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
                 world.getComponent(type: InputComponent.self, for: entity)?.aimDirection = aimDirection
                 // Update facing: aim direction takes priority over move direction when aim input is present.
-                let facingX: Float? = aimDirection.x != 0 ? aimDirection.x : finalMoveDirectionX
-                guard let facingX = facingX, facingX != 0 else { continue }
-                world.getComponent(type: FacingComponent.self, for: entity)?.facing = facingX > 0 ? .right : .left
+                let facingVector: SIMD2<Float> = simd_length(aimDirection) > 0.001 ? aimDirection : (finalMoveVector ?? .zero)
+                guard let newFacing = FacingType.from(vector: facingVector) else { continue }
+                world.getComponent(type: FacingComponent.self, for: entity)?.facing = newFacing
             }
         }
 
