@@ -73,5 +73,3 @@ fastlane/test_output
 
 # IDE
 .vscode/
-
-docs/package-lock.json
