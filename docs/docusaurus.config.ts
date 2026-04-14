@@ -11,11 +11,13 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://your-docusaurus-site.example.com',
-  baseUrl: '/',
+  url: 'https://cs3217-2526.github.io',
+  baseUrl: '/group-project-dungeonCrawler/',
 
   organizationName: 'cs3217-2526',
   projectName: 'group-project-dungeonCrawler',
+  deploymentBranch: 'gh-pages',
+  trailingSlash: false,
 
   onBrokenLinks: 'throw',
 
