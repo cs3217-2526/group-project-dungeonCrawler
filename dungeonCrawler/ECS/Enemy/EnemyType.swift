@@ -34,7 +34,13 @@ public struct EnemyType {
         scale: 0.75,
         mass: 5,
         contactDamage: 5.0,
-        strategy: StandardStrategy(attackBehaviour: ShooterBehaviour())
+        strategy: StandardStrategy(
+            wanderBehaviour: WanderBehaviour(),
+            attackBehaviour: CompositeBehaviour(
+                OrbitBehaviour(),
+                ShooterBehaviour(weaponBase: .enemyRangedDefault)
+            )
+        )
     )
 
     public static let tower = EnemyType(
@@ -43,8 +49,12 @@ public struct EnemyType {
         mass: 20,
         contactDamage: 15.0,
         strategy: StandardStrategy(
+            detectionRadius: 300,
             wanderBehaviour: StationaryBehaviour(),
-            attackBehaviour: StationaryBehaviour()
+            attackBehaviour: CompositeBehaviour(
+                StationaryBehaviour(),
+                ShooterBehaviour(weaponBase: .towerAttack)
+            )
         )
     )
 }

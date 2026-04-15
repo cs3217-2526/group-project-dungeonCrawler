@@ -11,7 +11,7 @@ public enum DungeonLibrary {
             theme: .chilling,
             layoutStrategy: LinearDungeonLayout(
                 roomCount: 3,
-                enemyPool: [.charger, .mummy, .ranger]
+                enemyPool: [.ranger, .tower]
             )
         ),
         DungeonDefinition(

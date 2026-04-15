@@ -18,13 +18,13 @@ final class StandardStrategyTests: XCTestCase {
 
     // Strategies
     var strategy: StandardStrategy!
-    var shooterStrategy: StandardStrategy!
+    var orbitShooterStrategy: StandardStrategy!
     var infiniteChaseStrategy: StandardStrategy!
 
     // Behaviours (for ID comparison)
     var wanderBehaviour: WanderBehaviour!
     var chaseBehaviour: ChaseBehaviour!
-    var shooterBehaviour: ShooterBehaviour!
+    var orbitShooterBehaviour: CompositeBehaviour!
 
     // Components
     var transform: TransformComponent!
@@ -44,11 +44,11 @@ final class StandardStrategyTests: XCTestCase {
         // 2. Behaviours
         wanderBehaviour = WanderBehaviour()
         chaseBehaviour = ChaseBehaviour()
-        shooterBehaviour = ShooterBehaviour()
+        orbitShooterBehaviour = CompositeBehaviour(OrbitBehaviour(), ShooterBehaviour())
 
         // 3. Strategies
         strategy = StandardStrategy(detectionRadius: 150, loseRadius: 225)
-        shooterStrategy = StandardStrategy(detectionRadius: 150, attackBehaviour: shooterBehaviour)
+        orbitShooterStrategy = StandardStrategy(detectionRadius: 150, attackBehaviour: orbitShooterBehaviour)
         infiniteChaseStrategy = StandardStrategy(detectionRadius: 150, loseRadius: nil)
 
         // 4. Components
@@ -68,12 +68,12 @@ final class StandardStrategyTests: XCTestCase {
         velocity = nil
         transform = nil
 
-        shooterBehaviour = nil
+        orbitShooterBehaviour = nil
         chaseBehaviour = nil
         wanderBehaviour = nil
 
         infiniteChaseStrategy = nil
-        shooterStrategy = nil
+        orbitShooterStrategy = nil
         strategy = nil
 
         enemy = nil
@@ -138,14 +138,11 @@ final class StandardStrategyTests: XCTestCase {
     // MARK: - Behaviour transition lifecycle
     // TODO: fix
 //    func testWanderTargetRemovedWhenSwitchingToAttack() {
-//        // Wander first
 //        strategy.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(200, 0), transform: transform, world: world))
 //
-//        // Capture to prevent deallocation crash during removal
 //        let wanderTarget = world.getComponent(type: WanderTargetComponent.self, for: enemy)
 //        XCTAssertNotNil(wanderTarget)
 //
-//        // Switch to attack
 //        strategy.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(100, 0), transform: transform, world: world))
 //        XCTAssertNil(world.getComponent(type: WanderTargetComponent.self, for: enemy))
 //    }
@@ -165,31 +162,34 @@ final class StandardStrategyTests: XCTestCase {
         XCTAssertEqual(vel.linear.y, 0, accuracy: 0.001)
     }
 
-    // MARK: - With Shooter attack behaviour
+    // MARK: - With OrbitShooter attack behaviour (CompositeBehaviour)
 
-    func testActivatesShooterBehaviourWhenPlayerInRange() {
-        shooterStrategy.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(100, 0), transform: transform, world: world))
-        XCTAssertEqual(activeBehaviourID(for: enemy), shooterBehaviour.id)
+    func testActivatesOrbitShooterBehaviourWhenPlayerInRange() {
+        orbitShooterStrategy.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(100, 0), transform: transform, world: world))
+        XCTAssertEqual(activeBehaviourID(for: enemy), orbitShooterBehaviour.id)
     }
 
-    func testShooterComponentAddedWhenEngaging() {
-        shooterStrategy.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(100, 0), transform: transform, world: world))
+    func testOrbitComponentAddedWhenEngaging() {
+        // OrbitBehaviour lazily adds ShooterBasicComponent on first update
+        orbitShooterStrategy.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(100, 0), transform: transform, world: world))
         XCTAssertNotNil(world.getComponent(type: ShooterBasicComponent.self, for: enemy))
     }
 
+    func testWeaponEquippedWhenEngaging() {
+        // ShooterBehaviour adds EquippedWeaponComponent on onActivate
+        orbitShooterStrategy.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(100, 0), transform: transform, world: world))
+        XCTAssertNotNil(world.getComponent(type: EquippedWeaponComponent.self, for: enemy))
+    }
+
     // TODO: Fix
-//    func testShooterComponentRemovedWhenDisengaging() {
-//        let strategyWithLose = StandardStrategy(detectionRadius: 150, loseRadius: 225, attackBehaviour: shooterBehaviour)
+//    func testOrbitAndWeaponRemovedWhenDisengaging() {
+//        let strategyWithLose = StandardStrategy(detectionRadius: 150, loseRadius: 225, attackBehaviour: orbitShooterBehaviour)
 //
-//        // Enter shooter attack
 //        strategyWithLose.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(100, 0), transform: transform, world: world))
+//        XCTAssertNotNil(world.getComponent(type: ShooterBasicComponent.self, for: enemy))
 //
-//        // Capture shooter component to prevent SIGABRT during state switch
-//        let shooterComp = world.getComponent(type: ShooterBasicComponent.self, for: enemy)
-//        XCTAssertNotNil(shooterComp)
-//
-//        // Disengage
 //        strategyWithLose.update(entity: enemy, context: BehaviourContext(entity: enemy, playerPos: SIMD2(300, 0), transform: transform, world: world))
 //        XCTAssertNil(world.getComponent(type: ShooterBasicComponent.self, for: enemy))
+//        XCTAssertNil(world.getComponent(type: EquippedWeaponComponent.self, for: enemy))
 //    }
 }

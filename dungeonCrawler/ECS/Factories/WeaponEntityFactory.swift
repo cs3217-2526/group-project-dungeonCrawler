@@ -70,13 +70,20 @@ public struct WeaponEntityFactory: EntityFactory {
         return entity
     }
     
-    public func make(in world: World, player: Entity) -> Entity {
+    /// Use this for any owner entity — player or enemy.
+    /// Attaches OwnerComponent, FacingComponent, and TransformComponent to the weapon.
+    public func make(in world: World, owner: Entity) -> Entity {
         let entity = make(in: world)
-        let ownerFacing = world.getComponent(type: FacingComponent.self, for: player)?.facing ?? .right
-        let initLocation = world.getComponent(type: TransformComponent.self, for: player)?.position ?? .zero
+        let ownerFacing = world.getComponent(type: FacingComponent.self, for: owner)?.facing ?? .right
+        let initLocation = world.getComponent(type: TransformComponent.self, for: owner)?.position ?? .zero
         world.addComponent(component: FacingComponent(facing: ownerFacing), to: entity)
-        world.addComponent(component: OwnerComponent(ownerEntity: player), to: entity)
+        world.addComponent(component: OwnerComponent(ownerEntity: owner), to: entity)
         world.addComponent(component: TransformComponent(position: initLocation + offset, rotation: initRotation, scale: scale), to: entity)
         return entity
+    }
+
+    /// Convenience alias so existing player call sites keep compiling unchanged.
+    public func make(in world: World, player: Entity) -> Entity {
+        make(in: world, owner: player)
     }
 }

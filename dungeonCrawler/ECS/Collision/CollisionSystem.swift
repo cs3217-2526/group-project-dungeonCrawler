@@ -60,8 +60,10 @@ public final class CollisionSystem: System {
         let bIsSolid      = isSolid(entityB, world: world)
         let aIsEnemy      = isEnemy(entityA, world: world)
         let bIsEnemy      = isEnemy(entityB, world: world)
- 
-        // Projectile hits a solid surface — record event, skip physics resolution.
+        let aIsPlayer     = world.getComponent(type: PlayerTagComponent.self, for: entityA) != nil
+        let bIsPlayer     = world.getComponent(type: PlayerTagComponent.self, for: entityB) != nil
+
+        // Projectile hits a solid surface
         if aIsProjectile && bIsSolid {
             events.recordProjectileHitSolid(projectile: entityA, solid: entityB)
             return
@@ -70,27 +72,45 @@ public final class CollisionSystem: System {
             events.recordProjectileHitSolid(projectile: entityB, solid: entityA)
             return
         }
-        
-        // Projectile hits an enemy — record damage event, skip physics resolution.
-        // CombatSystem consumes this to apply damage and destroy the projectile.
+
+        // Projectile hits an enemy — only player-owned projectiles damage enemies
         if aIsProjectile && bIsEnemy {
             let damage = world.getComponent(type: ContactDamageComponent.self, for: entityA)?.damage ?? 0
-            // Guard: a projectile should not damage its own owner
-            let ownerID = world.getComponent(type: OwnerComponent.self, for: entityA)?.ownerEntity.id
-            guard ownerID != entityB.id else { return }
+            let owner = world.getComponent(type: OwnerComponent.self, for: entityA)?.ownerEntity
+            guard let owner, owner.id != entityB.id else { return }
+            guard world.getComponent(type: PlayerTagComponent.self, for: owner) != nil else { return }
             events.recordProjectileHitEnemy(projectile: entityA, enemy: entityB, damage: damage)
             return
         }
         if bIsProjectile && aIsEnemy {
             let damage = world.getComponent(type: ContactDamageComponent.self, for: entityB)?.damage ?? 0
-            let ownerID = world.getComponent(type: OwnerComponent.self, for: entityB)?.ownerEntity.id
-            guard ownerID != entityA.id else { return }
+            let owner = world.getComponent(type: OwnerComponent.self, for: entityB)?.ownerEntity
+            guard let owner, owner.id != entityA.id else { return }
+            guard world.getComponent(type: PlayerTagComponent.self, for: owner) != nil else { return }
             events.recordProjectileHitEnemy(projectile: entityB, enemy: entityA, damage: damage)
             return
         }
- 
-        // Projectile↔projectile or projectile↔non-solid — ignore for now.
-        // Add a ProjectileHitProjectileEvent here if you ever need it.
+
+        // Enemy-owned projectile hits the player
+        // Reuses the existing playerHitByEnemy event + DamageSystem iframes logic
+        if aIsProjectile && bIsPlayer {
+            let owner = world.getComponent(type: OwnerComponent.self, for: entityA)?.ownerEntity
+            guard let owner, isEnemy(owner, world: world) else { return }
+            let damage = world.getComponent(type: ContactDamageComponent.self, for: entityA)?.damage ?? 0
+            events.recordPlayerHitByEnemy(player: entityB, enemy: entityA, damage: damage)
+            destructionQueue.enqueue(entityA)
+            return
+        }
+        if bIsProjectile && aIsPlayer {
+            let owner = world.getComponent(type: OwnerComponent.self, for: entityB)?.ownerEntity
+            guard let owner, isEnemy(owner, world: world) else { return }
+            let damage = world.getComponent(type: ContactDamageComponent.self, for: entityB)?.damage ?? 0
+            events.recordPlayerHitByEnemy(player: entityA, enemy: entityB, damage: damage)
+            destructionQueue.enqueue(entityB)
+            return
+        }
+
+        // Projectile↔projectile or projectile↔non-solid — ignore
         if aIsProjectile || bIsProjectile { return }
  
         // Standard physics resolution for everything else.
