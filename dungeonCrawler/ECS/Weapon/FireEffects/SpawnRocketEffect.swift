@@ -35,9 +35,9 @@ struct SpawnRocketEffect: WeaponEffect {
             dir.x * sinA + dir.y * cosA
         )
         let fireAngle = atan2(loftedDir.y, loftedDir.x)
-        guard (.pi / 20 ... .pi * 19/20).contains(fireAngle) else {
-            return .blocked("fire down not allowed")
-        }
+//        guard (.pi / 20 ... .pi * 19/20).contains(fireAngle) else {
+//            return .blocked("fire down not allowed")
+//        }
         let vx0 = Double(abs(speed * cos(fireAngle)))
         let vz0 = Double(speed * sin(fireAngle))
         let g = Double(gravity)

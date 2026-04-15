@@ -25,13 +25,14 @@ enum WeaponType: CaseIterable {
                 cooldown: TimeInterval(0.2),
                 attackSpeed: 1,
                 effects: [
-                    ConsumeManaEffect(amount: 5),
+                    ConsumeManaEffect(amount: 1),
                     SpawnProjectileEffect(
                         speed: 300,
                         effectiveRange: 400,
                         damage: 15,
                         spriteName: "normalHandgunBullet",
-                        collisionSize: SIMD2<Float>(6, 6)
+                        collisionSize: SIMD2<Float>(6, 6),
+                        hitEffects: []
                     ),
                 ],
                 anchorPoint: nil,
@@ -65,11 +66,12 @@ enum WeaponType: CaseIterable {
                 cooldown: TimeInterval(0.8),
                 attackSpeed: 1,
                 effects: [
-                    ConsumeManaEffect(amount: 20),
+                    ConsumeManaEffect(amount: 2),
                     SpawnProjectileEffect(
                         speed: 400, effectiveRange: 800,
                         damage: 50, spriteName: "normalHandgunBullet",
-                        collisionSize: SIMD2<Float>(6, 6)),
+                        collisionSize: SIMD2<Float>(6, 6),
+                    hitEffects: []),
                 ],
                 anchorPoint: nil,
                 initRotation: nil,
@@ -83,14 +85,12 @@ enum WeaponType: CaseIterable {
                 cooldown: TimeInterval(1),
                 attackSpeed: 1,
                 effects: [
-                    ConsumeManaEffect(amount: 3),
-                    SpawnRocketEffect(
-                        speed: 300,
-                        damage: 80,
-                        spriteName: "rocket",
+                    ConsumeManaEffect(amount: 10),
+                    SpawnProjectileEffect(
+                        speed: 300, effectiveRange: 800,
+                        damage: 80, spriteName: "rocket",
                         collisionSize: SIMD2<Float>(10, 10),
-                        gravity: 200,
-                        launchAngle: 0),
+                    hitEffects: [SpawnZoneEffect()]),
                 ],
                 anchorPoint: nil,
                 initRotation: nil,

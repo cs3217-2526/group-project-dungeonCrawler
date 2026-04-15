@@ -65,13 +65,13 @@ public final class ProjectileSystem: System {
             let entity = Entity(id: id)
             guard world.isAlive(entity: entity) else { continue }
             let pos = world.getComponent(type: TransformComponent.self, for: entity)?.position ?? .zero
-            destructionQueue.enqueue(entity)
             guard let projectileComponent = world.getComponent(type: ProjectileComponent.self, for: entity) else { continue }
             for effect in projectileComponent.hitEffects {
                 effect.apply(
                     context: ZoneContext(center: pos, world: world,
                                          zoneBase: HitEffectsLibrary.fireZone.effectDefinition))
             }
+            destructionQueue.enqueue(entity)
         }
         destructionQueue.flush(world: world)
     }
