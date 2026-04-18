@@ -40,7 +40,6 @@ enum WeaponType: CaseIterable {
                         collisionSize: SIMD2<Float>(6, 6),
                         hitEffects: []
                     ),
-                    ConsumeAmmoEffect(),
                 ],
                 anchorPoint: nil,
                 initRotation: nil,
@@ -63,7 +62,6 @@ enum WeaponType: CaseIterable {
                         collisionSize: SIMD2<Float>(6, 6),
                         hitEffects: []
                     ),
-                    ConsumeAmmoEffect(),
                 ],
                 anchorPoint: nil,
                 initRotation: nil,
@@ -86,7 +84,6 @@ enum WeaponType: CaseIterable {
                         collisionSize: SIMD2<Float>(10, 10),
                         gravity: 200,
                         launchAngle: 0),
-                    ConsumeAmmoEffect(),
                 ],
                 anchorPoint: nil,
                 initRotation: nil,

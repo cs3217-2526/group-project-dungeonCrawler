@@ -64,13 +64,13 @@ public final class ProjectileSystem: System {
             let entity = Entity(id: id)
             guard world.isAlive(entity: entity) else { continue }
             let pos = world.getComponent(type: TransformComponent.self, for: entity)?.position ?? .zero
+            destructionQueue.enqueue(entity)
             
             guard let projectileComponent = world.getComponent(type: ProjectileComponent.self, for: entity) else { continue }
             let context = HitContext(center: pos, world: world, target: nil, zoneBase: nil)
             for effect in projectileComponent.hitEffects {
                 effect.apply(context: context)
             }
-            destructionQueue.enqueue(entity)
         }
 
         // Projectile hit an enemy — run hit effects only.
