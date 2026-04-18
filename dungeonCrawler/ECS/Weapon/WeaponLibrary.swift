@@ -31,7 +31,7 @@ enum WeaponType: CaseIterable {
                 cooldown: TimeInterval(0.2),
                 attackSpeed: 1,
                 effects: [
-                    CheckEnoughAmmoEffect(),
+                    ConsumeAmmoEffect(),
                     SpawnProjectileEffect(
                         speed: 300,
                         effectiveRange: 400,
@@ -56,7 +56,7 @@ enum WeaponType: CaseIterable {
                 cooldown: TimeInterval(0.8),
                 attackSpeed: 1,
                 effects: [
-                    CheckEnoughAmmoEffect(),
+                    ConsumeAmmoEffect(),
                     SpawnProjectileEffect(
                         speed: 400, effectiveRange: 800,
                         damage: 50, spriteName: "normalHandgunBullet",
@@ -68,6 +68,30 @@ enum WeaponType: CaseIterable {
                 anchorPoint: nil,
                 initRotation: nil,
                 ammoConfig: AmmoConfig(magazineSize: 1, reloadTime: 2.0)
+            )
+        case .bazooka:
+            WeaponBase(
+                textureName: "bazooka",
+                offset: SIMD2<Float>(10, -5),
+                scale: 0.4,
+                lastFiredAt: 0,
+                cooldown: TimeInterval(1),
+                attackSpeed: 1,
+                effects: [
+                    ConsumeAmmoEffect(),
+                    SpawnRocketEffect(
+                        speed: 300,
+                        damage: 80,
+                        spriteName: "rocket",
+                        collisionSize: SIMD2<Float>(10, 10),
+                        gravity: 200,
+                        launchAngle: 0),
+                    ConsumeAmmoEffect(),
+                ],
+                anchorPoint: nil,
+                initRotation: nil,
+                ammoConfig: AmmoConfig(magazineSize: 1, reloadTime: 3.0)
+                // ammoConfig intentionally nil — mana-gated only
             )
 
         // Melee:
@@ -120,30 +144,7 @@ enum WeaponType: CaseIterable {
                 initRotation: nil
                 // ammoConfig intentionally nil — mana-gated only
             )
-        case .bazooka:
-            WeaponBase(
-                textureName: "bazooka",
-                offset: SIMD2<Float>(10, -5),
-                scale: 0.4,
-                lastFiredAt: 0,
-                cooldown: TimeInterval(1),
-                attackSpeed: 1,
-                effects: [
-                    CheckEnoughAmmoEffect(),
-                    SpawnRocketEffect(
-                        speed: 300,
-                        damage: 80,
-                        spriteName: "rocket",
-                        collisionSize: SIMD2<Float>(10, 10),
-                        gravity: 200,
-                        launchAngle: 0),
-                    ConsumeAmmoEffect(),
-                ],
-                anchorPoint: nil,
-                initRotation: nil,
-                ammoConfig: AmmoConfig(magazineSize: 1, reloadTime: 3.0)
-                // ammoConfig intentionally nil — mana-gated only
-            )
+        
         }
     }
 }

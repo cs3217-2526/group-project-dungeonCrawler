@@ -68,9 +68,7 @@ public final class ProjectileSystem: System {
             guard let projectileComponent = world.getComponent(type: ProjectileComponent.self, for: entity) else { continue }
             let context = HitContext(center: pos, world: world, target: nil, zoneBase: nil)
             for effect in projectileComponent.hitEffects {
-                effect.apply(context: ZoneContext(
-                    center: pos, world: world,
-                    zoneBase: HitEffectsLibrary.fireZone.effectDefinition))
+                effect.apply(context: context)
             }
             destructionQueue.enqueue(entity)
         }
