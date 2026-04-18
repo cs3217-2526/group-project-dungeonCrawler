@@ -31,4 +31,17 @@ public struct BehaviourContext {
         guard maxHP > 0 else { return nil }
         return hp.value.current / maxHP
     }
+
+    /// The bounds of the room this entity belongs to, looked up via RoomMemberComponent → RoomMetadataComponent.
+    /// Returns nil if the entity has no room membership or the room entity cannot be found.
+    public var roomBounds: RoomBounds? {
+        guard let roomMember = world.getComponent(type: RoomMemberComponent.self, for: entity) else { return nil }
+        for roomEntity in world.entities(with: RoomMetadataComponent.self) {
+            if let meta = world.getComponent(type: RoomMetadataComponent.self, for: roomEntity),
+               meta.roomID == roomMember.roomID {
+                return meta.bounds
+            }
+        }
+        return nil
+    }
 }

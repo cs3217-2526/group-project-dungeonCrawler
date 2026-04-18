@@ -72,6 +72,21 @@ final class WanderBehaviourTests: XCTestCase {
         super.tearDown()
     }
 
+    // MARK: - Helpers
+
+    /// Creates a room entity with the given bounds and returns its roomID.
+    private func makeRoom(bounds: RoomBounds) -> UUID {
+        let roomEntity = world.createEntity()
+        let meta = RoomMetadataComponent(bounds: bounds)
+        world.addComponent(component: meta, to: roomEntity)
+        return meta.roomID
+    }
+
+    /// Attaches the enemy to a room so context.roomBounds resolves.
+    private func joinRoom(roomID: UUID) {
+        world.addComponent(component: RoomMemberComponent(roomID: roomID), to: enemy)
+    }
+
     // MARK: - Default initialisation
 
     func testDefaultWanderRadius() {
@@ -80,6 +95,10 @@ final class WanderBehaviourTests: XCTestCase {
 
     func testDefaultWanderSpeed() {
         XCTAssertEqual(WanderBehaviour().wanderSpeed, 40, accuracy: 0.001)
+    }
+
+    func testDefaultWallMargin() {
+        XCTAssertEqual(WanderBehaviour().wallMargin, 40, accuracy: 0.001)
     }
 
     // MARK: - Lazy WanderTargetComponent
@@ -155,5 +174,61 @@ final class WanderBehaviourTests: XCTestCase {
 
         XCTAssertEqual(vel1.x, vel2.x, accuracy: 0.001)
         XCTAssertEqual(vel1.y, vel2.y, accuracy: 0.001)
+    }
+
+    // MARK: - Room bounds: target stays inside safe area
+
+    func testWanderTargetInsideRoomSafeAreaWhenRoomIsPresent() {
+        let roomBounds = RoomBounds(center: .zero, size: SIMD2(600, 600))
+        let roomID = makeRoom(bounds: roomBounds)
+        joinRoom(roomID: roomID)
+
+        let safeArea = roomBounds.inset(by: behaviour.wallMargin)
+
+        // Run several updates to increase coverage over random candidates
+        for _ in 0..<20 {
+            // Reset target each iteration so a new candidate is chosen
+            world.removeComponent(type: WanderTargetComponent.self, from: enemy)
+            behaviour.update(entity: enemy, context: context)
+
+            let target = world.getComponent(type: WanderTargetComponent.self, for: enemy)?.target
+            if let t = target {
+                XCTAssertTrue(safeArea.contains(t),
+                              "Target \(t) is outside safe area \(safeArea)")
+            }
+        }
+    }
+
+    func testWanderTargetPicksValidPointWhenEnemyNearWall() {
+        // Place enemy near the right wall — most random directions lead outside
+        let roomBounds = RoomBounds(center: .zero, size: SIMD2(600, 600))
+        let roomID = makeRoom(bounds: roomBounds)
+        joinRoom(roomID: roomID)
+
+        let nearWallPos = SIMD2<Float>(roomBounds.maxX - 10, roomBounds.center.y)
+        let nearWallTransform = TransformComponent(position: nearWallPos)
+        world.addComponent(component: nearWallTransform, to: enemy)
+        let nearWallContext = BehaviourContext(entity: enemy, playerPos: SIMD2(999, 999),
+                                               transform: nearWallTransform, world: world)
+
+        let safeArea = roomBounds.inset(by: behaviour.wallMargin)
+
+        for _ in 0..<10 {
+            world.removeComponent(type: WanderTargetComponent.self, from: enemy)
+            behaviour.update(entity: enemy, context: nearWallContext)
+
+            let target = world.getComponent(type: WanderTargetComponent.self, for: enemy)?.target
+            if let t = target {
+                XCTAssertTrue(safeArea.contains(t),
+                              "Near-wall target \(t) is outside safe area \(safeArea)")
+            }
+        }
+    }
+
+    func testWanderBehaviourWithoutRoomMembershipStillProducesTarget() {
+        // No RoomMemberComponent → roomBounds is nil → unconstrained fallback
+        behaviour.update(entity: enemy, context: context)
+        XCTAssertNotNil(world.getComponent(type: WanderTargetComponent.self, for: enemy)?.target,
+                        "Should still pick a target when no room bounds are available")
     }
 }
