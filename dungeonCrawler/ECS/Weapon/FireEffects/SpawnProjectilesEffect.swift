@@ -27,7 +27,6 @@ struct SpawnProjectileEffect: WeaponEffect {
     let damage: Float
     let spriteName: String
     let collisionSize: SIMD2<Float>
-    let hitEffects: [any ProjectileHitEffect]?
 
     func apply(context: FireContext) -> FireEffectResult {
         ProjectileEntityFactory(
@@ -39,7 +38,7 @@ struct SpawnProjectileEffect: WeaponEffect {
             owner: context.owner,
             spriteName: spriteName,
             collisionBoxSize: collisionSize,
-            hitEffects: hitEffects
+            hitEffects: []
         ).make(in: context.world)
 
         return .success
