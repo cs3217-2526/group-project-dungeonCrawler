@@ -4,4 +4,6 @@ import Foundation
 public protocol HUDBackend: AnyObject {
     func updateHealthBar(current: Float, max: Float)
     func updateManaBar(current: Float, max: Float)
+    func updateAmmoBar(current: Int, max: Int, isReloading: Bool, reloadProgress: Float)
+    func hideAmmoBar()
 }

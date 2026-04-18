@@ -1,6 +1,7 @@
 import Foundation
 
-/// Reads the player's health and mana each frame and pushes the values to the HUD backend.
+/// Reads the player's health, mana, and equipped weapon ammo each frame
+/// and pushes the values to the HUD backend.
 /// Dequeues JoystickRenderCommands to update the joystick backend.
 public final class HUDSystem: System {
 
@@ -21,6 +22,8 @@ public final class HUDSystem: System {
         updateJoysticks()
     }
 
+    // MARK: - Stats
+
     private func updateStats(world: World) {
         guard let backend,
               let player = world.entities(with: PlayerTagComponent.self).first
@@ -35,7 +38,38 @@ public final class HUDSystem: System {
             let maxMP = mana.value.max ?? mana.value.base
             backend.updateManaBar(current: mana.value.current, max: maxMP)
         }
+
+        updateAmmo(player: player, world: world, backend: backend)
     }
+
+    // MARK: - Ammo
+
+    /// Reads ammo state from the player's primary weapon.
+    /// Shows the ammo bar only when a firearm (WeaponAmmoComponent) is equipped.
+    /// Hides the bar for melee and magical weapons.
+    private func updateAmmo(player: Entity, world: World, backend: HUDBackend) {
+        guard let equipped = world.getComponent(type: EquippedWeaponComponent.self, for: player) else {
+            backend.hideAmmoBar()
+            return
+        }
+
+        let primaryWeapon = equipped.primaryWeapon
+
+        guard let ammo = world.getComponent(type: WeaponAmmoComponent.self, for: primaryWeapon) else {
+            // Primary weapon is melee or magical — no ammo bar needed.
+            backend.hideAmmoBar()
+            return
+        }
+
+        backend.updateAmmoBar(
+            current: ammo.currentAmmo,
+            max: ammo.magazineSize,
+            isReloading: ammo.isReloading,
+            reloadProgress: ammo.reloadProgress
+        )
+    }
+
+    // MARK: - Joysticks
 
     private func updateJoysticks() {
         guard let joystickBackend else { return }
