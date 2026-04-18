@@ -29,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		334ED9FE2F93276000AB8976 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Base.xcconfig; sourceTree = "<group>"; };
 		337108922F5EB5B800D27C2E /* dungeonCrawler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dungeonCrawler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		337108AB2F5EB5BA00D27C2E /* dungeonCrawlerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dungeonCrawlerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		337108B52F5EB5BA00D27C2E /* dungeonCrawlerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dungeonCrawlerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,6 +92,7 @@
 				8D8259BC2F5FFFBC00742D1A /* .gitignore */,
 				8D8259BD2F5FFFBC00742D1A /* .swiftlint.yml */,
 				337108932F5EB5B800D27C2E /* Products */,
+				334ED9FE2F93276000AB8976 /* Base.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -322,6 +324,7 @@
 /* Begin XCBuildConfiguration section */
 		337108BD2F5EB5BA00D27C2E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -385,6 +388,7 @@
 		};
 		337108BE2F5EB5BA00D27C2E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -441,6 +445,7 @@
 		};
 		337108C02F5EB5BA00D27C2E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -448,7 +453,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = V8V5CR5275;
+				DEVELOPMENT_TEAM = "$(APP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = SoullessKnight;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -461,7 +466,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jannice.com;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -476,6 +481,7 @@
 		};
 		337108C12F5EB5BA00D27C2E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -483,7 +489,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = V8V5CR5275;
+				DEVELOPMENT_TEAM = "$(APP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = SoullessKnight;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -496,7 +502,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jannice.com;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -511,15 +517,16 @@
 		};
 		337108C32F5EB5BA00D27C2E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BTQD2M86U9;
+				DEVELOPMENT_TEAM = "$(APP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sky.dungeonCrawlerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_TEST_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -533,15 +540,16 @@
 		};
 		337108C42F5EB5BA00D27C2E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BTQD2M86U9;
+				DEVELOPMENT_TEAM = "$(APP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sky.dungeonCrawlerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_TEST_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -555,13 +563,14 @@
 		};
 		337108C62F5EB5BA00D27C2E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BTQD2M86U9;
+				DEVELOPMENT_TEAM = "$(APP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sky.dungeonCrawlerUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_UI_TEST_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -575,13 +584,14 @@
 		};
 		337108C72F5EB5BA00D27C2E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 334ED9FE2F93276000AB8976 /* Base.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BTQD2M86U9;
+				DEVELOPMENT_TEAM = "$(APP_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sky.dungeonCrawlerUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_UI_TEST_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

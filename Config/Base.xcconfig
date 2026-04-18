@@ -1,0 +1,9 @@
+APP_DISPLAY_NAME = SoullessKnight
+
+APP_BUNDLE_IDENTIFIER = com.example.dungeonCrawler
+APP_TEST_BUNDLE_IDENTIFIER = com.example.dungeonCrawlerTests
+APP_UI_TEST_BUNDLE_IDENTIFIER = com.example.dungeonCrawlerUITests
+
+APP_DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"

@@ -1,0 +1,4 @@
+APP_BUNDLE_IDENTIFIER = yourname.dungeonCrawler
+APP_TEST_BUNDLE_IDENTIFIER = yourname.dungeonCrawlerTests
+APP_UI_TEST_BUNDLE_IDENTIFIER = yourname.dungeonCrawlerUITests
+APP_DEVELOPMENT_TEAM = YOURTEAMID
