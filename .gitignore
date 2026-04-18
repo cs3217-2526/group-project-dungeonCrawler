@@ -73,3 +73,6 @@ fastlane/test_output
 
 # IDE
 .vscode/
+
+# Personal signing overrides
+Config/Local.xcconfig
