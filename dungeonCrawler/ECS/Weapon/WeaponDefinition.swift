@@ -1,6 +1,8 @@
 import Foundation
 import simd
 
+/// Core definition of a weapon's static data.
+/// Instantiated from WeaponLibrary (player weapons) or WeaponPresets (enemy weapons).
 public struct WeaponBase {
     let textureName: String
     let offset: SIMD2<Float>
@@ -11,54 +13,30 @@ public struct WeaponBase {
     let effects: [any WeaponEffect]
     let anchorPoint: SIMD2<Float>?
     let initRotation: Float?
-}
+    /// Non-nil only for firearms. Used by WeaponEntityFactory to attach WeaponAmmoComponent.
+    let ammoConfig: AmmoConfig?
 
-public extension WeaponBase {
- 
-    /// Basic ranged weapon used by the Ranger enemy.
-    /// Fires a slow projectile with a short cooldown.
-    static let enemyRangedDefault = WeaponBase(
-        textureName: "EnemyBullet",
-        offset: .zero,          // centred on the enemy — no visible held weapon
-        scale: 1.0,
-        lastFiredAt: nil,
-        cooldown: 0.5,
-        attackSpeed: 150,
-        effects: [
-            SpawnProjectileEffect(
-                speed: 180,
-                effectiveRange: 300,
-                damage: 8,
-                spriteName: "normalHandgunBullet",
-                collisionSize: SIMD2<Float>(6, 6),
-                hitEffects: []
-            )
-        ],
-        anchorPoint: SIMD2<Float>(0.5, 0.5),
-        initRotation: 0
-    )
-    
-    /// Attack weapon used by the Tower enemy.
-    /// Fires a fast projectile with a short cooldown.
-    static let towerAttack = WeaponBase(
-        textureName: "EnemyBullet",
-        offset: .zero,          // centred on the enemy — no visible held weapon
-        scale: 1.0,
-        lastFiredAt: nil,
-        cooldown: 0.2,
-        attackSpeed: 200,
-        effects: [
-            SpawnProjectileEffect(
-                speed: 250,
-                effectiveRange: 300,
-                damage: 8,
-                spriteName: "normalHandgunBullet",
-                collisionSize: SIMD2<Float>(6, 6),
-                hitEffects: []
-            )
-        ],
-        anchorPoint: SIMD2<Float>(0.5, 0.5),
-        initRotation: 0
-    )
+    public init(
+        textureName: String,
+        offset: SIMD2<Float>,
+        scale: Float,
+        lastFiredAt: Float?,
+        cooldown: TimeInterval?,
+        attackSpeed: Float?,
+        effects: [any WeaponEffect],
+        anchorPoint: SIMD2<Float>?,
+        initRotation: Float?,
+        ammoConfig: AmmoConfig? = nil
+    ) {
+        self.textureName = textureName
+        self.offset = offset
+        self.scale = scale
+        self.lastFiredAt = lastFiredAt
+        self.cooldown = cooldown
+        self.attackSpeed = attackSpeed
+        self.effects = effects
+        self.anchorPoint = anchorPoint
+        self.initRotation = initRotation
+        self.ammoConfig = ammoConfig
+    }
 }
- 

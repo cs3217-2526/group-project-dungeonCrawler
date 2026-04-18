@@ -16,6 +16,8 @@ public struct WeaponEntityFactory: EntityFactory {
     let effects: [any WeaponEffect]
     let anchorPoint: SIMD2<Float>
     let initRotation: Float
+    /// Carried through from WeaponBase so make() can attach WeaponAmmoComponent.
+    let ammoConfig: AmmoConfig?
 
     public init(base: WeaponBase) {
         self.textureName = base.textureName
@@ -27,15 +29,12 @@ public struct WeaponEntityFactory: EntityFactory {
         self.effects = base.effects
         self.anchorPoint = base.anchorPoint ?? SIMD2<Float>(0.5, 0.5)
         self.initRotation = base.initRotation ?? 0
+        self.ammoConfig = base.ammoConfig
     }
 
-    /// Components include:
-    /// Transform Component
-    /// Facing Component
-    /// Owner Component
-    /// Weapon Timing Component
-    /// Weapon Effects Component
-    /// Weapon Render Component
+    /// Components added to every weapon entity regardless of spawn context:
+    ///   WeaponTimingComponent, WeaponRenderComponent, WeaponEffectsComponent
+    ///   WeaponAmmoComponent   (firearms only — when ammoConfig is non-nil)
     @discardableResult
     public func make(in world: World) -> Entity {
         let entity = world.createEntity()
@@ -51,10 +50,20 @@ public struct WeaponEntityFactory: EntityFactory {
                 textureName: textureName,
                 anchorPoint: anchorPoint,
                 initRotation: initRotation,
-                offset: offset
-            ),
+                offset: offset),
             to: entity)
-        world.addComponent(component: WeaponEffectsComponent(effects: effects), to: entity)
+        world.addComponent(
+            component: WeaponEffectsComponent(effects: effects),
+            to: entity)
+
+        // Attach ammo state for firearms; spellbooks and melee leave this nil.
+        if let ammoConfig {
+            world.addComponent(
+                component: WeaponAmmoComponent(
+                    magazineSize: ammoConfig.magazineSize,
+                    reloadTime: ammoConfig.reloadTime),
+                to: entity)
+        }
 
         return entity
     }

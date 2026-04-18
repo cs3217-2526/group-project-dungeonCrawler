@@ -14,6 +14,13 @@ public final class WeaponSystem: System {
         self.gameTime += Float(deltaTime)
         let delta = Float(deltaTime)
 
+        // ── Reload tick ──────────────────────────────────────────────────────
+        // Runs every frame for all weapon entities that are currently reloading.
+        // Kept separate from the fire loop so reload progresses even when the
+        // player is not shooting.
+        tickReloads(delta: delta, world: world)
+
+        // ── Fire loop ────────────────────────────────────────────────────────
         for (weaponEntity, timing, effectsComponent, ownerComponent, _, weaponRenderComponent) in world.entities(
             with: WeaponTimingComponent.self,
             and: WeaponEffectsComponent.self,
@@ -31,6 +38,7 @@ public final class WeaponSystem: System {
             } else {
                 ownerFacing = world.getComponent(type: FacingComponent.self, for: ownerEntity)?.facing ?? .right
             }
+
             let aimDir = ownerInput.aimDirection
             let isFiring = ownerInput.isShooting
             let weaponFacing: FacingType
@@ -123,6 +131,26 @@ public final class WeaponSystem: System {
             timing.lastFiredAt = gameTime
         }
     }
+
+    // MARK: - Reload
+
+    private func tickReloads(delta: Float, world: World) {
+        for (weaponEntity) in world.entities(with: WeaponAmmoComponent.self) {
+            guard var ammo = world.getComponent(type: WeaponAmmoComponent.self, for: weaponEntity) else { continue }
+            
+            guard ammo.isReloading else { continue }
+
+            ammo.reloadElapsed += delta
+
+            if ammo.reloadElapsed >= ammo.reloadTime {
+                ammo.currentAmmo = ammo.magazineSize
+                ammo.isReloading = false
+                ammo.reloadElapsed = 0
+            }
+        }
+    }
+
+    // MARK: - Helpers
 
     private func isReadyToFire(gameTime: Float, timing: WeaponTimingComponent) -> Bool {
         guard let cooldown = timing.coolDownInterval else { return true }
