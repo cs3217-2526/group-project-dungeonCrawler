@@ -28,7 +28,7 @@ public struct ProjectileEntityFactory: EntityFactory {
         owner: Entity,
         spriteName: String = "normalHandgunBullet",
         collisionBoxSize: SIMD2<Float> = SIMD2<Float>(6, 6),
-        hitEffects: [any ProjectileHitEffect]?
+        hitEffects: [any ProjectileHitEffect] = []
     ) {
         self.position = position
         self.direction = direction
@@ -38,7 +38,7 @@ public struct ProjectileEntityFactory: EntityFactory {
         self.owner = owner
         self.spriteName = spriteName
         self.collisionBoxSize = collisionBoxSize
-        self.hitEffects = hitEffects ?? []
+        self.hitEffects = hitEffects
     }
 
     @discardableResult

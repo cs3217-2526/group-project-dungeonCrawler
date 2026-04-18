@@ -150,6 +150,7 @@ class GameScene: SKScene {
         systemManager.register(RenderSystem(backend: renderingBackend))
         systemManager.register(ProjectileSystem(events: collisionEvents, destructionQueue: destructionQueue))
         systemManager.register(FireEffectsSystem(destructionQueue: destructionQueue))
+        systemManager.register(SlowSystem())
     }
 
     // MARK: - Level management

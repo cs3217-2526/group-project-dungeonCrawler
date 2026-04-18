@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ZoneBase {
+public struct ZoneBase {
     let textureName: String
     let radius: Float
     let damagePerSecond: Float
@@ -15,9 +15,9 @@ struct ZoneBase {
     
 }
 
-enum HitEffectsLibrary {
+public enum HitEffectsLibrary {
     case fireZone
-    var effectDefinition: ZoneBase {
+    public var effectDefinition: ZoneBase {
         switch self {
         case .fireZone:
             ZoneBase(

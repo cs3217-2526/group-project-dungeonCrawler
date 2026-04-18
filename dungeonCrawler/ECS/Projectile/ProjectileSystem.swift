@@ -44,35 +44,47 @@ public final class ProjectileSystem: System {
 
             world.getComponent(type: TransformComponent.self, for: projectileEntity)?.position += velocityComponent.linear * dt
             let distanceTraveled = simd_length(velocityComponent.linear) * dt
-            var remainingRange: Float = .greatestFiniteMagnitude
 
             rangeComponent.value.current -= distanceTraveled
-            remainingRange = rangeComponent.value.current
 
-            if remainingRange <= 0 {
+            // Range expiry — no specific target was hit
+            if rangeComponent.value.current <= 0 {
                 let pos = world.getComponent(type: TransformComponent.self, for: projectileEntity)?.position ?? .zero
                 destructionQueue.enqueue(projectileEntity)
+                let context = HitContext(center: pos, world: world, target: nil, zoneBase: nil)
                 for effect in projectileComponent.hitEffects {
-                    effect.apply(
-                        context: ZoneContext(center: pos, world: world,
-                                             zoneBase: HitEffectsLibrary.fireZone.effectDefinition))
+                    effect.apply(context: context)
                 }
             }
         }
-        
-        let hitProjectiles = Set(events.projectileHitSolid.map { $0.projectile.id })
-        for id in hitProjectiles {
+
+        // Projectile hit a solid wall — no target entity, no zone
+        let hitSolidProjectiles = Set(events.projectileHitSolid.map { $0.projectile.id })
+        for id in hitSolidProjectiles {
             let entity = Entity(id: id)
             guard world.isAlive(entity: entity) else { continue }
             let pos = world.getComponent(type: TransformComponent.self, for: entity)?.position ?? .zero
             destructionQueue.enqueue(entity)
             guard let projectileComponent = world.getComponent(type: ProjectileComponent.self, for: entity) else { continue }
+            let context = HitContext(center: pos, world: world, target: nil, zoneBase: nil)
             for effect in projectileComponent.hitEffects {
-                effect.apply(
-                    context: ZoneContext(center: pos, world: world,
-                                         zoneBase: HitEffectsLibrary.fireZone.effectDefinition))
+                effect.apply(context: context)
             }
         }
+
+        // Projectile hit an enemy — run hit effects only.
+        // Damage application and projectile destruction are handled by DamageSystem.
+        for event in events.projectileHitEnemy {
+            let entity = event.projectile
+            guard world.isAlive(entity: entity) else { continue }
+            let pos = world.getComponent(type: TransformComponent.self, for: entity)?.position ?? .zero
+            guard let projectileComponent = world.getComponent(type: ProjectileComponent.self, for: entity) else { continue }
+            let context = HitContext(center: pos, world: world, target: event.enemy, zoneBase: nil)
+            for effect in projectileComponent.hitEffects {
+                effect.apply(context: context)
+            }
+        }
+
         destructionQueue.flush(world: world)
     }
 }

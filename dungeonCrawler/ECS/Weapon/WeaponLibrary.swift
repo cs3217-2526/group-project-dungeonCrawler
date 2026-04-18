@@ -82,7 +82,7 @@ enum WeaponType: CaseIterable {
                         speed: 300, effectiveRange: 800,
                         damage: 80, spriteName: "rocket",
                         collisionSize: SIMD2<Float>(10, 10),
-                        hitEffects: [SpawnZoneEffect()]
+                        hitEffects: [SpawnZoneEffect(zoneBase: HitEffectsLibrary.fireZone.effectDefinition)]
                     ),
                 ],
                 anchorPoint: nil,
@@ -133,7 +133,7 @@ enum WeaponType: CaseIterable {
                         damage: 30,
                         spriteName: "magicOrb",
                         collisionSize: SIMD2<Float>(8, 8),
-                        hitEffects: []
+                        hitEffects: [SlowEffect(multiplier: 0.4, duration: 2.0)]
                     ),
                 ],
                 anchorPoint: nil,

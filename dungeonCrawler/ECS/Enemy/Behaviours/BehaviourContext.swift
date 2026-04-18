@@ -32,6 +32,11 @@ public struct BehaviourContext {
         return hp.value.current / maxHP
     }
 
+    /// Speed multiplier from SlowComponent (0.0–1.0), or 1.0 if not slowed.
+    public var slowMultiplier: Float {
+        world.getComponent(type: SlowComponent.self, for: entity)?.multiplier ?? 1.0
+    }
+
     /// The bounds of the room this entity belongs to, looked up via RoomMemberComponent → RoomMetadataComponent.
     /// Returns nil if the entity has no room membership or the room entity cannot be found.
     public var roomBounds: RoomBounds? {

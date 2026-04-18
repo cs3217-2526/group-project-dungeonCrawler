@@ -21,6 +21,6 @@ public struct FleeBehaviour: EnemyBehaviour {
         let delta = context.transform.position - context.playerPos
         guard simd_length_squared(delta) > 1e-6 else { return }
 
-        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(delta) * self.speed
+        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(delta) * self.speed * context.slowMultiplier
     }
 }

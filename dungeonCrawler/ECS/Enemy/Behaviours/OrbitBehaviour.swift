@@ -81,7 +81,7 @@ public struct OrbitBehaviour: EnemyBehaviour {
         let moveDir = target - context.transform.position
         guard simd_length_squared(moveDir) > 1e-6 else { return }
 
-        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(moveDir) * self.moveSpeed
+        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(moveDir) * self.moveSpeed * context.slowMultiplier
     }
 
     // MARK: - Private

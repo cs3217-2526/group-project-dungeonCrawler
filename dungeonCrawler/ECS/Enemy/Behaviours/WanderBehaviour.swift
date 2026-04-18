@@ -47,7 +47,7 @@ public struct WanderBehaviour: EnemyBehaviour {
         let wanderDelta = target - context.transform.position
         guard simd_length_squared(wanderDelta) > 1e-6 else { return }
 
-        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(wanderDelta) * self.wanderSpeed
+        context.world.getComponent(type: VelocityComponent.self, for: entity)?.linear = normalize(wanderDelta) * self.wanderSpeed * context.slowMultiplier
     }
 
     /// Discard WanderTargetComponent when no longer in use
