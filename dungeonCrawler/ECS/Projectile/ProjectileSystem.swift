@@ -34,11 +34,7 @@ public final class ProjectileSystem: System {
             // Apply gravity for parabolic projectiles (e.g. rockets)
             if let gravityComp = world.getComponent(type: GravityComponent.self, for: projectileEntity) {
                 velocityComponent.linear.y -= gravityComp.gravity * dt
-                // Update rotation to follow the arc
-                let goingRight = velocityComponent.linear.x >= 0
-                let newRotation: Float = goingRight
-                    ? atan2(velocityComponent.linear.y, velocityComponent.linear.x)
-                    : -atan2(velocityComponent.linear.y, -velocityComponent.linear.x)
+                let newRotation: Float = atan2(velocityComponent.linear.y, velocityComponent.linear.x)
                 world.getComponent(type: TransformComponent.self, for: projectileEntity)?.rotation = newRotation
             }
 

@@ -128,7 +128,7 @@ enum WeaponType: CaseIterable {
                 cooldown: TimeInterval(1),
                 attackSpeed: 1,
                 effects: [
-                    CheckEnoughManaEffect(amount: 30),
+                    CheckEnoughAmmoEffect(),
                     SpawnRocketEffect(
                         speed: 300,
                         damage: 80,
@@ -136,7 +136,7 @@ enum WeaponType: CaseIterable {
                         collisionSize: SIMD2<Float>(10, 10),
                         gravity: 200,
                         launchAngle: 0),
-                    ConsumeManaEffect(amount: 30)
+                    ConsumeAmmoEffect()
                 ],
                 anchorPoint: nil,
                 initRotation: nil,
