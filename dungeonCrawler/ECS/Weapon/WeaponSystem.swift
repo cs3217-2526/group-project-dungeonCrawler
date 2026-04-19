@@ -32,6 +32,12 @@ public final class WeaponSystem: System {
             guard let ownerTransform = world.getComponent(type: TransformComponent.self, for: ownerEntity),
                   let ownerInput = world.getComponent(type: InputComponent.self, for: ownerEntity) else { continue }
 
+
+            if let equipped = world.getComponent(type: EquippedWeaponComponent.self, for: ownerEntity),
+               equipped.primaryWeapon != weaponEntity {
+                continue
+            }
+
             let ownerFacing: AnimationDirection
             if let anim = world.getComponent(type: AnimationComponent.self, for: ownerEntity) {
                 ownerFacing = AnimationDirection(animationDirection: anim.lastDirection)
@@ -40,17 +46,20 @@ public final class WeaponSystem: System {
             }
 
             let aimDir = ownerInput.aimDirection
+            let aimAngle = atan2(aimDir.y, aimDir.x)
             let isFiring = ownerInput.isShooting
             let weaponFacing: AnimationDirection
             if isFiring, let aimFacing = AnimationDirection.from(vector: aimDir) {
                 weaponFacing = aimFacing
-                world.modifyComponent(type: AnimationComponent.self, for: ownerEntity, fallback: nil) { ownerAnimation in
-                    ownerAnimation.lastDirection = weaponFacing
-                }
             } else {
                 weaponFacing = ownerFacing
             }
             let isLeft = weaponFacing.isLeft
+
+            if let sprite = world.getComponent(type: SpriteComponent.self, for: weaponEntity),
+               sprite.layer == .weaponBack || sprite.layer == .weaponFront {
+                sprite.layer = isLeft ? .weaponBack : .weaponFront
+            }
 
             let mirroredOffset = SIMD2<Float>(
                 isLeft ? -weaponRenderComponent.offset.x : weaponRenderComponent.offset.x,
@@ -61,15 +70,7 @@ public final class WeaponSystem: System {
                 .initRotation ?? 0
             let mirroredInitRotation = isLeft ? -initRotationOffset : initRotationOffset
 
-            let aimAngle: Float
-            if simd_length(aimDir) > 0.001 {
-                aimAngle = atan2(aimDir.y, aimDir.x)
-            } else {
-                aimAngle = weaponFacing.angle
-            }
-            // Mirror the angle across the y-axis when the sprite is flipped so the
-            // weapon points outward rather than back into the character.
-            let defaultWeaponRotation: Float = isLeft ? (-.pi + aimAngle) : aimAngle
+            let defaultWeaponRotation = isLeft ? (aimAngle - .pi) : aimAngle
             var renderedRotation = defaultWeaponRotation + mirroredInitRotation
 
             if let swing = world.getComponent(type: WeaponSwingComponent.self, for: weaponEntity) {
@@ -91,20 +92,10 @@ public final class WeaponSystem: System {
 
             world.getComponent(type: FacingComponent.self, for: weaponEntity)?.facing = weaponFacing
 
-            if let sprite = world.getComponent(type: SpriteComponent.self, for: weaponEntity),
-               sprite.layer == .weaponBack || sprite.layer == .weaponFront {
-                sprite.layer = isLeft ? .weaponBack : .weaponFront
-            }
-
-            if let equipped = world.getComponent(type: EquippedWeaponComponent.self, for: ownerEntity),
-               equipped.primaryWeapon != weaponEntity {
-                continue
-            }
-
             guard ownerInput.isShooting else { continue }
             guard isReadyToFire(gameTime: gameTime, timing: timing) else { continue }
 
-            var fireDirection = ownerInput.aimDirection
+            var fireDirection = aimDir
             let epsilon: Float = 0.001
             if simd_length_squared(fireDirection) < epsilon * epsilon {
                 fireDirection = isLeft ? SIMD2<Float>(-1, 0) : SIMD2<Float>(1, 0)
@@ -139,7 +130,7 @@ public final class WeaponSystem: System {
 
     private func tickReloads(delta: Float, world: World) {
         for (weaponEntity) in world.entities(with: WeaponAmmoComponent.self) {
-            guard var ammo = world.getComponent(type: WeaponAmmoComponent.self, for: weaponEntity) else { continue }
+            guard let ammo = world.getComponent(type: WeaponAmmoComponent.self, for: weaponEntity) else { continue }
             
             guard ammo.isReloading else { continue }
 
