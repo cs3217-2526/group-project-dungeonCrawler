@@ -11,6 +11,7 @@ import simd
 enum WeaponType: CaseIterable {
     case handgun
     case sword
+    case axe
     case sniper
     case bazooka
     case spellBook
@@ -86,6 +87,28 @@ enum WeaponType: CaseIterable {
                         maxTargets: 1,
                         swingDuration: 0.3,
                         swingAngleDegrees: 40
+                    )
+                ],
+                anchorPoint: SIMD2<Float>(0.2, 0.5),
+                initRotation: .pi / 9
+            )
+
+        case .axe:
+            WeaponBase(
+                textureName: "axe",
+                offset: SIMD2<Float>(20, -15),
+                scale: 0.3,
+                lastFiredAt: 0,
+                cooldown: 0.6,
+                attackSpeed: 1,
+                effects: [
+                    ChargeEffect(required: 1.2),
+                    MeleeDamageEffect(
+                        damage: 120, range: 110,
+                        halfAngleDegrees: 90,
+                        maxTargets: 3,
+                        swingDuration: 0.35,
+                        swingAngleDegrees: 60
                     )
                 ],
                 anchorPoint: SIMD2<Float>(0.2, 0.5),

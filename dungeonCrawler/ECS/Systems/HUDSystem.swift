@@ -40,6 +40,18 @@ public final class HUDSystem: System {
         }
 
         updateAmmo(player: player, world: world, backend: backend)
+        updateCharge(player: player, world: world, backend: backend)
+    }
+
+    private func updateCharge(player: Entity, world: World, backend: HUDBackend) {
+        guard let equipped = world.getComponent(type: EquippedWeaponComponent.self, for: player),
+              let charge = world.getComponent(type: WeaponChargeComponent.self, for: equipped.primaryWeapon),
+              charge.required > 0 else {
+            backend.hideChargeBar()
+            return
+        }
+
+        backend.updateChargeBar(progress: charge.elapsed / charge.required)
     }
 
     // MARK: - Ammo

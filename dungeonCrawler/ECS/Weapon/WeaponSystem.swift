@@ -20,6 +20,8 @@ public final class WeaponSystem: System {
         // player is not shooting.
         tickReloads(delta: delta, world: world)
 
+        resetChargesWhenNotFiring(world: world)
+
         // ── Fire loop ────────────────────────────────────────────────────────
         for (weaponEntity, timing, effectsComponent, ownerComponent, _, _) in world.entities(
             with: WeaponTimingComponent.self,
@@ -91,6 +93,19 @@ public final class WeaponSystem: System {
                 ammo.currentAmmo = ammo.magazineSize
                 ammo.isReloading = false
                 ammo.reloadElapsed = 0
+            }
+        }
+    }
+
+    private func resetChargesWhenNotFiring(world: World) {
+        for weaponEntity in world.entities(with: WeaponChargeComponent.self) {
+            guard let charge = world.getComponent(type: WeaponChargeComponent.self, for: weaponEntity) else { continue }
+
+            let ownerEntity = world.getComponent(type: OwnerComponent.self, for: weaponEntity)?.ownerEntity
+            let isFiring = ownerEntity.flatMap { world.getComponent(type: InputComponent.self, for: $0)?.isShooting } ?? false
+
+            if !isFiring {
+                charge.elapsed = 0
             }
         }
     }

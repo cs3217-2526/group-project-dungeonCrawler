@@ -11,6 +11,9 @@ public final class SpriteKitHUDAdapter: HUDBackend {
     private let ammoReloadBg: SKSpriteNode
     private let ammoContainer: SKNode
 
+    private let chargeFill: SKSpriteNode
+    private let chargeBg: SKSpriteNode
+
     private static let barWidth: CGFloat  = 160
     private static let barHeight: CGFloat = 14
     private static let padding: CGFloat   = 20
@@ -46,6 +49,15 @@ public final class SpriteKitHUDAdapter: HUDBackend {
         ammoContainer  = ammoUI.container
         ammoReloadBg   = ammoUI.reloadBg
         ammoReloadFill = ammoUI.reloadFill
+
+        (chargeBg, chargeFill) = Self.makeBar(
+            in: uiLayer,
+            color: SKColor(red: 1.00, green: 0.55, blue: 0.10, alpha: 1),
+            leftEdge: leftEdge,
+            centerY: topY - 3 * (Self.barHeight + Self.gap)
+        )
+        chargeBg.isHidden = true
+        chargeFill.isHidden = true
     }
 
     // MARK: - HUDBackend
@@ -72,6 +84,17 @@ public final class SpriteKitHUDAdapter: HUDBackend {
 
     public func hideAmmoBar() {
         ammoContainer.isHidden = true
+    }
+
+    public func updateChargeBar(progress: Float) {
+        chargeBg.isHidden = false
+        chargeFill.isHidden = false
+        chargeFill.xScale = CGFloat(Swift.max(0, Swift.min(1, progress)))
+    }
+
+    public func hideChargeBar() {
+        chargeBg.isHidden = true
+        chargeFill.isHidden = true
     }
 
     // MARK: - Pips

@@ -76,6 +76,22 @@ extension PopulateContext {
             occupiedPositions.append(spellBookPos)
         }
 
+        if let axePos = findEmptySpace() {
+            let axeDef = WeaponType.axe.baseDefinition
+            let axeWeapon = WeaponEntityFactory(base: axeDef).make(in: world, initLocation: axePos)
+            world.addComponent(
+                component: SpriteComponent(
+                    content: .texture(name: axeDef.textureName),
+                    layer: .weaponFront,
+                    anchorPoint: axeDef.anchorPoint ?? SIMD2<Float>(0.5, 0.5)),
+                to: axeWeapon)
+            world.addComponent(
+                component: RoomMemberComponent(roomID: roomID),
+                to: axeWeapon
+            )
+            occupiedPositions.append(axePos)
+        }
+
         return weapon
     }
 }

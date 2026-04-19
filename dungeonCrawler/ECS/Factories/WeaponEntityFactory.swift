@@ -65,6 +65,16 @@ public struct WeaponEntityFactory: EntityFactory {
                 to: entity)
         }
 
+        // Attach charge state for weapons that gate firing behind a ChargeEffect.
+        for effect in effects {
+            if let charge = effect as? ChargeEffect {
+                world.addComponent(
+                    component: WeaponChargeComponent(required: charge.required),
+                    to: entity)
+                break
+            }
+        }
+
         return entity
     }
     

@@ -28,8 +28,10 @@ public final class MovementSystem: System {
         for (entity, input, _, moveSpeed) in movable {
             guard world.getComponent(type: KnockbackComponent.self, for: entity) == nil else { continue }
 
-            world.getComponent(type: VelocityComponent.self, for: entity)?.linear = input.moveDirection * moveSpeed.value.current
-            
+            let stalled = input.isShooting && isChargingWeapon(owner: entity, world: world)
+            let desiredDirection = stalled ? .zero : input.moveDirection
+            world.getComponent(type: VelocityComponent.self, for: entity)?.linear = desiredDirection * moveSpeed.value.current
+
             guard let velocity = world.getComponent(type: VelocityComponent.self, for: entity)
             else { continue }
 
@@ -47,5 +49,11 @@ public final class MovementSystem: System {
 
             world.getComponent(type: TransformComponent.self, for: entity)?.position += velocity.linear * dt
         }
+    }
+
+    /// Owner's primary weapon stalls movement while it is winding up a charged attack.
+    private func isChargingWeapon(owner: Entity, world: World) -> Bool {
+        guard let equipped = world.getComponent(type: EquippedWeaponComponent.self, for: owner) else { return false }
+        return world.getComponent(type: WeaponChargeComponent.self, for: equipped.primaryWeapon) != nil
     }
 }

@@ -6,4 +6,6 @@ public protocol HUDBackend: AnyObject {
     func updateManaBar(current: Float, max: Float)
     func updateAmmoBar(current: Int, max: Int, isReloading: Bool, reloadProgress: Float)
     func hideAmmoBar()
+    func updateChargeBar(progress: Float)
+    func hideChargeBar()
 }
