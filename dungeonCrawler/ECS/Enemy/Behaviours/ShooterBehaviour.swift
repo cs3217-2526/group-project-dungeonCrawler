@@ -79,7 +79,7 @@ public struct ShooterBehaviour: EnemyBehaviour {
 
         // Update facing so the weapon sprite mirrors correctly
         if let facing = context.world.getComponent(type: FacingComponent.self, for: entity),
-           let aimFacing = FacingType.from(vector: input.aimDirection) {
+           let aimFacing = AnimationDirection.from(vector: input.aimDirection) {
             facing.facing = aimFacing
         }
     }

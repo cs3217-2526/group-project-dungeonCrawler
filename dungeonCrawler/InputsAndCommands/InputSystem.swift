@@ -37,7 +37,7 @@ public final class InputSystem: System {
                 world.getComponent(type: InputComponent.self, for: entity)?.aimDirection = aimDirection
                 // Update facing: aim direction takes priority over move direction when aim input is present.
                 let facingVector: SIMD2<Float> = simd_length(aimDirection) > 0.001 ? aimDirection : (finalMoveVector ?? .zero)
-                guard let newFacing = FacingType.from(vector: facingVector) else { continue }
+                guard let newFacing = AnimationDirection.from(vector: facingVector) else { continue }
                 world.getComponent(type: FacingComponent.self, for: entity)?.facing = newFacing
             }
         }

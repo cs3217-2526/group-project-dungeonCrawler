@@ -22,8 +22,8 @@ public final class AnimationSystem: System {
             else { continue }
 
             // Derive the desired animation key from velocity, keeping the last direction when idle.
-            let direction  = AnimationDirection.from(velocity: vel.linear) ?? anim.lastDirection
-            let isMoving   = AnimationDirection.from(velocity: vel.linear) != nil
+            let direction  = AnimationDirection.from(vector: vel.linear) ?? anim.lastDirection
+            let isMoving   = AnimationDirection.from(vector: vel.linear) != nil
             let key        = "\(isMoving ? "walk" : "idle")\(direction.rawValue)"
 
             // Store direction so idle animations face where the character last moved.

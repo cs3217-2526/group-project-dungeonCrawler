@@ -32,18 +32,21 @@ public final class WeaponSystem: System {
             guard let ownerTransform = world.getComponent(type: TransformComponent.self, for: ownerEntity),
                   let ownerInput = world.getComponent(type: InputComponent.self, for: ownerEntity) else { continue }
 
-            let ownerFacing: FacingType
+            let ownerFacing: AnimationDirection
             if let anim = world.getComponent(type: AnimationComponent.self, for: ownerEntity) {
-                ownerFacing = FacingType(animationDirection: anim.lastDirection)
+                ownerFacing = AnimationDirection(animationDirection: anim.lastDirection)
             } else {
                 ownerFacing = world.getComponent(type: FacingComponent.self, for: ownerEntity)?.facing ?? .right
             }
 
             let aimDir = ownerInput.aimDirection
             let isFiring = ownerInput.isShooting
-            let weaponFacing: FacingType
-            if isFiring, let aimFacing = FacingType.from(vector: aimDir) {
+            let weaponFacing: AnimationDirection
+            if isFiring, let aimFacing = AnimationDirection.from(vector: aimDir) {
                 weaponFacing = aimFacing
+                world.modifyComponent(type: AnimationComponent.self, for: ownerEntity, fallback: nil) { ownerAnimation in
+                    ownerAnimation.lastDirection = weaponFacing
+                }
             } else {
                 weaponFacing = ownerFacing
             }
