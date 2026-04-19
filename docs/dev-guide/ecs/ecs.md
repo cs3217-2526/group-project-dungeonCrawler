@@ -19,7 +19,7 @@ A component is a plain data container (e.g. a struct) attached to an entity. It 
 - `HealthComponent` — stores current and max HP
 - `VelocityComponent` — stores movement vector
 
-See: [Components](./components/component.md)
+See: [Components](./component.md)
 
 ### System
 A system contains the logic. Systems iterate over all entities, for those that have a specific set of components, they process them and update the components. Examples:
@@ -28,7 +28,7 @@ A system contains the logic. Systems iterate over all entities, for those that h
 - `RenderSystem` — reads `TransformComponent`, draws the entity on screen
 - `CombatSystem` — reads `HealthComponent`, applies damage
 
-See: [Systems](./systems/system.md)
+See: [Systems](./system.md)
 
 ## Why ECS?
 
