@@ -1,10 +1,3 @@
-//
-//  PickupSystem.swift
-//  dungeonCrawler
-//
-//  Created by Letian on 4/4/26.
-//
-
 import Foundation
 import simd
 
@@ -43,9 +36,21 @@ public final class PickupSystem: System {
                 world.removeComponent(type: SpriteComponent.self, from: pickedWeapon)
                 if let secondWeapon = equipped.secondaryWeapon {
                     world.removeComponent(type: OwnerComponent.self, from: secondWeapon)
-                    guard let renderInfo = world.getComponent(type: WeaponRenderComponent.self, for: secondWeapon) else { fatalError("secondWeapon missing WeaponRenderComponent") }
-                    world.addComponent(component: SpriteComponent(textureName: renderInfo.textureName), to: secondWeapon)
+                    world.removeComponent(type: FacingComponent.self, from: secondWeapon)
+                    guard let renderInfo = world.getComponent(type: WeaponRenderComponent.self, for: secondWeapon)
+                    else { fatalError("secondWeapon missing WeaponRenderComponent") }
+
+                    world.getComponent(type: TransformComponent.self, for: secondWeapon)?.position
+                        = playerTransform.position
+
+                    world.addComponent(
+                        component: SpriteComponent(
+                            content: .texture(name: renderInfo.textureName),
+                            layer: .weaponFront,
+                            anchorPoint: renderInfo.anchorPoint),
+                        to: secondWeapon)
                 }
+                
                 equipped.secondaryWeapon = pickedWeapon
                 world.addComponent(
                     component: OwnerComponent(ownerEntity: player),
