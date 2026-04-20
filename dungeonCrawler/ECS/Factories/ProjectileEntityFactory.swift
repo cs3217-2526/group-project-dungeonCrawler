@@ -18,6 +18,7 @@ public struct ProjectileEntityFactory: EntityFactory {
     let spriteName: String
     let collisionBoxSize: SIMD2<Float>
     let hitEffects: [any ProjectileHitEffect]
+    let scale: Float
 
     public init(
         from position: SIMD2<Float>,
@@ -28,7 +29,8 @@ public struct ProjectileEntityFactory: EntityFactory {
         owner: Entity,
         spriteName: String = "normalHandgunBullet",
         collisionBoxSize: SIMD2<Float> = SIMD2<Float>(6, 6),
-        hitEffects: [any ProjectileHitEffect] = []
+        hitEffects: [any ProjectileHitEffect] = [],
+        scale: Float = 1
     ) {
         self.position = position
         self.direction = direction
@@ -39,6 +41,7 @@ public struct ProjectileEntityFactory: EntityFactory {
         self.spriteName = spriteName
         self.collisionBoxSize = collisionBoxSize
         self.hitEffects = hitEffects
+        self.scale = scale
     }
 
     @discardableResult
@@ -48,7 +51,7 @@ public struct ProjectileEntityFactory: EntityFactory {
         let bulletRotation: Float = goingRight
             ? atan2(direction.y, direction.x)
             : -atan2(direction.y, -direction.x)
-        world.addComponent(component: TransformComponent(position: position, rotation: bulletRotation, scale: 1), to: entity)
+        world.addComponent(component: TransformComponent(position: position, rotation: bulletRotation, scale: scale), to: entity)
         world.addComponent(component: VelocityComponent(linear: direction * speed), to: entity)
         world.addComponent(component: SpriteComponent(content: .texture(name: spriteName), layer: .projectile), to: entity)
         world.addComponent(component: ProjectileComponent(hitEffects: hitEffects), to: entity)

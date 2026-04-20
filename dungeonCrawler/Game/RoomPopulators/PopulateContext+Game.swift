@@ -92,6 +92,22 @@ extension PopulateContext {
             occupiedPositions.append(axePos)
         }
 
+        if let bottlePos = findEmptySpace() {
+            let bottleDef = WeaponType.poisonBottle.baseDefinition
+            let bottle = WeaponEntityFactory(base: bottleDef).make(in: world, initLocation: bottlePos)
+            world.addComponent(
+                component: SpriteComponent(
+                    content: .texture(name: bottleDef.textureName),
+                    layer: .weaponFront,
+                    anchorPoint: bottleDef.anchorPoint ?? SIMD2<Float>(0.5, 0.5)),
+                to: bottle)
+            world.addComponent(
+                component: RoomMemberComponent(roomID: roomID),
+                to: bottle
+            )
+            occupiedPositions.append(bottlePos)
+        }
+
         return weapon
     }
 }
