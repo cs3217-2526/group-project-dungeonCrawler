@@ -20,7 +20,7 @@ public extension WeaponBase {
         cooldown: 0.5,
         attackSpeed: 150,
         effects: [
-            SpawnProjectileEffect(
+            SpawnLinearProjectileEffect(
                 speed: 180,
                 effectiveRange: 300,
                 damage: 8,
@@ -42,7 +42,7 @@ public extension WeaponBase {
         cooldown: 0.2,
         attackSpeed: 200,
         effects: [
-            SpawnProjectileEffect(
+            SpawnLinearProjectileEffect(
                 speed: 250,
                 effectiveRange: 300,
                 damage: 8,

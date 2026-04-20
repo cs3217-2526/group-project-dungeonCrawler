@@ -21,7 +21,7 @@ import simd
  *  - collision box size: SIMD2<Float>
  */
 
-struct SpawnProjectileEffect: WeaponEffect {
+struct SpawnLinearProjectileEffect: WeaponEffect {
     let speed: Float
     let effectiveRange: Float
     let damage: Float

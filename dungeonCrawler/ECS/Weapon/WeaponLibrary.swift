@@ -34,7 +34,7 @@ enum WeaponType: CaseIterable {
                 attackSpeed: 1,
                 effects: [
                     ConsumeAmmoEffect(),
-                    SpawnProjectileEffect(
+                    SpawnLinearProjectileEffect(
                         speed: 300,
                         effectiveRange: 400,
                         damage: 15,
@@ -58,7 +58,7 @@ enum WeaponType: CaseIterable {
                 attackSpeed: 1,
                 effects: [
                     ConsumeAmmoEffect(),
-                    SpawnProjectileEffect(
+                    SpawnLinearProjectileEffect(
                         speed: 400, effectiveRange: 800,
                         damage: 50, spriteName: "normalHandgunBullet",
                         collisionSize: SIMD2<Float>(6, 6),
@@ -129,7 +129,7 @@ enum WeaponType: CaseIterable {
                 attackSpeed: 1,
                 effects: [
                     ConsumeManaEffect(amount: 15),
-                    SpawnProjectileEffect(
+                    SpawnLinearProjectileEffect(
                         speed: 250,
                         effectiveRange: 500,
                         damage: 30,
@@ -180,17 +180,18 @@ enum WeaponType: CaseIterable {
                 cooldown: TimeInterval(0.5),
                 attackSpeed: 1,
                 effects: [
-                    ConsumeManaEffect(amount: 15),
+                    CheckEnoughManaEffect(amount: 6),
                     SpawnParabolaProjectileEffect(
-                        speed: 100,
-                        damage: 80,
+                        speed: 300,
+                        damage: 0,
                         spriteName: "poisonBottle",
                         collisionSize: SIMD2<Float>(10, 10),
-                        gravity: 100,
+                        gravity: 300,
                         launchAngle: 0,
-                        hitEffects: [SpawnZoneEffectsLibrary.poisonZone.effect]
+                        hitEffects: [SpawnZoneEffectsLibrary.poisonZone.effect],
+                        scale: 0.6
                         ),
-                    ConsumeAmmoEffect()
+                    ConsumeManaEffect(amount: 6),
                 ],
                 anchorPoint: nil,
                 initRotation: .pi / 9)

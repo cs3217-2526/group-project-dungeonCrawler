@@ -9,6 +9,7 @@ struct SpawnParabolaProjectileEffect: WeaponEffect {
     let gravity: Float
     let launchAngle: Float
     let hitEffects: [any ProjectileHitEffect]
+    let scale: Float
 
     init(
         speed: Float,
@@ -17,7 +18,8 @@ struct SpawnParabolaProjectileEffect: WeaponEffect {
         collisionSize: SIMD2<Float>,
         gravity: Float = 300,
         launchAngle: Float = 0,
-        hitEffects: [any ProjectileHitEffect] = []
+        hitEffects: [any ProjectileHitEffect] = [],
+        scale: Float = 1
     ) {
         self.speed = speed
         self.gravity = gravity
@@ -26,6 +28,7 @@ struct SpawnParabolaProjectileEffect: WeaponEffect {
         self.spriteName = spriteName
         self.collisionSize = collisionSize
         self.hitEffects = hitEffects
+        self.scale = scale
     }
 
     func apply(context: FireContext) -> FireEffectResult {
@@ -57,7 +60,8 @@ struct SpawnParabolaProjectileEffect: WeaponEffect {
             owner: context.owner,
             spriteName: spriteName,
             collisionBoxSize: collisionSize,
-            hitEffects: hitEffects
+            hitEffects: hitEffects,
+            scale: scale
         ).make(in: context.world)
 
         context.world.addComponent(
