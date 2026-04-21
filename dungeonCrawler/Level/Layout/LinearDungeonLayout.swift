@@ -25,8 +25,6 @@ public final class LinearDungeonLayout: DungeonLayoutStrategy {
     // MARK: - DungeonLayoutStrategy
 
     public func generate(context: GenerationContext) -> DungeonGraph {
-        _ = context.makeGenerator()
-
         let roomWidth: Float  = 1000
         let roomHeight: Float = 800
         let size = SIMD2(roomWidth, roomHeight)

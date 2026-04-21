@@ -25,8 +25,6 @@ public final class StarDungeonLayout: DungeonLayoutStrategy {
     // MARK: - DungeonLayoutStrategy
 
     public func generate(context: GenerationContext) -> DungeonGraph {
-        _ = context.makeGenerator()
-
         let roomWidth:  Float = 1000
         let roomHeight: Float = 800
         let size = SIMD2(roomWidth, roomHeight)
@@ -59,7 +57,7 @@ public final class StarDungeonLayout: DungeonLayoutStrategy {
             corridor: corridor,
             isBoss: true,
             populator: EnemyRoomPopulator(
-                enemyCount: 3 + context.floorIndex,
+                enemyCount: enemyCount(roomIndex: 4, levelNumber: context.floorIndex, isBoss: true),
                 enemyPool: enemyPool
             )
         )
