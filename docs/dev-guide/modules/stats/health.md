@@ -17,7 +17,7 @@ For how damage is applied to `HealthComponent`, see [Damage Module](../damage/da
 `HealthComponent` stores an entity's current, base, and maximum HP via `StatValue`. It conforms to `StatProvidable`.
 
 ```swift
-public struct HealthComponent: StatProvidable {
+public class HealthComponent: StatProvidable {
     public var value: StatValue
 
     // Starting HP equals max HP
@@ -40,15 +40,7 @@ world.addComponent(component: HealthComponent(base: 80), to: enemy)
 world.addComponent(component: HealthComponent(base: 50, max: 100), to: player)
 ```
 
-Damage is applied by directly decrementing `value.current` and calling `clampToMin()`:
-
-```swift
-world.modifyComponentIfExist(type: HealthComponent.self, for: entity) { health in
-    health.value.current -= damage
-    health.value.clampToMin()
-}
-```
-
+Damage is applied by directly decrementing `value.current` and calling `clampToMin()`.
 ---
 
 ## HealthSystem

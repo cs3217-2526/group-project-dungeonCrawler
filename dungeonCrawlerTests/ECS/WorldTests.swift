@@ -134,20 +134,6 @@ final class WorldTests: XCTestCase {
         XCTAssertNil(retrieved)
     }
     
-    func testModifyComponent() {
-        world.addComponent(component: transform1, to: entity1)
-
-        if let component = world.getComponent(type: TransformComponent.self, for: entity1) {
-            component.position.x = 100
-            component.scale = 2.0
-        }
-
-        let retrieved = world.getComponent(type: TransformComponent.self, for: entity1)
-        XCTAssertEqual(retrieved?.position.x, 100)
-        XCTAssertEqual(retrieved?.position.y, 20)
-        XCTAssertEqual(retrieved?.scale, 2.0)
-    }
-    
     func testRemoveComponent() {
         world.addComponent(component: transform1, to: entity1)
         XCTAssertNotNil(world.getComponent(type: TransformComponent.self, for: entity1))

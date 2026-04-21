@@ -7,13 +7,15 @@ sidebar_position: 2
 
 # Components
 
-A component is a **plain data container**: a Swift `struct` that holds state but no logic. Every component conforms to the `Component` marker protocol:
+A component is a **plain data container**: a Swift `class` that holds state but no logic. Every component conforms to the `Component` marker protocol:
 
 ```swift
 public protocol Component {}
 ```
 
-Components are attached to entities and stored centrally in `ComponentStorage`. Systems query for entities that have specific components and process them each frame. Keep components as **pure data**, with no methods that mutate state, no references to other objects. Logic belongs in systems.
+Components are attached to entities and stored centrally in `ComponentStorage`. Systems query for entities that have specific components and process them each frame. Because components are now **reference types (classes)**, you can mutate their data directly without needing to re-assign them to the world.
+
+Keep components as **pure data**, with no methods that encapsulate logic—logic belongs in systems.
 
 ---
 
@@ -36,28 +38,16 @@ These are generally never interacted with directly. Use the `World` API instead.
 world.addComponent(component: TransformComponent(position: .zero), to: entity)
 ```
 
-### Read a component
+### Read and Mutate a component
+
+Since components are classes, you can retrieve a reference and modify its properties directly. These changes are immediately reflected in the ECS world.
 
 ```swift
 if let transform = world.getComponent(type: TransformComponent.self, for: entity) {
+    // Reading
     print(transform.position)
-}
-```
 
-### Mutate a component
-
-Components are value types (`struct`). Use `modifyComponentIfExist` to mutate in place — this avoids the copy-then-reassign pattern, and silently no-ops if the component isn't present:
-
-```swift
-world.modifyComponentIfExist(type: TransformComponent.self, for: entity) { transform in
-    transform.position += SIMD2<Float>(10, 0)
-}
-```
-
-If you need to mutate when it exists, or add a fallback component when it doesn't, use `modifyComponent`:
-
-```swift
-world.modifyComponent(type: TransformComponent.self, for: entity, component: TransformComponent(position: .zero)) { transform in
+    // Mutating directly on the reference
     transform.position += SIMD2<Float>(10, 0)
 }
 ```

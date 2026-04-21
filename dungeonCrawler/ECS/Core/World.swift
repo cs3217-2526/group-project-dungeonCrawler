@@ -59,18 +59,6 @@ public final class World {
         components.remove(type: type, from: entity)
     }
 
-    /// This method use closure `body` to modify component of type `T` in entity `entity`
-    /// It will add a component of type `t`, i.e. the `component` in argument if the entity has no component of type `T`
-    /// Practically, it means the `component` should be the desired result of applying the closure
-    public func modifyComponent<T: Component>(type: T.Type, for entity: Entity, fallback: T?, _ body: (T) -> Void) {
-        if let existing = components.get(type: type, for: entity) {
-            body(existing)
-        } else if let newComponent = fallback {
-            components.add(component: newComponent, to: entity)
-            body(newComponent)
-        }
-    }
-
     // MARK: - Querying helpers used by Systems
 
     public func entities<T: Component>(with type: T.Type) -> [Entity] {

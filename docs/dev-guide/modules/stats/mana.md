@@ -15,7 +15,7 @@ The mana module manages the player's spell resource. It is composed of `ManaComp
 `ManaComponent` stores an entity's current, base, and maximum mana via `StatValue`, plus a regeneration rate. It conforms to `StatProvidable`.
 
 ```swift
-public struct ManaComponent: StatProvidable {
+public class ManaComponent: StatProvidable {
     public var value: StatValue
     public var regenRate: Float  // mana per second
 
@@ -48,16 +48,7 @@ world.addComponent(
 
 ### Spending Mana
 
-To consume mana (e.g. when casting a spell), decrement `value.current` directly:
-
-```swift
-world.modifyComponentIfExist(type: ManaComponent.self, for: player) { mana in
-    mana.value.current -= spellCost
-    mana.value.clampToMin()
-}
-```
-
-To check whether the player can afford a spell before casting:
+To consume mana (e.g. when casting a spell), decrement `value.current` directly. To check whether the player can afford a spell before casting:
 
 ```swift
 if let mana = world.getComponent(type: ManaComponent.self, for: player),
