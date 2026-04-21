@@ -23,12 +23,11 @@ public final class WeaponEffectSystem: System {
         resetChargesWhenNotFiring(world: world)
 
         // ── Fire loop ────────────────────────────────────────────────────────
-        for (weaponEntity, timing, effectsComponent, ownerComponent, _, _) in world.entities(
+        for (weaponEntity, timing, effectsComponent, ownerComponent, _) in world.entities(
             with: WeaponTimingComponent.self,
             and: WeaponEffectsComponent.self,
             and: OwnerComponent.self,
             and: TransformComponent.self,
-            and: WeaponRenderComponent.self
         ) {
             let ownerEntity = ownerComponent.ownerEntity
             guard let ownerInput = world.getComponent(type: InputComponent.self, for: ownerEntity) else { continue }

@@ -8,7 +8,7 @@
 import Foundation
 import simd
 
-enum WeaponType: CaseIterable {
+public enum WeaponType: CaseIterable {
     case handgun
     case sword
     case axe
@@ -16,8 +16,10 @@ enum WeaponType: CaseIterable {
     case bazooka
     case spellBook
     case poisonBottle
+    case enemyRangedDefault
+    case towerAttack
 
-    var baseDefinition: WeaponLibraryEnemy {
+    public var baseDefinition: WeaponBase {
         switch self {
 
         // Firearms:
@@ -25,7 +27,7 @@ enum WeaponType: CaseIterable {
         // ConsumeAmmoEffect gates firing and drives the reload cycle.
 
         case .handgun:
-            WeaponLibraryEnemy(
+            WeaponBase(
                 textureName: "handgun",
                 offset: SIMD2<Float>(8, -18),
                 scale: WorldConstants.standardEntityScale,
@@ -50,7 +52,7 @@ enum WeaponType: CaseIterable {
             )
 
         case .sniper:
-            WeaponLibraryEnemy(
+            WeaponBase(
                 textureName: "Sniper",
                 offset: SIMD2<Float>(10, -8),
                 scale: WorldConstants.standardEntityScale,
@@ -77,7 +79,7 @@ enum WeaponType: CaseIterable {
         // No ammo config, no mana cost — just swing cooldown.
 
         case .sword:
-            WeaponLibraryEnemy(
+            WeaponBase(
                 textureName: "sword",
                 offset: SIMD2<Float>(20, -15),
                 scale: 0.3,
@@ -98,7 +100,7 @@ enum WeaponType: CaseIterable {
             )
 
         case .axe:
-            WeaponLibraryEnemy(
+            WeaponBase(
                 textureName: "axe",
                 offset: SIMD2<Float>(20, -15),
                 scale: 0.3,
@@ -123,7 +125,7 @@ enum WeaponType: CaseIterable {
         // ConsumeManaEffect gates firing — no ammo component created.
 
         case .spellBook:
-            WeaponLibraryEnemy(
+            WeaponBase(
                 textureName: "spellbook",
                 offset: SIMD2<Float>(8, -18),
                 scale: 0.55,
@@ -150,7 +152,7 @@ enum WeaponType: CaseIterable {
             )
         
         case .bazooka:
-            WeaponLibraryEnemy(
+            WeaponBase(
                 textureName: "bazooka",
                 offset: SIMD2<Float>(10, -5),
                 scale: 0.4,
@@ -178,7 +180,7 @@ enum WeaponType: CaseIterable {
                 // ammoConfig intentionally nil — mana-gated only
             )
         case .poisonBottle:
-            WeaponLibraryEnemy(
+            WeaponBase(
                 textureName: "poisonBottle",
                 offset: SIMD2<Float>(10, -5),
                 scale: 0.6,
@@ -202,6 +204,50 @@ enum WeaponType: CaseIterable {
                 ],
                 anchorPoint: nil,
                 initRotation: .pi / 9)
+        case .enemyRangedDefault:
+            WeaponBase(
+                textureName: "EnemyBullet",
+                offset: .zero,
+                scale: 1.0,
+                lastFiredAt: nil,
+                cooldown: 0.5,
+                attackSpeed: 150,
+                effects: [
+                    SpawnLinearProjectileEffect(
+                        speed: 180,
+                        effectiveRange: 300,
+                        spriteName: "normalHandgunBullet",
+                        collisionSize: SIMD2<Float>(6, 6),
+                        hitEffects: [
+                            DamageEffect(amount: 8)
+                        ]
+                    )
+                ],
+                anchorPoint: SIMD2<Float>(0.5, 0.5),
+                initRotation: 0
+            )
+        case .towerAttack:
+            WeaponBase(
+                textureName: "EnemyBullet",
+                offset: .zero,
+                scale: 1.0,
+                lastFiredAt: nil,
+                cooldown: 0.2,
+                attackSpeed: 200,
+                effects: [
+                    SpawnLinearProjectileEffect(
+                        speed: 250,
+                        effectiveRange: 300,
+                        spriteName: "normalHandgunBullet",
+                        collisionSize: SIMD2<Float>(6, 6),
+                        hitEffects: [
+                            DamageEffect(amount: 8)
+                        ]
+                    )
+                ],
+                anchorPoint: SIMD2<Float>(0.5, 0.5),
+                initRotation: 0
+            )
         }
     }
 }

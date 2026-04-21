@@ -3,7 +3,7 @@ import simd
 
 /// Core definition of a weapon's static data.
 /// Instantiated from WeaponLibrary (player weapons) or WeaponPresets (enemy weapons).
-public struct WeaponLibraryEnemy {
+public struct WeaponBase {
     let textureName: String
     let offset: SIMD2<Float>
     let scale: Float

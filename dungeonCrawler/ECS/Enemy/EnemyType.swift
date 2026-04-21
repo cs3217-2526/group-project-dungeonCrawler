@@ -38,7 +38,8 @@ public struct EnemyType {
             wanderBehaviour: WanderBehaviour(),
             attackBehaviour: CompositeBehaviour(
                 OrbitBehaviour(),
-                ShooterBehaviour(weaponBase: .enemyRangedDefault)
+                ShooterBehaviour(
+                    weaponBase: WeaponType.enemyRangedDefault.baseDefinition)
             )
         )
     )
@@ -53,7 +54,7 @@ public struct EnemyType {
             wanderBehaviour: StationaryBehaviour(),
             attackBehaviour: CompositeBehaviour(
                 StationaryBehaviour(),
-                ShooterBehaviour(weaponBase: .towerAttack)
+                ShooterBehaviour(weaponBase: WeaponType.towerAttack.baseDefinition)
             )
         )
     )
