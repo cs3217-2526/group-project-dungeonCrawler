@@ -134,168 +134,115 @@ public final class LevelGenerationManager {
         }
     }
 
-    private func buildCorridor(edge: DungeonEdge, from fromSpec: RoomSpecification, to toSpec: RoomSpecification, world: World) {
-        guard var currentRNG = rng else { return }
-        
-        let wallThickness = WorldConstants.wallThickness
+    private struct CorridorGeometry {
+        let bounds: RoomBounds
+        let walls: [(center: SIMD2<Float>, size: SIMD2<Float>)]
+        let renderBounds: RoomBounds
+        let axis: CorridorAxis
+    }
+
+    private func corridorGeometry(
+        for edge: DungeonEdge,
+        from fromSpec: RoomSpecification,
+        to toSpec: RoomSpecification
+    ) -> CorridorGeometry? {
+        let t = WorldConstants.wallThickness
         let width = edge.corridor.width
-        var corridorBounds: RoomBounds?
-        var structuralBounds: [(center: SIMD2<Float>, size: SIMD2<Float>)] = []
 
         switch edge.exitDirection {
         case .east:
-            let x0 = fromSpec.bounds.maxX
-            let x1 = toSpec.bounds.minX
-            let corridorLen = x1 - x0
-            guard corridorLen > 0 else { return }
-            let midX = (x0 + x1) / 2
-            let midY = fromSpec.bounds.center.y
-
-            let bounds = RoomBounds(
-                origin: SIMD2(x0, midY - width / 2),
-                size:   SIMD2(corridorLen, width)
-            )
-            corridorBounds = bounds
-
-            makeCorridorEntity(position: bounds.center, size: bounds.size, isWall: false, roomID: fromSpec.id, world: world)
-            
-            let t = wallThickness
-            let wall1Pos = SIMD2(midX, midY + width / 2 + t / 2)
-            let wall1Size = SIMD2(corridorLen, t)
-            makeCorridorEntity(position: wall1Pos, size: wall1Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall1Pos, size: wall1Size))
-            
-            let wall2Pos = SIMD2(midX, midY - width / 2 - t / 2)
-            let wall2Size = SIMD2(corridorLen, t)
-            makeCorridorEntity(position: wall2Pos, size: wall2Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall2Pos, size: wall2Size))
-
-            tileMapRenderer?.renderCorridor(
-                roomID: fromSpec.id,
-                bounds: RoomBounds(origin: SIMD2(x0, midY - width / 2 - t), size: SIMD2(corridorLen, width + t * 4)),
-                axis: .horizontal,
-                theme: theme,
-                using: &currentRNG
-            )
-
+            return horizontalCorridorGeometry(
+                x0: fromSpec.bounds.maxX, x1: toSpec.bounds.minX,
+                midY: fromSpec.bounds.center.y, width: width, t: t)
         case .west:
-            let x0 = toSpec.bounds.maxX
-            let x1 = fromSpec.bounds.minX
-            let corridorLen = x1 - x0
-            guard corridorLen > 0 else { return }
-            let midX = (x0 + x1) / 2
-            let midY = fromSpec.bounds.center.y
-
-            let bounds = RoomBounds(origin: SIMD2(x0, midY - width / 2), size: SIMD2(corridorLen, width))
-            corridorBounds = bounds
-
-            makeCorridorEntity(position: bounds.center, size: bounds.size, isWall: false, roomID: fromSpec.id, world: world)
-            
-            let t = wallThickness
-            let wall1Pos = SIMD2(midX, midY + width / 2 + t / 2)
-            let wall1Size = SIMD2(corridorLen, t)
-            makeCorridorEntity(position: wall1Pos, size: wall1Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall1Pos, size: wall1Size))
-            
-            let wall2Pos = SIMD2(midX, midY - width / 2 - t / 2)
-            let wall2Size = SIMD2(corridorLen, t)
-            makeCorridorEntity(position: wall2Pos, size: wall2Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall2Pos, size: wall2Size))
-
-            tileMapRenderer?.renderCorridor(
-                roomID: fromSpec.id,
-                bounds: RoomBounds(origin: SIMD2(x0, midY - width / 2 - t), size: SIMD2(corridorLen, width + t * 4)),
-                axis: .horizontal,
-                theme: theme,
-                using: &currentRNG
-            )
-
+            return horizontalCorridorGeometry(
+                x0: toSpec.bounds.maxX, x1: fromSpec.bounds.minX,
+                midY: fromSpec.bounds.center.y, width: width, t: t)
         case .north:
-            let y0 = fromSpec.bounds.maxY
-            let y1 = toSpec.bounds.minY
-            let corridorLen = y1 - y0
-            guard corridorLen > 0 else { return }
+            let y0 = fromSpec.bounds.maxY, y1 = toSpec.bounds.minY
+            guard y1 - y0 > 0 else { return nil }
             let midX = fromSpec.bounds.center.x
-
-            let bounds = RoomBounds(origin: SIMD2(midX - width / 2, y0), size: SIMD2(width, corridorLen))
-            corridorBounds = bounds
-
-            makeCorridorEntity(position: bounds.center, size: bounds.size, isWall: false, roomID: fromSpec.id, world: world)
-
-            let t = wallThickness
-            // Side walls extend into the room's north wall frame to seal the doorframe sides.
-            let wallStartY     = y0 - WorldConstants.northCorridorFrameDepth
-            let sideWallHeight = y1 - wallStartY
-            let sideWallMidY   = (wallStartY + y1) / 2
-
-            let wall1Pos = SIMD2(midX + width / 2 + t / 2, sideWallMidY)
-            let wall1Size = SIMD2(t, sideWallHeight)
-            makeCorridorEntity(position: wall1Pos, size: wall1Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall1Pos, size: wall1Size))
-
-            let wall2Pos = SIMD2(midX - width / 2 - t / 2, sideWallMidY)
-            let wall2Size = SIMD2(t, sideWallHeight)
-            makeCorridorEntity(position: wall2Pos, size: wall2Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall2Pos, size: wall2Size))
-
-            tileMapRenderer?.renderCorridor(
-                roomID: fromSpec.id,
-                bounds: RoomBounds(origin: SIMD2(midX - width / 2 - t, y0), size: SIMD2(width + t * 2, corridorLen)),
-                axis: .vertical,
-                theme: theme,
-                using: &currentRNG
-            )
-
+            let wallStartY = y0 - WorldConstants.northCorridorFrameDepth
+            return verticalCorridorGeometry(
+                y0: y0, y1: y1, midX: midX, width: width, t: t,
+                sideWallStartY: wallStartY, sideWallEndY: y1)
         case .south:
-            let y0 = toSpec.bounds.maxY
-            let y1 = fromSpec.bounds.minY
-            let corridorLen = y1 - y0
-            guard corridorLen > 0 else { return }
+            let y0 = toSpec.bounds.maxY, y1 = fromSpec.bounds.minY
+            guard y1 - y0 > 0 else { return nil }
             let midX = fromSpec.bounds.center.x
+            return verticalCorridorGeometry(
+                y0: y0, y1: y1, midX: midX, width: width, t: t,
+                sideWallStartY: y0, sideWallEndY: y1 + t)
+        }
+    }
 
-            let bounds = RoomBounds(origin: SIMD2(midX - width / 2, y0), size: SIMD2(width, corridorLen))
-            corridorBounds = bounds
+    private func horizontalCorridorGeometry(
+        x0: Float, x1: Float, midY: Float, width: Float, t: Float
+    ) -> CorridorGeometry? {
+        let len = x1 - x0
+        guard len > 0 else { return nil }
+        let midX = (x0 + x1) / 2
+        let bounds = RoomBounds(origin: SIMD2(x0, midY - width / 2), size: SIMD2(len, width))
+        return CorridorGeometry(
+            bounds: bounds,
+            walls: [
+                (center: SIMD2(midX, midY + width / 2 + t / 2), size: SIMD2(len, t)),
+                (center: SIMD2(midX, midY - width / 2 - t / 2), size: SIMD2(len, t))
+            ],
+            renderBounds: RoomBounds(origin: SIMD2(x0, midY - width / 2 - t), size: SIMD2(len, width + t * 4)),
+            axis: .horizontal
+        )
+    }
 
-            makeCorridorEntity(position: bounds.center, size: bounds.size, isWall: false, roomID: fromSpec.id, world: world)
+    private func verticalCorridorGeometry(
+        y0: Float, y1: Float, midX: Float, width: Float, t: Float,
+        sideWallStartY: Float, sideWallEndY: Float
+    ) -> CorridorGeometry {
+        let len = y1 - y0
+        let sideWallHeight = sideWallEndY - sideWallStartY
+        let sideWallMidY = (sideWallStartY + sideWallEndY) / 2
+        let bounds = RoomBounds(origin: SIMD2(midX - width / 2, y0), size: SIMD2(width, len))
+        return CorridorGeometry(
+            bounds: bounds,
+            walls: [
+                (center: SIMD2(midX + width / 2 + t / 2, sideWallMidY), size: SIMD2(t, sideWallHeight)),
+                (center: SIMD2(midX - width / 2 - t / 2, sideWallMidY), size: SIMD2(t, sideWallHeight))
+            ],
+            renderBounds: RoomBounds(origin: SIMD2(midX - width / 2 - t, y0), size: SIMD2(width + t * 2, len)),
+            axis: .vertical
+        )
+    }
 
-            let t = wallThickness
-            // Side walls extend into the room's south wall frame to seal the doorframe sides.
-            let wallEndY       = y1 + t   // south wall is one tile thick
-            let sideWallHeight = wallEndY - y0
-            let sideWallMidY   = (y0 + wallEndY) / 2
+    private func buildCorridor(edge: DungeonEdge, from fromSpec: RoomSpecification, to toSpec: RoomSpecification, world: World) {
+        guard var currentRNG = rng,
+              let geometry = corridorGeometry(for: edge, from: fromSpec, to: toSpec)
+        else { return }
 
-            let wall1Pos = SIMD2(midX + width / 2 + t / 2, sideWallMidY)
-            let wall1Size = SIMD2(t, sideWallHeight)
-            makeCorridorEntity(position: wall1Pos, size: wall1Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall1Pos, size: wall1Size))
+        makeCorridorEntity(position: geometry.bounds.center, size: geometry.bounds.size, isWall: false, roomID: fromSpec.id, world: world)
 
-            let wall2Pos = SIMD2(midX - width / 2 - t / 2, sideWallMidY)
-            let wall2Size = SIMD2(t, sideWallHeight)
-            makeCorridorEntity(position: wall2Pos, size: wall2Size, isWall: true, roomID: fromSpec.id, world: world)
-            structuralBounds.append((center: wall2Pos, size: wall2Size))
-
-            tileMapRenderer?.renderCorridor(
-                roomID: fromSpec.id,
-                bounds: RoomBounds(origin: SIMD2(midX - width / 2 - t, y0), size: SIMD2(width + t * 2, corridorLen)),
-                axis: .vertical,
-                theme: theme,
-                using: &currentRNG
-            )
+        let structuralBounds: [(center: SIMD2<Float>, size: SIMD2<Float>)] = geometry.walls.map { wall in
+            makeCorridorEntity(position: wall.center, size: wall.size, isWall: true, roomID: fromSpec.id, world: world)
+            return wall
         }
 
-        if let corridorBounds {
-            var populateContext = PopulateContext(
-                world: world,
-                bounds: corridorBounds,
-                scale: WorldConstants.standardEntityScale,
-                roomID: fromSpec.id,
-                generator: currentRNG,
-                structuralBounds: structuralBounds
-            )
-            
-            edge.corridor.populator.populate(context: &populateContext)
-            self.rng = populateContext.generator
-        }
+        tileMapRenderer?.renderCorridor(
+            roomID: fromSpec.id,
+            bounds: geometry.renderBounds,
+            axis: geometry.axis,
+            theme: theme,
+            using: &currentRNG
+        )
+
+        var populateContext = PopulateContext(
+            world: world,
+            bounds: geometry.bounds,
+            scale: WorldConstants.standardEntityScale,
+            roomID: fromSpec.id,
+            generator: currentRNG,
+            structuralBounds: structuralBounds
+        )
+        edge.corridor.populator.populate(context: &populateContext)
+        self.rng = populateContext.generator
     }
 
     private func makeCorridorEntity(
