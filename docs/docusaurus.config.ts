@@ -3,8 +3,8 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'Dungeon Crawler',
-  tagline: 'A dungeon crawling RPG for iOS',
+  title: 'Soulless Knight',
+  tagline: 'A high-performance iOS dungeon crawler built with a custom ECS engine.',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -43,12 +43,12 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/projectBanner.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Dungeon Crawler',
+      title: 'Soulless Knight',
       logo: {
         alt: 'Dungeon Crawler Logo',
         src: 'img/logo.svg',
@@ -75,27 +75,8 @@ const config: Config = {
     },
     footer: {
       style: 'dark',
-      links: [
-        {
-          title: 'Docs',
-          items: [
-            {
-              label: 'Introduction',
-              to: '/dev-guide/ecs',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'GitHub',
-              href: 'https://github.com/cs3217-2526/group-project-dungeonCrawler',
-            },
-          ],
-        },
-      ],
-      copyright: `Copyright © ${new Date().getFullYear()} Dungeon Crawler. Built with Docusaurus.`,
+      links: [],
+      copyright: `Copyright © ${new Date().getFullYear()} Soulless Knight. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
