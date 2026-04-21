@@ -4,23 +4,22 @@ import simd
 /// API for constructing dungeon topologies, so less hardcoding in each
 /// layout strategy.
 public final class LayoutBuilder {
-    private var graph: DungeonGraph?
+    private var graph: DungeonGraph
+    public let startNodeID: UUID
 
-    public init() {}
-
-    @discardableResult
-    public func placeStartRoom(
-        bounds: RoomBounds,
+    public init(
+        startRoom bounds: RoomBounds,
         populator: RoomPopulatorStrategy = EmptyRoomPopulator()
-    ) -> UUID {
+    ) {
+        let id = UUID()
         let spec = RoomSpecification(
-            id: UUID(),
+            id: id,
             bounds: bounds,
             isStartRoom: true,
             populator: populator
         )
         self.graph = DungeonGraph(startingRoomSpecification: spec)
-        return spec.id
+        self.startNodeID = id
     }
 
     /// Appends a new room to an existing one in a specific direction.
@@ -33,7 +32,7 @@ public final class LayoutBuilder {
         isBoss: Bool = false,
         populator: RoomPopulatorStrategy = EmptyRoomPopulator()
     ) -> UUID {
-        guard let fromSpec = graph?.specification(for: fromID) else {
+        guard let fromSpec = graph.specification(for: fromID) else {
             fatalError("LayoutBuilder: Cannot extend from non-existent room \(fromID)")
         }
 
@@ -52,8 +51,8 @@ public final class LayoutBuilder {
             populator: populator
         )
 
-        graph?.addRoom(nextSpec)
-        graph?.addBidirectionalConnection(
+        graph.addRoom(nextSpec)
+        graph.addBidirectionalConnection(
             from: fromID,
             to: nextID,
             exitDirection: direction,
@@ -66,9 +65,6 @@ public final class LayoutBuilder {
 
     /// Returns the fully constructed graph.
     public func build() -> DungeonGraph {
-        guard let graph = self.graph else {
-            fatalError("LayoutBuilder: build() called before placeStartRoom()")
-        }
         return graph
     }
 }

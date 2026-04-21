@@ -30,13 +30,11 @@ public final class LShapeDungeonLayout: DungeonLayoutStrategy {
         let corridor = CorridorSpecification(length: corridorLength)
         let level = context.floorIndex
 
-        let builder = LayoutBuilder()
-
-        // Start room (weapon room)
-        let startID = builder.placeStartRoom(
-            bounds: RoomBounds(origin: SIMD2(-roomWidth / 2, -roomHeight / 2), size: size),
+        let builder = LayoutBuilder(
+            startRoom: RoomBounds(origin: SIMD2(-roomWidth / 2, -roomHeight / 2), size: size),
             populator: WeaponRoomPopulator()
         )
+        let startID = builder.startNodeID
 
         // Horizontal leg
         let combat1ID = builder.addRoom(

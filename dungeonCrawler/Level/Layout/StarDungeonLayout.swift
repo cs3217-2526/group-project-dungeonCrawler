@@ -30,11 +30,11 @@ public final class StarDungeonLayout: DungeonLayoutStrategy {
         let size = SIMD2(roomWidth, roomHeight)
         let corridor = CorridorSpecification(length: corridorLength)
 
-        let builder = LayoutBuilder()
-        let startID = builder.placeStartRoom(
-            bounds: RoomBounds(origin: SIMD2(-roomWidth / 2, -roomHeight / 2), size: size),
+        let builder = LayoutBuilder(
+            startRoom: RoomBounds(origin: SIMD2(-roomWidth / 2, -roomHeight / 2), size: size),
             populator: WeaponRoomPopulator()
         )
+        let startID = builder.startNodeID
 
         // Three regular combat rooms on N, E, S branches
         let combatBranches: [(Direction, Int)] = [(.north, 1), (.east, 2), (.south, 3)]

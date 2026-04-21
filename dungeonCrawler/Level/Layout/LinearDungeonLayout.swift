@@ -29,13 +29,11 @@ public final class LinearDungeonLayout: DungeonLayoutStrategy {
         let roomHeight: Float = 800
         let size = SIMD2(roomWidth, roomHeight)
 
-        let builder = LayoutBuilder()
-        
-        // Start Room
-        let startID = builder.placeStartRoom(
-            bounds: RoomBounds(origin: SIMD2(-roomWidth / 2, -roomHeight / 2), size: size),
+        let builder = LayoutBuilder(
+            startRoom: RoomBounds(origin: SIMD2(-roomWidth / 2, -roomHeight / 2), size: size),
             populator: WeaponRoomPopulator()
         )
+        let startID = builder.startNodeID
         
         var currentID = startID
         for index in 1..<roomCount {
